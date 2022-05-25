@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "*.in": "yaml",
+        "hz_bioCycle.C": "cpp"
+    }
+}

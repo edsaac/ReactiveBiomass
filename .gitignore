@@ -127,3 +127,8 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+
+### OpenFOAM test cases
+# Make builds
+**/Make/linux*
