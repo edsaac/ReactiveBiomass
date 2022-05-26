@@ -132,3 +132,10 @@ dmypy.json
 ### OpenFOAM test cases
 # Make builds
 **/Make/linux*
+
+# Run cases
+**/[1-9]*/
+**/dynamicCode/
+**/postProcessing/
+**/VTK/
+**/log*
