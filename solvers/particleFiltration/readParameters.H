@@ -77,6 +77,9 @@ dimensionedScalar Temp(transportProperties.lookup("Temp"));
 // Foam::Info << "Attachment rate (first order rate)\n" << endl;
 // dimensionedScalar katt(transportProperties.lookup("katt"));
 
+Foam::Info << "Attachment rate (first order rate)\n" << endl;
+dimensionedScalar alphaCFT(transportProperties.lookup("alphaCFT"));
+
 Foam::Info << "Detachment rate (first order rate)\n" << endl;
 dimensionedScalar kdet(transportProperties.lookup("kdet"));
 

@@ -94,33 +94,17 @@ volScalarField depositedClay
 
 // Calculate diffusion coefficient from Einstein-Stokes equation
 //   >> use this in the Péclet number calculation
-dimensionedScalar D_diffusion
-(
-    (kBoltz*Temp)/(3.0*PI*mu*dp)
-);
+dimensionedScalar D_diffusion ( (kBoltz*Temp)/(3.0*PI*mu*dp) );
 
 Foam::Info << "D_diff: ("<< D_diffusion.value() <<")\n" << endl;
 
+
+// Calculate deposited mass and clogLimiter
 Foam::Info << "Calculate total biomass and clogLimiter \n" << endl;
 volScalarField XMAX ((n_0 - n_c) * rho_X);
 volScalarField clogLimiter (1.0 - depositedClay/XMAX);
 clogLimiter *= Foam::pos(clogLimiter);
 
-// Happel model for filtration
-
-//   Check HappelPolyFit.ipynb on how this replaces the
-//   original Happel expression. 
-double As_Coeffs[3] = { 8.99992117, -7.49203318, 0.4119361 };
-
-// Static dimensionless numbers for filtration model
-dimensionedScalar log_N_Ratio ( log(dp/ds) );
-Info<< "Aspect Ratio:"<< log_N_Ratio.value() <<"\n" << endl;
-
-dimensionedScalar log_N_vdW ( log(Hamaker/(kBoltz*Temp)) );
-Info<< "van der Waals:"<< log_N_vdW.value() <<"\n" << endl;
-
-dimensionedScalar log_N_gravit ( log(PI * pow(dp,4) * (rho_clay - rho) * g / ( 12.0 * kBoltz * Temp )) );
-Info<< "Gravitational:"<< log_N_gravit.value() <<"\n" << endl;
 
 #include "calculateCFT.H"
 
@@ -135,7 +119,7 @@ IOobject
     IOobject::NO_READ,
     IOobject::AUTO_WRITE
 ),
-(3.0 * (1-n) * alpha * eta)/(2.0*ds)
+(3.0 * (1.0-n) * alphaCFT * eta)/(2.0*ds)
 );
 
 volScalarField katt (Lambda * mag(U));

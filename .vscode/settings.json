@@ -2,6 +2,7 @@
     "files.associations": {
         "*.in": "yaml",
         "hz_bioCycle.C": "cpp",
-        "cloggingFoam.C": "cpp"
+        "cloggingFoam.C": "cpp",
+        "ostream": "cpp"
     }
 }

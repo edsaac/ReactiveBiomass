@@ -1,3 +1,18 @@
+// Happel model for filtration
+//   Check HappelPolyFit.ipynb on how this replaces the
+//   original Happel expression. 
+const double As_Coeffs[3] = { 8.99992117, -7.49203318, 0.4119361 };
+
+// Static dimensionless numbers for filtration model
+dimensionedScalar log_N_Ratio ( log(dp/ds) );
+Info<< "Aspect Ratio:"<< log_N_Ratio.value() <<"\n" << endl;
+
+dimensionedScalar log_N_vdW ( log(Hamaker/(kBoltz*Temp)) );
+Info<< "van der Waals:"<< log_N_vdW.value() <<"\n" << endl;
+
+dimensionedScalar log_N_gravit ( log(PI * pow(dp,4) * (rho_clay - rho) * g / ( 12.0 * kBoltz * Temp )) );
+Info<< "Gravitational:"<< log_N_gravit.value() <<"\n" << endl;
+
 // Field of Happel parameter As
 volScalarField log_As ( log(As_Coeffs[0]*sqr(1/n) + As_Coeffs[1]*(1/n) + As_Coeffs[2]) );
 
