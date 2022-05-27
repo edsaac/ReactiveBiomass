@@ -42,7 +42,7 @@ kBoltz    kBoltz    [1 2 -2 -1 0 0 0]   1.380649E-23;
 Temp      Temp      [0 0 0  1  0 0 0]   283.0;
 
 //Dynamic-var Filtration & clogging
-alphaCFT  alphaCFT  [0 0 0 0 0 0 0]     0.001;
+alphaCFT  alphaCFT  [0 0 0 0 0 0 0]     0.01;
 
 //Static-var Filtration & clogging
 kdet      kdet      [0 0 -1 0 0 0 0]    2.315E-7;

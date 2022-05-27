@@ -99,7 +99,7 @@ int main(int argc, char *argv[])
         #include "CourantNo.H"
         #include "calculateCFT.H"
         Lambda = (3.0 * (1.0 - n) * alphaCFT * eta)/(2.0*ds);
-        katt = Lambda * mag(U);
+        katt = Lambda * mag(U) / n;
         Foam::Info << "\n\nkatt : " << katt << endl;
 
         // Transport equations
