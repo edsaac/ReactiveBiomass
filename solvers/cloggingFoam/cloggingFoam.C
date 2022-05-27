@@ -95,10 +95,12 @@ int main(int argc, char *argv[])
         Foam::Info << "\n Update porosity field (n):" << endl;
         U   = - hydraulicCond * fvc::grad(h);
         phi = fvc::flux(U);
+
         #include "CourantNo.H"
         #include "calculateCFT.H"
-        Lambda = (3.0 * (1.0 - n) * alpha * eta)/(2.0*ds);
+        Lambda = (3.0 * (1.0 - n) * alphaCFT * eta)/(2.0*ds);
         katt = Lambda * mag(U);
+        Foam::Info << "\n\nkatt : " << katt << endl;
 
         // Transport equations
         while (simple.correctNonOrthogonal())

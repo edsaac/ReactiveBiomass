@@ -59,7 +59,7 @@ volVectorField U
         IOobject::NO_READ,
         IOobject::AUTO_WRITE
     ),
-    - hydraulicCond * fvc::grad(h) //+ (Slope*K)
+    - hydraulicCond * fvc::grad(h) 
 );
 
 

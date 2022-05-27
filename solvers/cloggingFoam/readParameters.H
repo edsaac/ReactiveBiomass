@@ -49,8 +49,8 @@ Foam::Info << "Dispersion tensor\n" << endl;
 dimensionedTensor DispTensor(transportProperties.lookup("DispTensor"));
 
 //Dynamic-var Filtration
-Foam::Info << "Reading attachement efficiency (alpha)\n" << endl;
-dimensionedScalar alpha(transportProperties.lookup("alpha"));
+Foam::Info << "Reading attachment efficiency (alphaCFT)\n" << endl;
+dimensionedScalar alphaCFT(transportProperties.lookup("alphaCFT"));
 
 //Clogging
 Foam::Info << "Switch for clogging?? (cloggingSwitch)\n" << endl;
@@ -77,8 +77,8 @@ dimensionedScalar Temp(transportProperties.lookup("Temp"));
 // Foam::Info << "Attachment rate (first order rate)\n" << endl;
 // dimensionedScalar katt(transportProperties.lookup("katt"));
 
-Foam::Info << "Attachment rate (first order rate)\n" << endl;
-dimensionedScalar alphaCFT(transportProperties.lookup("alphaCFT"));
+// Foam::Info << "Attachment rate (first order rate)\n" << endl;
+// dimensionedScalar alphaCFT(transportProperties.lookup("alphaCFT"));
 
 Foam::Info << "Detachment rate (first order rate)\n" << endl;
 dimensionedScalar kdet(transportProperties.lookup("kdet"));

@@ -3,6 +3,7 @@
         "*.in": "yaml",
         "hz_bioCycle.C": "cpp",
         "cloggingFoam.C": "cpp",
-        "ostream": "cpp"
+        "ostream": "cpp",
+        "GeometricField.C": "cpp"
     }
 }

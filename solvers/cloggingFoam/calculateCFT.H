@@ -5,19 +5,21 @@ const double As_Coeffs[3] = { 8.99992117, -7.49203318, 0.4119361 };
 
 // Static dimensionless numbers for filtration model
 dimensionedScalar log_N_Ratio ( log(dp/ds) );
-Info<< "Aspect Ratio:"<< log_N_Ratio.value() <<"\n" << endl;
+Info<< "Aspect Ratio:"<< log_N_Ratio.value() <<"\n";
 
 dimensionedScalar log_N_vdW ( log(Hamaker/(kBoltz*Temp)) );
-Info<< "van der Waals:"<< log_N_vdW.value() <<"\n" << endl;
+Info<< "van der Waals:"<< log_N_vdW.value() <<"\n";
 
 dimensionedScalar log_N_gravit ( log(PI * pow(dp,4) * (rho_clay - rho) * g / ( 12.0 * kBoltz * Temp )) );
-Info<< "Gravitational:"<< log_N_gravit.value() <<"\n" << endl;
+Info<< "Gravitational:"<< log_N_gravit.value() <<"\n";
 
 // Field of Happel parameter As
 volScalarField log_As ( log(As_Coeffs[0]*sqr(1/n) + As_Coeffs[1]*(1/n) + As_Coeffs[2]) );
+Info<< "Happel:"<< max(log_As) <<"\n";
 
 // Peclét number field 
-volScalarField log_N_Peclet ( log((mag(U)*ds)/D_diffusion) );
+volScalarField log_N_Peclet ( log( (mag(U)*ds)/D_diffusion ) );
+Info<< "Peclet:"<< max(log_N_Peclet) <<"\n";
 
 // Field of filtration efficiency
 volScalarField eta
@@ -54,3 +56,5 @@ exp(
 )
 
 );
+
+Info<< "eta_0:"<< max(eta) <<"\n" << endl;
