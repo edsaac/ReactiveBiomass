@@ -43,9 +43,6 @@ volScalarField perm
     mesh
 );
 
-// Store a copy of the initial porosity and permeability
-volScalarField n_0 (n);
-volScalarField perm_0 (perm);
 volScalarField hydraulicCond (perm_0 * rho * g / mu);
 
 // U in this code refers to the Darcy velocity (a.k.a q)

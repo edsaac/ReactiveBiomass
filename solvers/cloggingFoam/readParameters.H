@@ -89,5 +89,34 @@ dimensionedScalar kdet(transportProperties.lookup("kdet"));
 
 
 ////////////////////////////////////////////////////////////
+// Store a copy of the initial porosity and permeability
+
+volScalarField n_0 
+(
+    IOobject
+    (
+        "n_0",
+        runTime.constant(),
+        mesh,
+        IOobject::MUST_READ_IF_MODIFIED,
+        IOobject::NO_WRITE
+    ),
+    mesh
+);
+
+// Initial permeability has to be a constant rather than the one read from the  initial
+// timestep of the simulation, otherwise the clogging function will take a wrong input. 
+volScalarField perm_0 
+(
+    IOobject
+    (
+        "perm_0",
+        runTime.constant(),
+        mesh,
+        IOobject::MUST_READ_IF_MODIFIED,
+        IOobject::NO_WRITE
+    ),
+    mesh
+);
 
 
