@@ -9,48 +9,13 @@ FoamFile
 {
     version     2.0;
     format      ascii;
-    class       volScalarField;
-    location    "constant";
-    object      perm;
+    class       labelList;
+    note        "nPoints: 8 nCells: 1 nFaces: 6 nInternalFaces: 0";
+    location    "constant/polyMesh";
+    object      owner;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dimensions      [0 2 0 0 0 0 0];
-
-internalField   uniform 1.02E-11;
-
-boundaryField
-{
-    front
-    {
-        type    empty;
-    }
-
-    back
-    {
-        type    empty;
-    }
-
-    right
-    {
-        type    empty;
-    }
-
-    left
-    {
-        type    empty;
-    }
-
-    top
-    {
-        type            zeroGradient;
-    }
-
-    bottom
-    {
-        type            zeroGradient;
-    }
-}
-
+6{0}
 
 // ************************************************************************* //

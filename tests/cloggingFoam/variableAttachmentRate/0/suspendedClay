@@ -10,14 +10,13 @@ FoamFile
     version     2.0;
     format      ascii;
     class       volScalarField;
-    location    "constant";
-    object      perm;
+    object      DOC;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dimensions      [0 2 0 0 0 0 0];
+dimensions      [1 -3 0 0 0 0 0];
 
-internalField   uniform 1.02E-11;
+internalField   uniform 100.0E-3;
 
 boundaryField
 {
@@ -43,7 +42,9 @@ boundaryField
 
     top
     {
-        type            zeroGradient;
+        type               uniformInletOutlet;
+        uniformInletValue  constant 100.0E-3;
+        phi                phi;
     }
 
     bottom
@@ -51,6 +52,5 @@ boundaryField
         type            zeroGradient;
     }
 }
-
 
 // ************************************************************************* //

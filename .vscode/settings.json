@@ -1,6 +1,11 @@
 {
     "files.associations": {
         "*.in": "yaml",
-        "hz_bioCycle.C": "cpp"
+        "hz_bioCycle.C": "cpp",
+        "cloggingFoam.C": "cpp",
+        "ostream": "cpp",
+        "GeometricField.C": "cpp",
+        "*.C": "cpp",
+        "*.H": "cpp"
     }
 }
