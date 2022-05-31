@@ -43,8 +43,34 @@ volScalarField perm
 );
 
 // Store a copy of the initial porosity and permeability
-volScalarField n_0 (n);
-volScalarField perm_0 (perm);
+volScalarField n_0 
+(
+    IOobject
+    (
+        "n_0",
+        runTime.constant(),
+        mesh,
+        IOobject::MUST_READ_IF_MODIFIED,
+        IOobject::NO_WRITE
+    ),
+    mesh
+);
+
+// Initial permeability has to be a constant rather than the initial
+// timestep, otherwise the clogging function will use the wrong input. 
+volScalarField perm_0 
+(
+    IOobject
+    (
+        "perm_0",
+        runTime.constant(),
+        mesh,
+        IOobject::MUST_READ_IF_MODIFIED,
+        IOobject::NO_WRITE
+    ),
+    mesh
+);
+
 volScalarField hydraulicCond (perm_0 * rho * g / mu);
 
 // U in this code refers to the Darcy velocity (a.k.a q)
