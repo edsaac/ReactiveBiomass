@@ -9,48 +9,23 @@ FoamFile
 {
     version     2.0;
     format      ascii;
-    class       volScalarField;
+    class       dictionary;
     location    "constant";
-    object      perm_0;
+    object      transportProperties;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// [kg m s K mol * *]
 
-dimensions      [0 2 0 0 0 0 0];
+// Clogging parameters
+clog?     true;
 
-internalField   uniform 1.02E-11;
+n_c       n_c       [0 0 0 0 0 0 0]    0.10;     // Minimum porosity
+perm_c    perm_c    [0 2 0 0 0 0 0]    1.0E-14;  // Minimum permeability
 
-boundaryField
-{
-    front
-    {
-        type    empty;
-    }
+n_0       n_0       [0 0 0 0 0 0 0]    0.358;     // Reference porosity
+perm_0    perm_0    [0 2 0 0 0 0 0]    1.02E-11;  // Reference permeability
 
-    back
-    {
-        type    empty;
-    }
 
-    right
-    {
-        type    empty;
-    }
-
-    left
-    {
-        type    empty;
-    }
-
-    top
-    {
-        type            zeroGradient;
-    }
-
-    bottom
-    {
-        type            zeroGradient;
-    }
-}
 
 
 // ************************************************************************* //
