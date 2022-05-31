@@ -31,12 +31,6 @@ g         g         [0 1 -2 0 0 0 0]    9.81;
 mu        mu        [1 -1 -1 0 0 0 0]   0.001;
 //Slope     Slope     [0 0 0 0 0 0 0]     (0.0 0.0 0.0);
 
-// Clogging parameters
-clog?     true;
-n_c       n_c       [0 0 0 0 0 0 0]    0.10;     // Minimum porosity
-perm_c    perm_c    [0 2 0 0 0 0 0]    1.0E-14;  // Minimum permeability
-
-
 //Chemical parameters
 Hamaker   Hamaker   [1 2 -2 0  0 0 0]   1.0E-20;
 kBoltz    kBoltz    [1 2 -2 -1 0 0 0]   1.380649E-23;
