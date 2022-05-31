@@ -36,13 +36,13 @@ volScalarField perm
         "perm",
         runTime.timeName(),
         mesh,
-        IOobject::NO_READ,
+        IOobject::MUST_READ,
         IOobject::AUTO_WRITE
     ),
     mesh
 );
 
-volScalarField hydraulicCond (perm_0 * rho * g / mu);
+volScalarField hydraulicCond (perm * rho * g / mu);
 
 // U in this code refers to the Darcy velocity (a.k.a q)
 volVectorField U
@@ -222,8 +222,8 @@ volScalarField POCr
 //Foam::Info << "D_diff: ("<< D_diffusion.value() <<")\n" << endl;
 
 Foam::Info << "Calculate total biomass and clogLimiter \n" << endl;
+dimensionedScalar XMAX ((n_0 - n_c) * rho_X);
 volScalarField totalBiomass (XAR + XN + XDN + XI + EPS);
-volScalarField XMAX ((n_0 - n_c) * rho_X);
 volScalarField clogLimiter (1.0 - totalBiomass/XMAX);
 clogLimiter *= Foam::pos(clogLimiter);
 
