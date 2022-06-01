@@ -52,16 +52,6 @@ dimensionedTensor DispTensor(transportProperties.lookup("DispTensor"));
 Foam::Info << "Reading attachment efficiency (alphaCFT)\n" << endl;
 dimensionedScalar alphaCFT(transportProperties.lookup("alphaCFT"));
 
-//Clogging
-Foam::Info << "Switch for clogging?? (cloggingSwitch)\n" << endl;
-Foam::Switch cloggingSwitch(transportProperties.lookup("clog?"));
-
-Foam::Info << "Critical porosity (n_c)\n" << endl;
-dimensionedScalar n_c(transportProperties.lookup("n_c"));
-
-Foam::Info << "Minimum relative permeability (perm_c)\n" << endl;
-dimensionedScalar perm_c(transportProperties.lookup("perm_c"));
-
 //Chemical parameters
 Foam::Info << "Reading Hamaker constant (Hamaker)\n" << endl;
 dimensionedScalar Hamaker(transportProperties.lookup("Hamaker"));
@@ -89,34 +79,31 @@ dimensionedScalar kdet(transportProperties.lookup("kdet"));
 
 
 ////////////////////////////////////////////////////////////
-// Store a copy of the initial porosity and permeability
 
-volScalarField n_0 
+IOdictionary cloggingProperties
 (
     IOobject
     (
-        "n_0",
+        "cloggingProperties",
         runTime.constant(),
         mesh,
         IOobject::MUST_READ_IF_MODIFIED,
         IOobject::NO_WRITE
-    ),
-    mesh
+    )
 );
 
-// Initial permeability has to be a constant rather than the one read from the  initial
-// timestep of the simulation, otherwise the clogging function will take a wrong input. 
-volScalarField perm_0 
-(
-    IOobject
-    (
-        "perm_0",
-        runTime.constant(),
-        mesh,
-        IOobject::MUST_READ_IF_MODIFIED,
-        IOobject::NO_WRITE
-    ),
-    mesh
-);
+Foam::Info << "Switch for clogging?? (cloggingSwitch)\n" << endl;
+Foam::Switch cloggingSwitch(cloggingProperties.lookup("clog?"));
 
+Foam::Info << "Initial porosity (n_0)\n" << endl;
+dimensionedScalar n_0 (cloggingProperties.lookup("n_0"));
+
+Foam::Info << "Initial relative permeability (perm_0)\n" << endl;
+dimensionedScalar perm_0 (cloggingProperties.lookup("perm_0"));
+
+Foam::Info << "Critical porosity (n_c)\n" << endl;
+dimensionedScalar n_c(cloggingProperties.lookup("n_c"));
+
+Foam::Info << "Minimum relative permeability (perm_c)\n" << endl;
+dimensionedScalar perm_c(cloggingProperties.lookup("perm_c"));
 
