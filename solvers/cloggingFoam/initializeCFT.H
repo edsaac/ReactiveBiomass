@@ -87,7 +87,7 @@ volScalarField katt
         runTime.timeName(),
         mesh,
         IOobject::NO_READ,
-        IOobject::NO_WRITE
+        IOobject::AUTO_WRITE
     ),
     mesh,
     dimensionedScalar("katt0", dimensionSet(0,0,-1,0,0,0,0) , scalar(0.0))
