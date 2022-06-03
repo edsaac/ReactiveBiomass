@@ -39,5 +39,7 @@ exp(
 // Info<< "eta_0:"<< max(eta) <<"\n" << endl;
 
 // Calculate attachment rate
-Lambda = (3.0 * (1.0 - n) * alphaCFT * eta)/(2.0*ds);
+Lambda = min(
+    3.0 * (1.0 - n) * alphaCFT * eta)/(2.0*ds),
+    dimensionedScalar("maxLambda", dimensionSet(0,-1,0,0,0,0,0) , scalar(1.0E+05));
 katt   = Lambda * mag(U) / n;

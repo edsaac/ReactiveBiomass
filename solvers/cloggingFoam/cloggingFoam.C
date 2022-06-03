@@ -66,7 +66,7 @@ int main(int argc, char *argv[])
 
         //Info << "\nUpdate clog space limitation" << endl;
         clogLimiter = 1.0 - depositedClay/XMAX;
-        n  = n_0 - depositedClay/rho_X;
+        n  = n_0 - depositedClay/rho_clay;
 
         //Calculate hydraulic head using mass balance + Darcy's equation
         if (cloggingSwitch)
@@ -134,8 +134,8 @@ int main(int argc, char *argv[])
         //End bits
         runTime.write();
 
-        Foam::Info << "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
-                   << "  ClockTime = " << runTime.elapsedClockTime() << " s"
+        Foam::Info << "ExecutionTime = " << runTime.elapsedCpuTime()   << " s"
+                   << "    ClockTime = " << runTime.elapsedClockTime() << " s"
                    << nl << endl;
     }
 

@@ -91,10 +91,11 @@ volScalarField depositedClay
 
 
 // Calculate deposited mass and clogLimiter
-Foam::Info << "Calculate total biomass and clogLimiter \n" << endl;
-dimensionedScalar XMAX ((n_0 - n_c) * rho_X);
+dimensionedScalar XMAX ((n_0 - n_c) * rho_clay);
+Foam::Info << "Calculate max possible deposited mass: " << XMAX.value() << "\n";
+
 volScalarField clogLimiter (1.0 - depositedClay/XMAX);
-clogLimiter *= Foam::pos(clogLimiter);
+//clogLimiter *= Foam::pos(clogLimiter);
 
 #include "initializeCFT.H"
 #include "createPhi.H"
