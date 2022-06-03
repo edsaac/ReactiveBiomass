@@ -1,37 +1,20 @@
-// Happel model for filtration
-//   Check HappelPolyFit.ipynb on how this replaces the
-//   original Happel expression. 
-const double As_Coeffs[3] = { 8.99992117, -7.49203318, 0.4119361 };
-
-// Static dimensionless numbers for filtration model
-dimensionedScalar log_N_Ratio ( log(dp/ds) );
-Info<< "Aspect Ratio:"<< log_N_Ratio.value() <<"\n";
-
-dimensionedScalar log_N_vdW ( log(Hamaker/(kBoltz*Temp)) );
-Info<< "van der Waals:"<< log_N_vdW.value() <<"\n";
-
-dimensionedScalar log_N_gravit ( log(PI * pow(dp,4) * (rho_clay - rho) * g / ( 12.0 * kBoltz * Temp )) );
-Info<< "Gravitational:"<< log_N_gravit.value() <<"\n";
-
 // Field of Happel parameter As
-volScalarField log_As ( log(As_Coeffs[0]*sqr(1/n) + As_Coeffs[1]*(1/n) + As_Coeffs[2]) );
+log_As = log( As_Coeffs[0]*sqr(1/n) + As_Coeffs[1]*(1/n) + As_Coeffs[2] );
 Info<< "Happel:"<< max(log_As) <<"\n";
 
 // Peclét number field 
-volScalarField log_N_Peclet ( log( (mag(U)*ds)/D_diffusion ) );
+log_N_Peclet = log( (mag(U)*ds)/D_diffusion ) ;
 Info<< "Peclet:"<< max(log_N_Peclet) <<"\n";
 
 // Field of filtration efficiency
-volScalarField eta
-(
+eta = 
 // Diffusion mechanism
 exp(
     0.875468737
 + (0.333 * log_As)
 - (0.081 * log_N_Ratio)
 - (0.715 * log_N_Peclet)
-+ (0.052 * log_N_vdW)
-)
++ (0.052 * log_N_vdW) )
 
 + 
 
@@ -41,8 +24,7 @@ exp(
 + log_As
 + (1.550 * log_N_Ratio)
 - (0.125 * log_N_Peclet)
-+ (0.125 * log_N_vdW)
-)
++ (0.125 * log_N_vdW) )
 
 + 
 
@@ -52,9 +34,10 @@ exp(
 - (1.350 * log_N_Ratio)
 - (1.110 * log_N_Peclet)
 + (0.053 * log_N_vdW)
-+ (1.110 * log_N_gravit)
-)
++ (1.110 * log_N_gravit) );
 
-);
+// Info<< "eta_0:"<< max(eta) <<"\n" << endl;
 
-Info<< "eta_0:"<< max(eta) <<"\n" << endl;
+// Calculate attachment rate
+Lambda = (3.0 * (1.0 - n) * alphaCFT * eta)/(2.0*ds);
+katt   = Lambda * mag(U) / n;

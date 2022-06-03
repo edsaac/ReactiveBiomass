@@ -98,10 +98,7 @@ int main(int argc, char *argv[])
 
         #include "CourantNo.H"
         #include "calculateCFT.H"
-        Lambda = (3.0 * (1.0 - n) * alphaCFT * eta)/(2.0*ds);
-        katt = Lambda * mag(U) / n;
-        Foam::Info << "\n\nkatt : " << katt << endl;
-
+        
         // Transport equations
         while (simple.correctNonOrthogonal())
         {
@@ -118,7 +115,7 @@ int main(int argc, char *argv[])
             FiltratedEq.solve();
             fvOptions.correct(depositedClay);
 
-            //Info << "\nDissolved Organic Carbon DOC transport" << endl;
+            //Info << "\nSuspended fine particles" << endl;
             fvScalarMatrix SuspendedEq
             (
                 fvm::ddt(n,suspendedClay)

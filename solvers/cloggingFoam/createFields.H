@@ -37,7 +37,7 @@ volScalarField perm
         "perm",
         runTime.timeName(),
         mesh,
-        IOobject::NO_READ,
+        IOobject::MUST_READ,
         IOobject::AUTO_WRITE
     ),
     mesh
@@ -56,7 +56,8 @@ volVectorField U
         IOobject::NO_READ,
         IOobject::AUTO_WRITE
     ),
-    - hydraulicCond * fvc::grad(h) 
+    mesh,
+    dimensionedVector("U", dimensionSet(0,1,-1,0,0,0,0) , vector(0.0, 0.0, 0.0))
 );
 
 
@@ -89,38 +90,12 @@ volScalarField depositedClay
 );
 
 
-// Calculate diffusion coefficient from Einstein-Stokes equation
-//   >> use this in the Péclet number calculation
-dimensionedScalar D_diffusion ( (kBoltz*Temp)/(3.0*PI*mu*dp) );
-
-Foam::Info << "D_diff: ("<< D_diffusion.value() <<")\n" << endl;
-
-
 // Calculate deposited mass and clogLimiter
 Foam::Info << "Calculate total biomass and clogLimiter \n" << endl;
 dimensionedScalar XMAX ((n_0 - n_c) * rho_X);
 volScalarField clogLimiter (1.0 - depositedClay/XMAX);
 clogLimiter *= Foam::pos(clogLimiter);
 
-
-#include "calculateCFT.H"
-
-// Field of filtration coefficient
-volScalarField Lambda
-(
-IOobject
-(
-    "Lambda",
-    runTime.timeName(),
-    mesh,
-    IOobject::NO_READ,
-    IOobject::AUTO_WRITE
-),
-(3.0 * (1.0-n) * alphaCFT * eta)/(2.0*ds)
-);
-
-volScalarField katt (Lambda * mag(U));
-
+#include "initializeCFT.H"
 #include "createPhi.H"
-#include "CourantNo.H"
 #include "createFvOptions.H"
