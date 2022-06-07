@@ -27,9 +27,13 @@ gradSchemes
 }
 
 divSchemes
+/* Using Minmod scheme to avoid oscilations 
+   https://www.openfoam.com/documentation/guides/latest/doc/guide-schemes-divergence-example.html
+   By default, use Gauss linearUpwind grad(variable);
+*/
 {
     default                   none;
-    div(phi,suspendedClay)    Gauss linearUpwind grad(suspendedClay);
+    div(phi,suspendedClay)    Gauss Minmod;
 }
 
 laplacianSchemes

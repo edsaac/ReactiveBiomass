@@ -55,7 +55,8 @@ volVectorField U
         IOobject::NO_READ,
         IOobject::AUTO_WRITE
     ),
-    -hydraulicCond * fvc::grad(h) //+ (Slope*K)
+    mesh,
+    dimensionedVector("U", dimensionSet(0,1,-1,0,0,0,0) , vector(0.0, 0.0, 0.0))
 );
 
 
@@ -295,7 +296,3 @@ dimensionedScalar alpha_N(4.57 * (1.0 - 0.31*pXN.yield - kEPS));
 
 Foam::Info << "Ratio of mg NO3 / mg VSS-Xdn from DOC (beta_1)\n" << endl;
 dimensionedScalar beta_1(0.35 * (1.0 - 1.42*pXDN.yield - kEPS));
-
-#include "createPhi.H"
-#include "CourantNo.H"
-#include "createFvOptions.H"

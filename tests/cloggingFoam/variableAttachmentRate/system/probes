@@ -12,7 +12,7 @@ Description
 
 #includeEtc "caseDicts/postProcessing/probes/probes.cfg"
 
-fields (suspendedClay depositedClay U);
+fields (suspendedClay depositedClay U Lambda n katt);
 probeLocations
 (
     (0 0 0)

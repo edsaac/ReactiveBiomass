@@ -92,6 +92,9 @@ int main(int argc, char *argv[])
     simpleControl simple(mesh);
 
     #include "createFields.H"
+    #include "createPhi.H"
+    #include "CourantNo.H"
+    #include "createFvOptions.H"
 
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

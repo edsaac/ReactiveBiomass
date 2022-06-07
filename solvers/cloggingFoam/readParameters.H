@@ -26,9 +26,6 @@ dimensionedScalar rho(transportProperties.lookup("rho"));
 Foam::Info << "Reading clay density (rho_clay)\n" << endl;
 dimensionedScalar rho_clay(transportProperties.lookup("rho_clay"));
 
-Foam::Info << "Reading biomass density (rho_X)\n" << endl;
-dimensionedScalar rho_X(transportProperties.lookup("rho_X"));
-
 Foam::Info << "Reading sand density (rho_sand)\n" << endl;
 dimensionedScalar rho_sand(transportProperties.lookup("rho_sand"));
 
