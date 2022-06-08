@@ -91,23 +91,21 @@ int main(int argc, char *argv[])
     const volScalarField z(mesh.C().component(vector::Z));
 
     volScalarField psi_tmp = psi;
-
     volScalarField psim1 = psi;
 
     // Equation (2), in RichardsFoam3_systemOfEquations.pdf
     volScalarField thtil
     (
-
-                           pos0(psi)
-                           +
-                           neg(psi)*
-                           pow(
-                                  (1 + pow(
-                                              mag(alpha*psi),
-                                              n
-                                          )
-                                   ),
-                                  - (1 - (1/n)))
+        pos0(psi)
+        +
+        neg(psi)*
+            pow(
+                    (1 + pow(
+                                mag(alpha*psi),
+                                n
+                            )
+                    ),
+                    - (1 - (1/n)))
     );
 
 
@@ -412,7 +410,9 @@ int main(int argc, char *argv[])
 
         runTime.write();
 
-        runTime.printExecutionTime(Info);
+        Foam::Info << "ExecutionTime = " << runTime.elapsedCpuTime()   << " s"
+                   << "    ClockTime = " << runTime.elapsedClockTime() << " s"
+                   << nl << endl;
 
     } // Loop 1 closing - temporal loop //
 
