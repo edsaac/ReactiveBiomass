@@ -36,28 +36,13 @@ volVectorField U
 
 #include "createPhi.H"
 
-//- Porosity field [-]
-Info<< "Reading field porosity\n" << endl;
-volScalarField porosity
-(
-    IOobject
-    (
-        "porosity",
-        runTime.timeName(),
-        mesh,
-        IOobject::MUST_READ,
-        IOobject::NO_WRITE
-    ),
-    mesh
-);
-
-//- Saturation and effective saturation [-]
+//- Water contents and effective water content [-]
 Info<< "Reading field saturation\n" << endl;
-volScalarField sat
+volScalarField theta
 (
     IOobject
     (
-        "saturation",
+        "waterContent",
         runTime.timeName(),
         mesh,
         IOobject::MUST_READ,
@@ -66,18 +51,18 @@ volScalarField sat
     mesh
 );
 
-volScalarField sat_e
+volScalarField theta_e
 (
     IOobject
     (
-        "saturation",
+        "waterContent_effective",
         runTime.timeName(),
         mesh,
         IOobject::NO_READ,
         IOobject::NO_WRITE
     ),
     mesh,
-    dimensionedScalar("sat_e",dimless,scalar(0.0))
+    dimensionedScalar("theta_e",dimless,scalar(0.0))
 );
 
 volScalarField capillary

@@ -30,7 +30,6 @@ Description
     Solves for saturation and head:
     - Water saturation (theta)
     - Head (h)
-
     Eqs:
     
     
@@ -66,16 +65,16 @@ int main(int argc, char *argv[])
         while (simple.correctNonOrthogonal())
         {
             // Calculate effective saturation from van Genutchen eq.
-            sat_e = Foam::pow(1 + Foam::pow(soil.alpha * h, soil.n) , - soil.m);
+            theta_e = Foam::pow(1 + Foam::pow(soil.alpha * h, soil.n) , - soil.m);
             
             // Calculate saturation
-            sat = sat_e * (soil.sat_s - soil.sat_r) + soil.sat_r;
+            theta = theta_e * (soil.theta_s - soil.theta_r) + soil.theta_r;
 
             // Calculate relative permebility
-            perm = Foam::sqrt(sat_e) * Foam::sqr(1.0 - Foam::pow(1-Foam::pow(sat_e, 1.0/soil.m), soil.m));
+            perm = Foam::sqrt(theta_e) * Foam::sqr(1.0 - Foam::pow(1-Foam::pow(theta_e, 1.0/soil.m), soil.m));
 
             // Calculate calpillary capacity
-            capillary = fvc::ddt(sat)/fvc::ddt(h);
+            capillary = fvc::ddt(theta)/fvc::ddt(h);
 
             // Calculate hydraulic conductivity 
             hydrConduct = soil.K_s * perm;
@@ -95,7 +94,7 @@ int main(int argc, char *argv[])
         }
         
         // Calculate Darcy flow velocity
-        U = soil.K_s * perm * fvc::grad(h + z);
+        U = hydrConduct * fvc::grad(h + z);
         phi = fvc::flux(U);
 
         //End bits

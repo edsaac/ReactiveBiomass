@@ -36,8 +36,8 @@ class UnsaturatedSoilParameters{
         // Foam::dimensionedScalar alpha ("alpha", dimensionSet(0,-1,0,0,0,0,0) , scalar(0.0));
         // Foam::dimensionedScalar n ("n", dimless , scalar(0.0));
         // Foam::dimensionedScalar m ("m", dimless , scalar(0.0));
-        Foam::dimensionedScalar sat_s;
-        Foam::dimensionedScalar sat_r;
+        Foam::dimensionedScalar theta_s;
+        Foam::dimensionedScalar theta_r;
         Foam::dimensionedScalar K_s;
         Foam::dimensionedScalar alpha;
         Foam::dimensionedScalar n;
@@ -46,10 +46,10 @@ class UnsaturatedSoilParameters{
     UnsaturatedSoilParameters(IOdictionary& ParameterDict)
     {
         Foam::Info << "Saturation water content [-]\n" << endl;
-        sat_s.read(ParameterDict.lookup("sat_s"));
+        theta_s.read(ParameterDict.lookup("theta_s"));
         
         Foam::Info << "Residual water content [-]\n" << endl;
-        sat_r.read(ParameterDict.lookup("sat_r"));
+        theta_r.read(ParameterDict.lookup("theta_r"));
 
         Foam::Info << "Saturated hydraulic conductivity field [m/s]\n" << endl;
         K_s.read(ParameterDict.lookup("K_s"));
