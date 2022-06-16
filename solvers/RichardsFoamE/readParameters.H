@@ -2,25 +2,25 @@
                     Reading of scalar input data
 \*---------------------------------------------------------------------------*/
 
-Info<< "Reading transportProperties\n" << endl;
-IOdictionary transportProperties
-(
-    IOobject
-    (
-        "transportProperties",
-        runTime.constant(),
-        mesh,
-        IOobject::MUST_READ,
-        IOobject::NO_WRITE
-    )
-);
+// Info<< "Reading transportProperties\n" << endl;
+// IOdictionary transportProperties
+// (
+//     IOobject
+//     (
+//         "transportProperties",
+//         runTime.constant(),
+//         mesh,
+//         IOobject::MUST_READ,
+//         IOobject::NO_WRITE
+//     )
+// );
 
-Info<< "Reading unsaturatedSoilParametersDict\n" << endl;
-IOdictionary unsaturatedSoilParametersDict
+Info<< "Reading soilProperties\n" << endl;
+IOdictionary soilProperties
 (
     IOobject
     (
-        "unsaturatedSoilParametersDict",
+        "soilProperties",
         runTime.constant(),
         mesh,
         IOobject::MUST_READ_IF_MODIFIED,
@@ -36,6 +36,7 @@ class UnsaturatedSoilParameters{
         // Foam::dimensionedScalar alpha ("alpha", dimensionSet(0,-1,0,0,0,0,0) , scalar(0.0));
         // Foam::dimensionedScalar n ("n", dimless , scalar(0.0));
         // Foam::dimensionedScalar m ("m", dimless , scalar(0.0));
+        
         Foam::dimensionedScalar theta_s;
         Foam::dimensionedScalar theta_r;
         Foam::dimensionedScalar K_s;
@@ -66,4 +67,4 @@ class UnsaturatedSoilParameters{
 };
 
 //Biochemical parameters
-UnsaturatedSoilParameters soil {unsaturatedSoilParametersDict};
+UnsaturatedSoilParameters soil {soilProperties};

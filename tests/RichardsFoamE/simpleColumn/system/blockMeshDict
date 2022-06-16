@@ -16,11 +16,11 @@ FoamFile
 
 convertToMeters 1.0;
 
-lenght   10.0;
-diameter 10.0;
+lenght   1.0;
+diameter 1.0;
 
-deltaLenght 10.0;
-deltaDiam   10.0;
+deltaLenght 0.01;
+deltaDiam   1.0;
 
 LCells #calc "round($lenght/$deltaLenght)";
 TCells #calc "round($diameter/$deltaDiam)";

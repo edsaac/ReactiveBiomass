@@ -25,13 +25,13 @@ solvers
         relTol          0;
     }
 
-    "(suspendedClay|depositedClay)"
-    {
-        solver          PBiCGStab;
-        preconditioner  DILU;
-        tolerance       1e-06;
-        relTol          0;
-    }
+    // "(suspendedClay|depositedClay)"
+    // {
+    //     solver          PBiCGStab;
+    //     preconditioner  DILU;
+    //     tolerance       1e-06;
+    //     relTol          0;
+    // }
 }
 
 SIMPLE
@@ -63,8 +63,7 @@ relaxationFactors
 {
     equations
     {
-        suspendedClay        $relaxFactor;
-        depositedClay        $relaxFactor;
+        h        $relaxFactor;
     }
 }
 

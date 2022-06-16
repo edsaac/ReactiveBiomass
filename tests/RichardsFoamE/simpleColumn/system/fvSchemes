@@ -33,7 +33,7 @@ divSchemes
 */
 {
     default                   none;
-    div(phi,suspendedClay)    Gauss Minmod;
+//    div(phi,suspendedClay)    Gauss Minmod;
 }
 
 laplacianSchemes

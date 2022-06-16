@@ -66,18 +66,23 @@ int main(int argc, char *argv[])
         {
             // Calculate effective saturation from van Genutchen eq.
             theta_e = Foam::pow(1 + Foam::pow(soil.alpha * h, soil.n) , - soil.m);
-            
+            Foam::Info << "theta_e calculated" << endl;
+
             // Calculate saturation
             theta = theta_e * (soil.theta_s - soil.theta_r) + soil.theta_r;
-
+            Foam::Info << "theta calculated" << endl;
+            
             // Calculate relative permebility
             perm = Foam::sqrt(theta_e) * Foam::sqr(1.0 - Foam::pow(1-Foam::pow(theta_e, 1.0/soil.m), soil.m));
+            Foam::Info << "perm calculated" << endl;
 
             // Calculate calpillary capacity
-            capillary = fvc::ddt(theta)/fvc::ddt(h);
+            capillary = fvm::ddt(theta)/fvm::ddt(h);
+            Foam::Info << "capillary calculated" << endl;
 
             // Calculate hydraulic conductivity 
             hydrConduct = soil.K_s * perm;
+            Foam::Info << "hydrConduct calculated" << endl;
 
             // Solve Richard's equation    
             fvScalarMatrix richardsEquation
@@ -94,7 +99,7 @@ int main(int argc, char *argv[])
         }
         
         // Calculate Darcy flow velocity
-        U = hydrConduct * fvc::grad(h + z);
+        U = hydrConduct * (fvc::grad(h) + fvc::grad(z));
         phi = fvc::flux(U);
 
         //End bits

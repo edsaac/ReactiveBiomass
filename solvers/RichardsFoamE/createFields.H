@@ -42,7 +42,7 @@ volScalarField theta
 (
     IOobject
     (
-        "waterContent",
+        "theta",
         runTime.timeName(),
         mesh,
         IOobject::MUST_READ,
@@ -55,7 +55,7 @@ volScalarField theta_e
 (
     IOobject
     (
-        "waterContent_effective",
+        "theta_e",
         runTime.timeName(),
         mesh,
         IOobject::NO_READ,
@@ -69,7 +69,7 @@ volScalarField capillary
 (
     IOobject
     (
-        "saturation",
+        "capillary",
         runTime.timeName(),
         mesh,
         IOobject::NO_READ,
@@ -85,14 +85,14 @@ volScalarField perm
 (
     IOobject
     (
-        "relativePermeability",
+        "perm",
         runTime.timeName(),
         mesh,
         IOobject::NO_READ,
         IOobject::NO_WRITE
     ),
     mesh,
-    dimensionedScalar("perm",dimensionSet(0,2,0,0,0),scalar(0.0))
+    dimensionedScalar("perm",dimless,scalar(0.0))
 );
 
 volScalarField hydrConduct
