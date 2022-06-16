@@ -65,6 +65,20 @@ volScalarField theta_e
     dimensionedScalar("theta_e",dimless,scalar(0.0))
 );
 
+volScalarField innerAlphaPower
+(
+    IOobject
+    (
+        "innerAlphaPower",
+        runTime.timeName(),
+        mesh,
+        IOobject::NO_READ,
+        IOobject::NO_WRITE
+    ),
+    mesh,
+    dimensionedScalar("innerAlphaPower",dimless,scalar(0.0))
+);
+
 volScalarField capillary
 (
     IOobject

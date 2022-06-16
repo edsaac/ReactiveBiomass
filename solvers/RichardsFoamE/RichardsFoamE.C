@@ -48,9 +48,9 @@ int main(int argc, char *argv[])
     #include "createTime.H"
     #include "createMesh.H"
     
-    const volScalarField& z (mesh.C().component(vector::Z));
+    volScalarField z (mesh.C().component(2));
     simpleControl simple(mesh);
-
+      
     #include "readParameters.H"
     #include "createFields.H"
     #include "createFvOptions.H"
@@ -64,20 +64,32 @@ int main(int argc, char *argv[])
         // Solve saturation from Richards Equation    
         while (simple.correctNonOrthogonal())
         {
+            Foam::Info << "Enter the inner loop " << endl; 
+            
+            // Aux field of (-alpha*h)^n
+            // if h < 0 
+            innerAlphaPower = Foam::pow(- soil.alpha * h * Foam::neg(h), soil.n);
+            Foam::Info << "theta_e calculated " << innerAlphaPower.dimensions() << endl; 
+            
             // Calculate effective saturation from van Genutchen eq.
-            theta_e = Foam::pow(1 + Foam::pow(soil.alpha * h, soil.n) , - soil.m);
-            Foam::Info << "theta_e calculated" << endl;
+            theta_e = Foam::pow(1.0 + innerAlphaPower, - soil.m);
+            Foam::Info << "theta_e calculated " << theta_e.dimensions() << endl;
 
-            // Calculate saturation
+            // Calculate water content
             theta = theta_e * (soil.theta_s - soil.theta_r) + soil.theta_r;
-            Foam::Info << "theta calculated" << endl;
+            Foam::Info << "theta calculated " << endl;
             
             // Calculate relative permebility
             perm = Foam::sqrt(theta_e) * Foam::sqr(1.0 - Foam::pow(1-Foam::pow(theta_e, 1.0/soil.m), soil.m));
-            Foam::Info << "perm calculated" << endl;
+            Foam::Info << "perm calculated " << endl;
 
             // Calculate calpillary capacity
-            capillary = fvm::ddt(theta)/fvm::ddt(h);
+            // Check sympy for the dtheta/dh derivation
+            capillary = (soil.theta_s - soil.theta_r) 
+                * soil.m * soil.n
+                * innerAlphaPower
+                * theta_e
+                / (h * (innerAlphaPower + 1));
             Foam::Info << "capillary calculated" << endl;
 
             // Calculate hydraulic conductivity 
@@ -92,14 +104,17 @@ int main(int argc, char *argv[])
                 ==
                 fvc::laplacian(hydrConduct, z)
             );
+            Foam::Info << "FVM matrix built" << endl;
             richardsEquation.relax();
             fvOptions.constrain(richardsEquation);
             richardsEquation.solve();
+            Foam::Info << "FVM matrix solved" << endl;
             fvOptions.correct(h);
         }
         
         // Calculate Darcy flow velocity
-        U = hydrConduct * (fvc::grad(h) + fvc::grad(z));
+        U = - hydrConduct * (fvc::grad(h) + fvc::grad(z));
+        Foam::Info << "Flow velocity calculated " << endl;
         phi = fvc::flux(U);
 
         //End bits
