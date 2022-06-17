@@ -20,42 +20,52 @@ FoamFile
     top
     {
         type            patch;
-        nFaces          1;
-        startFace       99;
+        nFaces          101;
+        startFace       19999;
     }
     left
     {
-        type            empty;
-        inGroups        List<word> 1(empty);
+        type            cyclicAMI;
+        inGroups        List<word> 1(cyclicAMI);
         nFaces          100;
-        startFace       100;
+        startFace       20100;
+        matchTolerance  0.0001;
+        transform       translational;
+        neighbourPatch  right;
+        separationVector (1 0 0);
+        method          faceAreaWeightAMI;
     }
     right
     {
-        type            empty;
-        inGroups        List<word> 1(empty);
+        type            cyclicAMI;
+        inGroups        List<word> 1(cyclicAMI);
         nFaces          100;
-        startFace       200;
+        startFace       20200;
+        matchTolerance  0.0001;
+        transform       translational;
+        neighbourPatch  left;
+        separationVector (-1 0 0);
+        method          faceAreaWeightAMI;
     }
     front
     {
         type            empty;
         inGroups        List<word> 1(empty);
-        nFaces          100;
-        startFace       300;
+        nFaces          10100;
+        startFace       20300;
     }
     back
     {
         type            empty;
         inGroups        List<word> 1(empty);
-        nFaces          100;
-        startFace       400;
+        nFaces          10100;
+        startFace       30400;
     }
     bottom
     {
         type            patch;
-        nFaces          1;
-        startFace       500;
+        nFaces          101;
+        startFace       40500;
     }
 )
 

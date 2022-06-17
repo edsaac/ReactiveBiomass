@@ -136,6 +136,7 @@ dmypy.json
 # Run cases
 **/[1-9]*/
 **/dynamicCode/
+**/processor[0-9]*/
 **/postProcessing/
 **/VTK/
 **/log*

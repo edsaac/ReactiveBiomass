@@ -32,12 +32,12 @@ boundaryField
 
     right
     {
-  	    type		empty;
+  	    type		cyclicAMI;
     }
 
     left
     {
-  	    type		empty;
+  	    type		cyclicAMI;
     }
 
     top

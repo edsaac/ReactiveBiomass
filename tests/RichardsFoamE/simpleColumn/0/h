@@ -32,24 +32,47 @@ boundaryField
 
     right
     {
-  	type		empty;
+  	type		cyclicAMI;
     }
 
     left
     {
-  	type		empty;
+  	type		cyclicAMI;
     }
 
     top
     {
         type        fixedValue;
-	    value       uniform  0.01; // 1.004672127E+01;
+	    value       uniform  0.1; 
+        // type        codedFixedValue;
+        // value       uniform 0.01;
+
+        // name        bumpInTheMiddle;
+        // code
+        // #{
+        //     const vectorField& Cf = patch().Cf();
+        //     scalarField& field = *this;
+
+        //     const scalar hWet = 0.01;
+        //     const scalar hDry = -1.0;
+
+        //     forAll(Cf, faceI)
+        //     {
+        //         scalar x = Cf[faceI][0];
+        //         field[faceI] = hWet + hDry*sqr(x - 0.5);
+        //         // if(x > 0.4 && x < 0.6){field[faceI] = hWet * 1-4\left(x-0.5\right)^{2};}
+        //         // else{field[faceI] = hWet;}
+        //     }
+        // #};
+
     }
 
     bottom
     {
         type        fixedGradient;
-        gradient    -1.0;
+        gradient    -0.5;
+        // type fixedValue;
+        // value   uniform 0.01;
     }
 }
 

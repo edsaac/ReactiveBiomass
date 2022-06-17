@@ -17,30 +17,31 @@ FoamFile
 convertToMeters 1.0;
 
 lenght   1.0;
-diameter 1.0;
+depth    1.0;
 
 deltaLenght 0.01;
-deltaDiam   1.0;
+deltaDepth  0.01;
 
-LCells #calc "round($lenght/$deltaLenght)";
-TCells #calc "round($diameter/$deltaDiam)";
+XCells #calc "round($lenght/$deltaLenght) + 1";
+YCells 1;
+ZCells #calc "round($depth/$deltaDepth)";
 
 vertices
 (
     (0 0 0)
-    (0 $diameter 0)
-    (0 $diameter $lenght)
-    (0 0 $lenght)
-    ($diameter 0 0)
-    ($diameter $diameter 0)
-    ($diameter $diameter $lenght)
-    ($diameter 0 $lenght)
+    ($lenght 0 0)
+    ($lenght 0.2 0)
+    (0 0.2 0)
+    (0 0 $depth)
+    ($lenght 0 $depth)
+    ($lenght 0.2 $depth)
+    (0 0.2 $depth)    
 );
 
 
 blocks
 (
-    hex (0 4 5 1 3 7 6 2) ($TCells $TCells $LCells) simpleGrading (1 1 1)
+    hex (0 1 2 3 4 5 6 7) mainBlock ($XCells $YCells $ZCells) simpleGrading (1 1 1)
 );
 
 edges
@@ -54,23 +55,29 @@ boundary
         type patch;
         faces
         (
-            (3 7 6 2)
+            (4 7 6 5)
         );
     }
     left
     {
-        type empty;
+        type cyclicAMI;
+        neighbourPatch right;
+        transform   translational;
+        separationVector (1 0 0);
         faces
         (
-            (0 4 7 3)
+            (0 3 7 4)
         );
     }
     right
     {
-        type empty;
+        type cyclicAMI;
+        neighbourPatch left;
+        transform   translational;
+        separationVector (-1 0 0);
         faces
         (
-            (2 6 5 1)
+            (2 1 5 6)
         );
     }
 
@@ -79,7 +86,7 @@ boundary
         type empty;
         faces
         (
-            (4 5 6 7)
+            (0 4 5 1)
         );
     }
     back
@@ -87,7 +94,7 @@ boundary
         type empty;
         faces
         (
-            (0 3 2 1)
+            (3 2 6 7)
         );
     }
     bottom
@@ -95,7 +102,7 @@ boundary
         type patch;
         faces
         (
-            (0 1 5 4)
+            (0 1 2 3)
         );
     }
 
