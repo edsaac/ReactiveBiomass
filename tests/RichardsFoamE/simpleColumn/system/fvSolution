@@ -29,7 +29,7 @@ solvers
     {
         solver          PCG;
         preconditioner  DIC;
-        tolerance       1e-06;
+        tolerance       1e-10;
         relTol          0;
     }
 
@@ -44,7 +44,15 @@ solvers
 
 SIMPLE
 {
-    nNonOrthogonalCorrectors 3;
+    nNonOrthogonalCorrectors 2;
+}
+
+PISO
+{
+    nCorrectors     5;
+    nNonOrthogonalCorrectors 0;
+    pRefCell        0;
+    pRefValue       0;
 }
 
 // relaxationFactors
@@ -65,11 +73,16 @@ SIMPLE
 //     }
 // }
 
-relaxFactor 0.8;
+relaxFactor 1.0;
 
 relaxationFactors
 {
-    equations
+    fields  //Explicit relaxation
+    {
+
+    }
+    
+    equations  //Implicit relaxation
     {
         h        $relaxFactor;
     }

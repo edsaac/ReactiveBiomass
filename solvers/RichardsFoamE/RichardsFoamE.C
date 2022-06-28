@@ -57,7 +57,7 @@ int main(int argc, char *argv[])
    
     Foam::Info << "\nCalculating...\n" << endl;
     
-    while (simple.loop(runTime))
+    while (runTime.loop())
     {
         Foam::Info<< "Time = " << runTime.timeName() << nl << endl;
         

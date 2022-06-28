@@ -16,7 +16,7 @@ FoamFile
 
 dimensions      [0 1 0 0 0 0 0];
 
-internalField   uniform -1;
+internalField   uniform -10;
 
 boundaryField
 {
@@ -32,12 +32,16 @@ boundaryField
 
     right
     {
-  	type		cyclicAMI;
+        type        fixedGradient;
+        gradient    uniform 0.0;
+        // type		cyclicAMI;
     }
 
     left
     {
-  	type		cyclicAMI;
+  	    // type		cyclicAMI;
+          type        fixedGradient;
+          gradient    uniform 0.0;  // Negative means outside the patch
     }
 
     top
@@ -45,7 +49,7 @@ boundaryField
         type        fixedValue;
 	    value       uniform  0.1; 
         // type        codedFixedValue;
-        // value       uniform 0.01;
+        // value       uniform 0.1;
 
         // name        bumpInTheMiddle;
         // code
@@ -53,15 +57,15 @@ boundaryField
         //     const vectorField& Cf = patch().Cf();
         //     scalarField& field = *this;
 
-        //     const scalar hWet = 0.01;
-        //     const scalar hDry = -1.0;
+        //     const scalar hWet = 0.1;
+        //     const scalar hDry = -10.0;
 
         //     forAll(Cf, faceI)
         //     {
         //         scalar x = Cf[faceI][0];
-        //         field[faceI] = hWet + hDry*sqr(x - 0.5);
-        //         // if(x > 0.4 && x < 0.6){field[faceI] = hWet * 1-4\left(x-0.5\right)^{2};}
-        //         // else{field[faceI] = hWet;}
+        //         // field[faceI] = hWet + hDry*sqr(x - 0.5);
+        //         if(x > 0.4 && x < 0.6){field[faceI] = hWet;}
+        //         else{field[faceI] = hDry;}
         //     }
         // #};
 
@@ -70,7 +74,7 @@ boundaryField
     bottom
     {
         type        fixedGradient;
-        gradient    -0.5;
+        gradient    uniform 1.00;   // Set to 1.0 for a NO-FLOW condition
         // type fixedValue;
         // value   uniform 0.01;
     }

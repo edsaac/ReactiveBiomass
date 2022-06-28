@@ -17,13 +17,13 @@ FoamFile
 // [kg m s K mol * *]
 
 
-theta_s       theta_s       [0 0 0 0 0 0 0]    0.430; // Max water content
+theta_s       theta_s       [0 0 0 0 0 0 0]    0.230; // Max water content
 theta_r       theta_r       [0 0 0 0 0 0 0]    0.078; // Residual water content
 
-K_s           K_s           [0 1 -1 0 0 0 0]   2.89E-6; // Residual water content
-alpha         alpha         [0 -1 0 0 0 0 0]   3.6;     // Inverse of pc0
+K_s           K_s           [0 1 -1 0 0 0 0]   2.45E-5; // Saturated hydraulic conduct.
+alpha         alpha         [0 -1 0 0 0 0 0]   4.30;     // Inverse of pc0
 
-n             n             [0 0 0 0 0 0 0]    1.56;    // Van Genutchen exponent
+n             n             [0 0 0 0 0 0 0]    1.82;    // Van Genutchen exponent
 
 
 
