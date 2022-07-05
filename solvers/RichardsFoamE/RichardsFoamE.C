@@ -41,7 +41,6 @@ Description
 #include "simpleControl.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
 int main(int argc, char *argv[])
 {
     #include "setRootCaseLists.H"
@@ -65,33 +64,24 @@ int main(int argc, char *argv[])
         while (simple.correctNonOrthogonal())
         {
             Foam::Info << "Enter the inner loop " << endl; 
-            
-            // Aux field of (-alpha*h)^n
-            // if h < 0 
-            innerAlphaPower = Foam::pow(- soil.alpha * h * Foam::neg(h), soil.n);
-            Foam::Info << "theta_e calculated " << innerAlphaPower.dimensions() << endl; 
-            
+                     
             // Calculate effective saturation from van Genutchen eq.
-            theta_e = Foam::pow(1.0 + innerAlphaPower, - soil.m);
+            soil.innerVanGenuchtenCalculator(h,innerAlphaPower);
+            soil.vanGenuchtenCalculator(h,innerAlphaPower,theta_e);
             Foam::Info << "theta_e calculated " << theta_e.dimensions() << endl;
 
-            // Calculate water content
+            // Calculate water content           
             theta = theta_e * (soil.theta_s - soil.theta_r) + soil.theta_r;
             Foam::Info << "theta calculated " << endl;
             
-            // Calculate relative permebility
-            perm = Foam::sqrt(theta_e) * Foam::sqr(1.0 - Foam::pow(1-Foam::pow(theta_e, 1.0/soil.m), soil.m));
-            Foam::Info << "perm calculated " << endl;
-
             // Calculate calpillary capacity
             // Check sympy for the dtheta/dh derivation
-            capillary = (soil.theta_s - soil.theta_r) 
-                * soil.m * soil.n
-                * innerAlphaPower
-                * theta_e
-                / (h * (innerAlphaPower + 1));
+            soil.capillaryCapacityCalculator(innerAlphaPower,theta_e,h,capillary);
             Foam::Info << "capillary calculated" << endl;
 
+            // Calculate relative permebility
+            soil.mualemCalculator(theta_e,perm);
+            
             // Calculate hydraulic conductivity 
             hydrConduct = soil.K_s * perm;
             Foam::Info << "hydrConduct calculated" << endl;

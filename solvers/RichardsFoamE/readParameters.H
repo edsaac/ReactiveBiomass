@@ -44,6 +44,7 @@ class UnsaturatedSoilParameters{
         Foam::dimensionedScalar n;
         Foam::dimensionedScalar m;
 
+    
     UnsaturatedSoilParameters(IOdictionary& ParameterDict)
     {
         Foam::Info << "Saturation water content [-]\n" << endl;
@@ -64,7 +65,28 @@ class UnsaturatedSoilParameters{
         m = dimensionedScalar("m", dimless, scalar(1.0) - scalar(1.0)/n.value());
         Foam::Info << "van Genuchten exponent m [-]\n" << m << endl;
     }
+
+    void innerVanGenuchtenCalculator(const volScalarField& h, volScalarField& innerAlphaPower)
+    {
+        innerAlphaPower = Foam::pow(- alpha * h * Foam::neg(h), n);
+    }
+
+    void vanGenuchtenCalculator(const volScalarField& h, const volScalarField& innerAlphaPower, volScalarField& theta_e)
+    {
+        theta_e = Foam::pow( 1.0 + innerAlphaPower, -m);
+    }
+
+    void mualemCalculator(const volScalarField& theta_e, volScalarField& perm)
+    {
+        perm = Foam::sqrt(theta_e) * Foam::sqr(1.0 - Foam::pow(1-Foam::pow(theta_e, 1.0/m), m));
+    }
+    
+    void capillaryCapacityCalculator(const volScalarField& innerAlphaPower, const volScalarField& theta_e, const volScalarField& h, volScalarField& capillary)
+    {
+        capillary = (theta_s - theta_r) * m * n * innerAlphaPower * theta_e / (h * (innerAlphaPower + 1.0));
+    }
 };
+
 
 //Biochemical parameters
 UnsaturatedSoilParameters soil {soilProperties};

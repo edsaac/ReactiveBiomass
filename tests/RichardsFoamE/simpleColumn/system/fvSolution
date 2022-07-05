@@ -47,40 +47,14 @@ SIMPLE
     nNonOrthogonalCorrectors 2;
 }
 
-PISO
-{
-    nCorrectors     5;
-    nNonOrthogonalCorrectors 0;
-    pRefCell        0;
-    pRefValue       0;
-}
-
-// relaxationFactors
-// {
-//     equations
-//     {
-//         DissolvedCarbonTransport        $relaxFactor;
-//         AmmoniumTransport               $relaxFactor;
-//         EPSTransport                    $relaxFactor;
-//         UAPTransport                    $relaxFactor;
-//         BAPTransport                    $relaxFactor;
-//         ARGrowth                        $relaxFactor;
-//         NitrifiersGrowth                $relaxFactor;
-//         DenitrifiersGrowth              $relaxFactor;
-//         InertGeneration                 $relaxFactor;
-//         OxygenTransport                 $relaxFactor;
-//         NitrateTransport                $relaxFactor;
-//     }
-// }
-
-relaxFactor 1.0;
+relaxFactor 0.8;
 
 relaxationFactors
 {
-    fields  //Explicit relaxation
-    {
+    // fields  //Explicit relaxation
+    // {
 
-    }
+    // }
     
     equations  //Implicit relaxation
     {
