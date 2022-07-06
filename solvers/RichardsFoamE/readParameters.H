@@ -75,15 +75,50 @@ class UnsaturatedSoilParameters{
     {
         theta_e = Foam::pow( 1.0 + innerAlphaPower, -m);
     }
-
+    
+    void waterContentCalculator(const volScalarField& theta_e, volScalarField& theta)
+    {
+        theta = theta_e * (theta_s - theta_r) + theta_r;
+    }
+    
     void mualemCalculator(const volScalarField& theta_e, volScalarField& perm)
     {
         perm = Foam::sqrt(theta_e) * Foam::sqr(1.0 - Foam::pow(1-Foam::pow(theta_e, 1.0/m), m));
     }
-    
+
     void capillaryCapacityCalculator(const volScalarField& innerAlphaPower, const volScalarField& theta_e, const volScalarField& h, volScalarField& capillary)
     {
         capillary = (theta_s - theta_r) * m * n * innerAlphaPower * theta_e / (h * (innerAlphaPower + 1.0));
+    }
+
+    volScalarField innerVanGenuchtenCalculator(const volScalarField& h)
+    {
+        // innerAlphaPower
+        return Foam::pow(- alpha * h * Foam::neg(h), n);
+    }
+
+    volScalarField vanGenuchtenCalculator(const volScalarField& h)
+    {
+        // theta_e
+        return  Foam::pow( 1.0 + innerVanGenuchtenCalculator(h), -m);
+    }
+
+    volScalarField waterContentCalculator(const volScalarField& h)
+    {
+        // theta
+        return vanGenuchtenCalculator(h) * (theta_s - theta_r) + theta_r;
+    }
+
+    volScalarField mualemCalculator(const volScalarField& h)
+    {
+        // perm
+        return Foam::sqrt(vanGenuchtenCalculator(h)) * Foam::sqr(1.0 - Foam::pow(1-Foam::pow(vanGenuchtenCalculator(h), 1.0/m), m));
+    }
+
+    volScalarField capillaryCapacityCalculator(const volScalarField& h)
+    {
+        // C(h)
+        return (theta_s - theta_r) * m * n * innerVanGenuchtenCalculator(h) * vanGenuchtenCalculator(h) / (h * (innerVanGenuchtenCalculator(h) + 1.0));
     }
 };
 

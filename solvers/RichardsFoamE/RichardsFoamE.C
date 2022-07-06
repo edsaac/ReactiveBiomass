@@ -71,7 +71,7 @@ int main(int argc, char *argv[])
             Foam::Info << "theta_e calculated " << theta_e.dimensions() << endl;
 
             // Calculate water content           
-            theta = theta_e * (soil.theta_s - soil.theta_r) + soil.theta_r;
+            soil.waterContentCalculator(theta_e,theta);
             Foam::Info << "theta calculated " << endl;
             
             // Calculate calpillary capacity
@@ -89,7 +89,7 @@ int main(int argc, char *argv[])
             // Solve Richard's equation    
             fvScalarMatrix richardsEquation
             (
-                fvm::ddt(capillary,h)
+                fvm::ddt(soil.capillaryCapacityCalculator(h),h)
                 - fvm::laplacian(hydrConduct, h)
                 ==
                 fvc::laplacian(hydrConduct, z)

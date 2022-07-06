@@ -47,19 +47,19 @@ SIMPLE
     nNonOrthogonalCorrectors 2;
 }
 
-relaxFactor 0.8;
+// relaxFactor 0.8;
 
-relaxationFactors
-{
-    // fields  //Explicit relaxation
-    // {
+// relaxationFactors
+// {
+//     // fields  //Explicit relaxation
+//     // {
 
-    // }
+//     // }
     
-    equations  //Implicit relaxation
-    {
-        h        $relaxFactor;
-    }
-}
+//     equations  //Implicit relaxation
+//     {
+//         h        $relaxFactor;
+//     }
+// }
 
 // ************************************************************************* //
