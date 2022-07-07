@@ -20,40 +20,42 @@ FoamFile
     top
     {
         type            patch;
-        nFaces          101;
-        startFace       19999;
+        nFaces          1;
+        startFace       100;
     }
     left
     {
-        type            patch;
-        nFaces          100;
-        startFace       20100;
+        type            empty;
+        inGroups        List<word> 1(empty);
+        nFaces          101;
+        startFace       101;
     }
     right
     {
-        type            patch;
-        nFaces          100;
-        startFace       20200;
+        type            empty;
+        inGroups        List<word> 1(empty);
+        nFaces          101;
+        startFace       202;
     }
     front
     {
         type            empty;
         inGroups        List<word> 1(empty);
-        nFaces          10100;
-        startFace       20300;
+        nFaces          101;
+        startFace       303;
     }
     back
     {
         type            empty;
         inGroups        List<word> 1(empty);
-        nFaces          10100;
-        startFace       30400;
+        nFaces          101;
+        startFace       404;
     }
     bottom
     {
         type            patch;
-        nFaces          101;
-        startFace       40500;
+        nFaces          1;
+        startFace       505;
     }
 )
 

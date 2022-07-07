@@ -17,29 +17,13 @@ FoamFile
 
 solvers
 {
-    // h
-    // {
-    //     solver          PCG;
-    //     preconditioner  DIC;
-    //     tolerance       1e-06;
-    //     relTol          0;
-    // }
-
     h
     {
         solver          PCG;
-        preconditioner  DIC;
-        tolerance       1e-10;
+        preconditioner  FDIC;
+        tolerance       1e-20;
         relTol          0;
     }
-
-    // "(suspendedClay|depositedClay)"
-    // {
-    //     solver          PBiCGStab;
-    //     preconditioner  DILU;
-    //     tolerance       1e-06;
-    //     relTol          0;
-    // }
 }
 
 SIMPLE
@@ -47,19 +31,19 @@ SIMPLE
     nNonOrthogonalCorrectors 1;
 }
 
-// relaxFactor 0.8;
+relaxFactor 0.65;
 
-// relaxationFactors
-// {
-//     // fields  //Explicit relaxation
-//     // {
+relaxationFactors
+{
+    // fields  //Explicit relaxation
+    // {
 
-//     // }
+    // }
     
-//     equations  //Implicit relaxation
-//     {
-//         h        $relaxFactor;
-//     }
-// }
+    equations  //Implicit relaxation
+    {
+        h        $relaxFactor;
+    }
+}
 
 // ************************************************************************* //

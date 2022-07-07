@@ -12,10 +12,15 @@ Description
 
 #includeEtc "caseDicts/postProcessing/probes/probes.cfg"
 
-fields (suspendedClay depositedClay U Lambda n katt);
+fields (h);
+
 probeLocations
 (
-    (0 0 0)
+    (0.1 0.1 1.00)
+    (0.1 0.1 0.75)
+    (0.1 0.1 0.50)
+    (0.1 0.1 0.25)
+    (0.1 0.1 0.0)
 );
 
 // ************************************************************************* //

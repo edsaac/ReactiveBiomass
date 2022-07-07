@@ -16,15 +16,15 @@ FoamFile
 
 convertToMeters 1.0;
 
-lenght   1.0;
+lenght   0.2;
 depth    1.0;
 
-deltaLenght 0.01;
+deltaLenght 0.2;
 deltaDepth  0.01;
 
-XCells #calc "round($lenght/$deltaLenght) + 1";
+XCells 1;
 YCells 1;
-ZCells #calc "round($depth/$deltaDepth)";
+ZCells #calc "round($depth/$deltaDepth) + 1";
 
 vertices
 (
@@ -58,40 +58,19 @@ boundary
             (4 7 6 5)
         );
     }
-    // left
-    // {
-    //     type cyclicAMI;
-    //     neighbourPatch right;
-    //     transform   translational;
-    //     separationVector (1 0 0);
-    //     faces
-    //     (
-    //         (0 3 7 4)
-    //     );
-    // }
-    // right
-    // {
-    //     type cyclicAMI;
-    //     neighbourPatch left;
-    //     transform   translational;
-    //     separationVector (-1 0 0);
-    //     faces
-    //     (
-    //         (2 1 5 6)
-    //     );
-    // }
 
     left
     {
-        type patch;
+        type empty;
         faces
         (
             (0 3 7 4)
         );
     }
+
     right
     {
-        type patch;
+        type empty;
         faces
         (
             (2 1 5 6)
@@ -106,6 +85,7 @@ boundary
             (0 4 5 1)
         );
     }
+
     back
     {
         type empty;
@@ -114,6 +94,7 @@ boundary
             (3 2 6 7)
         );
     }
+    
     bottom
     {
         type patch;

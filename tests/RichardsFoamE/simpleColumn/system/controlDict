@@ -15,10 +15,10 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-end_hours 2.0;
+end_hours 25.0;
 end_secs #calc "round($end_hours*3600.0)";
 
-write_hours 0.25;
+write_hours 1.0;
 write_secs #calc "round($write_hours*3600.0)";
 
 application     RichardsFoamE;
@@ -31,7 +31,7 @@ endTime	        $end_secs;
 writeControl    runTime;
 writeInterval   $write_secs;
 
-deltaT          5;//1000;
+deltaT          30;//1000;
 purgeWrite      0;
 
 writeFormat     ascii;
@@ -53,10 +53,10 @@ debug           1;
 
 // To plot breakthrough curve
 
-// functions
-//     {
-//       #includeFunc    probes
-//     };
+functions
+    {
+      #includeFunc    probes
+    };
 
 
 // ************************************************************************* //

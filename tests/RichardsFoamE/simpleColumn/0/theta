@@ -32,14 +32,12 @@ boundaryField
 
     right
     {
-        type        zeroGradient;
-        // type		cyclicAMI;
+        type        empty;
     }
 
     left
     {
-  	    // type		cyclicAMI;
-        type        zeroGradient;
+        type        empty;
     }
 
     top
@@ -50,8 +48,6 @@ boundaryField
     bottom
     {
         type        zeroGradient;
-        // type        fixedValue;
-        // value		uniform   0.43;
     }
 }
 
