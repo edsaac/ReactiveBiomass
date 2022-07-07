@@ -11,46 +11,35 @@ FoamFile
     format      ascii;
     class       dictionary;
     location    "system";
-    object      fvSchemes;
+    object      decomposeParDict;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-ddtSchemes
+numberOfSubdomains 12;
+
+method           scotch;
+/*
+simpleCoeffs
 {
-    //default         Euler;
-    default         CrankNicolson 0.9;
+    n               (2 2 1);
+    delta           0.001;
 }
 
-gradSchemes
+hierarchicalCoeffs
 {
-    default 	    cellLimited leastSquares 1.0;;
-    grad(h)         cellLimited leastSquares 1.0;
+    n               (1 1 1);
+    delta           0.001;
+    order           xyz;
 }
 
-divSchemes
-/* Using Minmod scheme to avoid oscilations 
-   https://www.openfoam.com/documentation/guides/latest/doc/guide-schemes-divergence-example.html
-   By default, use Gauss linearUpwind grad(variable);
+manualCoeffs
+{
+    dataFile        "";
+}
+
+distributed     no;
+
+roots           ( );
 */
-{
-    default                   none;
-//    div(phi,suspendedClay)    Gauss Minmod;
-}
-
-laplacianSchemes
-{
-    default         Gauss linear corrected;
-}
-
-interpolationSchemes
-{
-    default         linear;
-}
-
-snGradSchemes
-{
-    default         corrected;
-}
-
 
 // ************************************************************************* //

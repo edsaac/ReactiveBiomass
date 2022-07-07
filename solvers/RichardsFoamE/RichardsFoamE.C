@@ -38,7 +38,6 @@ Description
 
 #include "fvCFD.H"
 #include "fvOptions.H"
-#include "simpleControl.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 int main(int argc, char *argv[])
@@ -48,7 +47,6 @@ int main(int argc, char *argv[])
     #include "createMesh.H"
     
     volScalarField z (mesh.C().component(2));
-    simpleControl simple(mesh);
       
     #include "readParameters.H"
     #include "createFields.H"
@@ -61,50 +59,26 @@ int main(int argc, char *argv[])
         Foam::Info<< "Time = " << runTime.timeName() << nl << endl;
         
         // Solve saturation from Richards Equation    
-        while (simple.correctNonOrthogonal())
+        for (size_t i = 0; i < 1; i++)
         {
             Foam::Info << "Enter the inner loop " << endl; 
                      
-            // Calculate effective saturation from van Genutchen eq.
-            soil.innerVanGenuchtenCalculator(h,innerAlphaPower);
-            soil.vanGenuchtenCalculator(h,innerAlphaPower,theta_e);
-            Foam::Info << "theta_e calculated " << theta_e.dimensions() << endl;
-
-            // Calculate water content           
-            soil.waterContentCalculator(theta_e,theta);
-            Foam::Info << "theta calculated " << endl;
-            
-            // Calculate calpillary capacity
-            // Check sympy for the dtheta/dh derivation
-            soil.capillaryCapacityCalculator(innerAlphaPower,theta_e,h,capillary);
-            Foam::Info << "capillary calculated" << endl;
-
-            // Calculate relative permebility
-            soil.mualemCalculator(theta_e,perm);
-            
-            // Calculate hydraulic conductivity 
-            hydrConduct = soil.K_s * perm;
-            Foam::Info << "hydrConduct calculated" << endl;
-
             // Solve Richard's equation    
             fvScalarMatrix richardsEquation
             (
-                fvm::ddt(soil.capillaryCapacityCalculator(h),h)
-                - fvm::laplacian(hydrConduct, h)
+                fvm::ddt(soil.capillary(h), h)
+                - fvm::laplacian(soil.K(h), h)
                 ==
-                fvc::laplacian(hydrConduct, z)
+                fvc::laplacian(soil.K(h), z)
             );
-            Foam::Info << "FVM matrix built" << endl;
             richardsEquation.relax();
             fvOptions.constrain(richardsEquation);
             richardsEquation.solve();
-            Foam::Info << "FVM matrix solved" << endl;
             fvOptions.correct(h);
         }
         
         // Calculate Darcy flow velocity
-        U = - hydrConduct * (fvc::grad(h) + fvc::grad(z));
-        Foam::Info << "Flow velocity calculated " << endl;
+        U = - soil.K(h) * (fvc::grad(h) + fvc::grad(z));
         phi = fvc::flux(U);
 
         //End bits
