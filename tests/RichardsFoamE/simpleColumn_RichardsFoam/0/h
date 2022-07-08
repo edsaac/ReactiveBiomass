@@ -9,40 +9,47 @@ FoamFile
 {
     version     2.0;
     format      ascii;
-    class       dictionary;
-    location    "system";
-    object      fvSolution;
+    class       volScalarField;
+    object      h;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-solvers
+dimensions      [0 1 0 0 0 0 0];
+
+internalField   uniform -1;
+
+boundaryField
 {
-    h
+    front
     {
-        solver          PCG;
-        preconditioner  FDIC;
-        tolerance       1e-20;
-        relTol          0;
+        type            empty;
     }
-}
 
-SIMPLE
-{
-    nNonOrthogonalCorrectors 1;
-}
-
-relaxFactor 1.0;
-
-relaxationFactors
-{
-    // fields  //Explicit relaxation
-    // {
-
-    // }
-    
-    equations  //Implicit relaxation
+    back
     {
-        h        $relaxFactor;
+        type            empty;
+    }
+
+    right
+    {
+        type            empty;
+    }
+
+    left
+    {
+        type            empty;
+    }
+
+    top
+    {
+        type        fixedValue;
+	    value       uniform  0.01;
+    }
+
+    bottom
+    {
+        type        fixedGradient;
+        gradient    uniform -1.0;
     }
 }
 

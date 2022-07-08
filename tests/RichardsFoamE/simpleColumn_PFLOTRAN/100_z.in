@@ -15,19 +15,37 @@ SUBSURFACE
 NUMERICAL_METHODS FLOW
 
   NEWTON_SOLVER
-    MAXIMUM_NUMBER_OF_ITERATIONS 20
+    MAXIMUM_NUMBER_OF_ITERATIONS 50
   /
 
 END
 
 #=========================== probes ========================================
 OBSERVATION
-  REGION observation_point1
+  REGION 75cm
   AT_COORDINATE
 /
 
-REGION observation_point1
-  COORDINATE 0.1 0.1 0.5
+REGION 75cm
+  COORDINATE 0.1 0.1 0.75
+/
+
+OBSERVATION
+  REGION 50cm
+  AT_COORDINATE
+/
+
+REGION 50cm
+  COORDINATE 0.1 0.1 0.50
+/
+
+OBSERVATION
+  REGION 25cm
+  AT_COORDINATE
+/
+
+REGION 25cm
+  COORDINATE 0.1 0.1 0.25
 /
 
 
@@ -54,6 +72,7 @@ MATERIAL_PROPERTY soil1
   TORTUOSITY 1.0
   CHARACTERISTIC_CURVES sf1
   PERMEABILITY
+    ISOTROPIC
     PERM_ISO 2.946E-13
   /
 END
@@ -86,12 +105,9 @@ OUTPUT
   /
 
   OBSERVATION_FILE
-    PERIODIC TIME 0.25 hour
+    PERIODIC TIME 5.0 minute
     VARIABLES
       LIQUID_PRESSURE
-      LIQUID_HEAD
-      LIQUID_SATURATION
-      CAPILLARY_PRESSURE
     /
   /
 END
@@ -132,22 +148,22 @@ FLOW_CONDITION initial
   TYPE
     LIQUID_PRESSURE DIRICHLET
   /
-  LIQUID_PRESSURE 91519.05 ! Pa      # -1m
+  LIQUID_PRESSURE 91519.05 ! Pa   # 1atm - 1m
 END
 
 FLOW_CONDITION top_bc
   TYPE
     LIQUID_PRESSURE DIRICHLET
   /
-  LIQUID_PRESSURE 101423.0 ! Pa   # +0.01m
+  LIQUID_PRESSURE 101423.0 ! Pa   # 1atm + 0.01m
 END
 
 FLOW_CONDITION bottom_bc
   TYPE
-    PRESSURE unit_gradient
+    LIQUID_FLUX NEUMANN
   /
-  PRESSURE -999 ! Pa (Ignored)
-  #LIQUID_FLUX 0 ! [m/s]
+  #PRESSURE -999 ! Pa (Ignored)
+  LIQUID_FLUX -1 ! [m/s]
 /
 
 #=========================== condition couplers ===============================

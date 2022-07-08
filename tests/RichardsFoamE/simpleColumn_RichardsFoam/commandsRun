@@ -1,0 +1,7 @@
+blockMesh > log_blockMesh
+
+RichardsFoam3 > log_RichardsFoam3
+
+RichardsFoam3 -postProcess > log_PostProcess
+
+
