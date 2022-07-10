@@ -52,29 +52,83 @@ int main(int argc, char *argv[])
     #include "createFields.H"
     #include "createFvOptions.H"
    
+    const label nbMesh = mesh.nCells();
+    double convergeFlow = 1.0;
+    int nCycles = 0;
+    // unsigned int nItersDebug = 0;
+
     Foam::Info << "\nCalculating...\n" << endl;
     
     while (runTime.loop())
     {
-        Foam::Info<< "Time = " << runTime.timeName() << nl << endl;
+        Foam::Info<< "Time = "   << runTime.timeName() << nl 
+                  << "deltaT = " << runTime.deltaTValue()  << endl;
         
+        nCycles = 0;
+        h_before = h;
+        h_after = h;
+
+        Foam::Info << "nCells: " << nbMesh;
+
         // Solve saturation from Richards Equation    
-        for (size_t i = 0; i < 1; i++)
+        while(true)
         {
             Foam::Info << "Enter the inner loop " << endl; 
-                     
+
             // Solve Richard's equation    
             fvScalarMatrix richardsEquation
             (
-                fvm::ddt(soil.capillary(h), h)
-                - fvm::laplacian(soil.K(h), h)
+                fvm::ddt(soil.capillary(h_before), h_after)
+                - fvm::laplacian(soil.K(h_before), h_after)
                 ==
-                fvc::laplacian(soil.K(h), z)
+                fvc::laplacian(soil.K(h_before), z)
             );
             richardsEquation.relax();
             fvOptions.constrain(richardsEquation);
             richardsEquation.solve();
-            fvOptions.correct(h);
+            fvOptions.correct(h_after);
+
+            // Check if solution converged
+            err = h_after - h_before;
+            convergeFlow = gSumMag(err)/nbMesh;
+            Foam::Info << "Converger: " << convergeFlow << "\n"
+                       << "nCycles:"    << nCycles      << endl;
+
+            if(convergeFlow < 1.0E-05) // converged
+            {
+                h = h_after;
+
+                if(nCycles < 2)
+                {
+                    Foam::Info << "deltaT increased" << endl;
+                    runTime.setDeltaT( 1.2 * runTime.deltaTValue() );
+                }
+                break;
+            }
+
+            else // did not converged, try again
+            {
+                h_before = h_after;
+                h_after = h;
+                nCycles++;
+            }
+
+            if(nCycles > 5) // has not converged yet
+            {
+                Foam::Info << "deltaT halved" << endl;
+                runTime.setDeltaT
+                (
+                    min
+                    (
+                        0.5 * runTime.deltaTValue(),
+                        100.0
+                    )
+                );
+
+                h_after = h;
+                nCycles = 0;
+            }
+            
         }
         
         // Calculate Darcy flow velocity
@@ -87,6 +141,9 @@ int main(int argc, char *argv[])
         Foam::Info << "ExecutionTime = " << runTime.elapsedCpuTime()   << " s"
                    << "    ClockTime = " << runTime.elapsedClockTime() << " s"
                    << nl << endl;
+
+        // nItersDebug++;
+        // if (nItersDebug > 4) { break; }
     }
 
     Foam::Info<< "End\n" << endl;

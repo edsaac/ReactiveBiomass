@@ -18,6 +18,37 @@ volScalarField h
     mesh
 );
 
+volScalarField h_before = h;
+volScalarField h_after = h;
+
+// volScalarField h_tmp
+// (
+//     IOobject
+//     (
+//         "h_tmp",
+//         runTime.timeName(),
+//         mesh,
+//         IOobject::NO_READ,
+//         IOobject::NO_WRITE
+//     ),
+//     mesh,
+//     dimensionedScalar("h_tmp",dimensionSet(0,1,0,0,0,0,0),scalar(0.0))
+// );
+
+volScalarField err
+(
+    IOobject
+    (
+        "h_tmp",
+        runTime.timeName(),
+        mesh,
+        IOobject::NO_READ,
+        IOobject::NO_WRITE
+    ),
+    mesh,
+    dimensionedScalar("err",dimensionSet(0,1,0,0,0,0,0),scalar(0.0))
+);
+
 //- Velocity vector field at the center of cells [m/s]
 Info<< "Reading field U\n" << endl;
 volVectorField U
