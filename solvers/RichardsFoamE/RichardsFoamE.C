@@ -94,14 +94,15 @@ int main(int argc, char *argv[])
             Foam::Info << "Converger: " << convergeFlow << "\n"
                        << "nCycles:"    << nCycles      << endl;
 
-            if(convergeFlow < 1.0E-05) // converged
+            if(convergeFlow < 1.0E-04) // converged
             {
                 h = h_after;
 
                 if(nCycles < 2)
                 {
-                    Foam::Info << "deltaT increased" << endl;
                     runTime.setDeltaT( 1.2 * runTime.deltaTValue() );
+                    Foam::Info << "\n deltaT going UP ↑↑↑"
+                               << "deltaT = " << runTime.deltaTValue()  << endl;
                 }
                 break;
             }
@@ -124,6 +125,9 @@ int main(int argc, char *argv[])
                         100.0
                     )
                 );
+
+                Foam::Info << "\n deltaT going DOWN ↓↓↓"
+                            << "deltaT = " << runTime.deltaTValue()  << endl;
 
                 h_after = h;
                 nCycles = 0;

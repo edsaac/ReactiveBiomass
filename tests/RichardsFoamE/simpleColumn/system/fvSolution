@@ -31,7 +31,7 @@ SIMPLE
     nNonOrthogonalCorrectors 1;
 }
 
-relaxFactor 1.0;
+relaxFactor 0.995;
 
 relaxationFactors
 {
