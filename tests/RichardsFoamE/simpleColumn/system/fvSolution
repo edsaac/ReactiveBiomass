@@ -26,20 +26,20 @@ solvers
     }
 }
 
-relaxFactor 1.0;
+// relaxFactor 1.0;
 
-relaxationFactors
-{
-    // fields  //Explicit relaxation
-    // {
-    //     h           $relaxFactor;
-    // }
+// relaxationFactors
+// {
+//     // fields  //Explicit relaxation
+//     // {
+//     //     h           $relaxFactor;
+//     // }
     
-    equations  //Implicit relaxation
-    {
-        h   $relaxFactor;
-    }
-}
+//     equations  //Implicit relaxation
+//     {
+//         h   $relaxFactor;
+//     }
+// }
 
 timeStepping
 {
@@ -48,7 +48,7 @@ timeStepping
 
     UpDeltaT_nIters     2;   // Triggers dT up
     UpDeltaT_Factor     1.1;
-    maxDeltaT           300;
+    maxDeltaT           30;
 
     DownDeltaT_Factor   0.5;
     minDeltaT           0.0001;      
