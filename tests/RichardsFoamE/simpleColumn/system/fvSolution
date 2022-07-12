@@ -31,7 +31,7 @@ SIMPLE
     nNonOrthogonalCorrectors 1;
 }
 
-relaxFactor 0.995;
+relaxFactor 1.0;
 
 relaxationFactors
 {
@@ -46,4 +46,16 @@ relaxationFactors
     }
 }
 
+timeStepping
+{
+    convergeThreshold   5.0E-04;
+    maxItersToConverge  10;  // Triggers dT down
+
+    UpDeltaT_nIters     2;   // Triggers dT up
+    UpDeltaT_Factor     1.1;
+    maxDeltaT           300;
+
+    DownDeltaT_Factor   0.5;
+    minDeltaT           0.001;      
+}
 // ************************************************************************* //

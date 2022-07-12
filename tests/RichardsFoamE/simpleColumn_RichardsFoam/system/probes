@@ -12,7 +12,7 @@ Description
 
 #includeEtc "caseDicts/postProcessing/probes/probes.cfg"
 
-fields (H);
+fields (H theta);
 
 probeLocations
 (

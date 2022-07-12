@@ -14,38 +14,26 @@ FoamFile
     object      controlDict;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-end_hours 25.0;
-end_secs #calc "round($end_hours*3600.0)";
-
-write_hours 1.0;
-write_secs #calc "round($write_hours*3600.0)";
-
-application     RichardsFoamE;
+application     RichardsFoam;
 
 startFrom       latestTime;
 startTime       0;
 stopAt          endTime;
 
-endTime	        $end_secs;
+endTime	        54000;
 writeControl    runTime;
-writeInterval   $write_secs;
+writeInterval   3600;
 
-deltaT          2;//1000;
+deltaT          1.0;
 purgeWrite      0;
 
 writeFormat     ascii;
-
 writePrecision  6;
-
 writeCompression off;
 
 timeFormat      fixed;
-
 timePrecision   3;
-
 runTimeModifiable true;
-
 adjustTimeStep  yes;
 
 maxCo           1.0;

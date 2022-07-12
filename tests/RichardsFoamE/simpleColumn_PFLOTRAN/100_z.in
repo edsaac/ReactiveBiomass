@@ -22,12 +22,12 @@ END
 
 #=========================== probes ========================================
 OBSERVATION
-  REGION 75cm
+  REGION 25cm
   AT_COORDINATE
 /
 
-REGION 75cm
-  COORDINATE 0.1 0.1 0.75
+REGION 25cm
+  COORDINATE 0.1 0.1 -0.25
 /
 
 OBSERVATION
@@ -36,16 +36,15 @@ OBSERVATION
 /
 
 REGION 50cm
-  COORDINATE 0.1 0.1 0.50
+  COORDINATE 0.1 0.1 -0.50
 /
 
 OBSERVATION
-  REGION 25cm
+  REGION 75cm
   AT_COORDINATE
 /
-
-REGION 25cm
-  COORDINATE 0.1 0.1 0.25
+REGION 75cm
+  COORDINATE 0.1 0.1 -0.75
 /
 
 
@@ -55,8 +54,8 @@ GRID
   ORIGIN 0.d0 0.d0 0.d0
   NXYZ 1 1 101
   BOUNDS 
-    0.d0 0.d0 0.d0
-    0.2d0 0.2d0 1.d0
+    0.d0 0.d0 -1.d0
+    0.2d0 0.2d0 0.d0
   /
 END
 
@@ -81,12 +80,12 @@ END
 CHARACTERISTIC_CURVES sf1
   SATURATION_FUNCTION VAN_GENUCHTEN
     M 0.359
-    ALPHA  3.67E-4
-    LIQUID_RESIDUAL_SATURATION 0.087
+    ALPHA 3.67E-4
+    LIQUID_RESIDUAL_SATURATION 0.1814
   /
   PERMEABILITY_FUNCTION MUALEM_VG_LIQ
     M 0.359
-    LIQUID_RESIDUAL_SATURATION 0.087
+    LIQUID_RESIDUAL_SATURATION 0.1814
   /
 END
 
@@ -108,15 +107,17 @@ OUTPUT
     PERIODIC TIME 5.0 minute
     VARIABLES
       LIQUID_PRESSURE
+      LIQUID_SATURATION
+      LIQUID_HEAD
     /
   /
 END
 
 #=========================== times ============================================
 TIME
-  FINAL_TIME 25 hour
-  INITIAL_TIMESTEP_SIZE 5.0 minute
-  MAXIMUM_TIMESTEP_SIZE 60. minute 
+  FINAL_TIME 15 hour
+  INITIAL_TIMESTEP_SIZE 1.0 minute
+  MAXIMUM_TIMESTEP_SIZE 5.0 minute 
 END
 
 #=========================== regions ==========================================
@@ -130,16 +131,16 @@ END
 REGION top
   FACE TOP
   COORDINATES
-    -1.d20 -1.d20 1.d0
-    1.d20 1.d20 1.d0
+    -1.d20 -1.d20 0.d0
+    1.d20 1.d20 0.d0
   /
 END
 
 REGION bottom
   FACE BOTTOM
   COORDINATES
-    -1.d20 -1.d20 0.d0
-    1.d20 1.d20 0.d0
+    -1.d20 -1.d20 -1.d0
+    1.d20 1.d20 -1.d0
   /
 END
 
@@ -148,7 +149,9 @@ FLOW_CONDITION initial
   TYPE
     LIQUID_PRESSURE DIRICHLET
   /
-  LIQUID_PRESSURE 91519.05 ! Pa   # 1atm - 1m
+  DATUM 0.d0 0.d0 0.d0
+  LIQUID_PRESSURE 91520.9! Pa   # 1atm - 1m
+  #LIQUID_PRESSURE 3284.36! Pa   # 1atm - 10m
 END
 
 FLOW_CONDITION top_bc
@@ -160,10 +163,11 @@ END
 
 FLOW_CONDITION bottom_bc
   TYPE
-    LIQUID_FLUX NEUMANN
+    #LIQUID_FLUX NEUMANN
+    LIQUID_PRESSURE UNIT_GRADIENT
   /
-  #PRESSURE -999 ! Pa (Ignored)
-  LIQUID_FLUX -1 ! [m/s]
+  #LIQUID_FLUX -1 ! [m/s]
+  PRESSURE -999 ! Pa (Ignored)
 /
 
 #=========================== condition couplers ===============================

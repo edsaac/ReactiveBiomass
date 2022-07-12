@@ -53,35 +53,36 @@ int main(int argc, char *argv[])
     #include "createFvOptions.H"
    
     const label nbMesh = mesh.nCells();
+    Foam::Info << "nCells: " << nbMesh;
+
     double convergeFlow = 1.0;
     int nCycles = 0;
     // unsigned int nItersDebug = 0;
 
     Foam::Info << "\nCalculating...\n" << endl;
-    
+    // Calculate Darcy flow velocity
+    U = - soil.K(h) * (fvc::grad(h) + fvc::grad(z));
+    phi = fvc::flux(U);
+
     while (runTime.loop())
     {
-        Foam::Info<< "Time = "   << runTime.timeName() << nl 
+        Foam::Info<< "Time = "   << runTime.timeName() << "\t" 
                   << "deltaT = " << runTime.deltaTValue()  << endl;
         
         nCycles = 0;
         h_before = h;
         h_after = h;
 
-        Foam::Info << "nCells: " << nbMesh;
-
         // Solve saturation from Richards Equation    
         while(true)
         {
-            Foam::Info << "Enter the inner loop " << endl; 
-
             // Solve Richard's equation    
             fvScalarMatrix richardsEquation
             (
                 fvm::ddt(soil.capillary(h_before), h_after)
                 - fvm::laplacian(soil.K(h_before), h_after)
                 ==
-                fvc::laplacian(soil.K(h_before), z)
+                - fvc::laplacian(soil.K(h_before), z)
             );
             richardsEquation.relax();
             fvOptions.constrain(richardsEquation);
@@ -89,55 +90,21 @@ int main(int argc, char *argv[])
             fvOptions.correct(h_after);
 
             // Check if solution converged
-            err = h_after - h_before;
-            convergeFlow = gSumMag(err)/nbMesh;
-            Foam::Info << "Converger: " << convergeFlow << "\n"
-                       << "nCycles:"    << nCycles      << endl;
+            err = Foam::mag(h_after - h_before);
+            convergeFlow = Foam::gSumMag(err)/nbMesh;
+            Foam::Info << "nCycles: "    << nCycles      << "\t"
+                       << "Converger: " << convergeFlow << endl;
 
-            if(convergeFlow < 1.0E-04) // converged
-            {
-                h = h_after;
-
-                if(nCycles < 2)
-                {
-                    runTime.setDeltaT( 1.2 * runTime.deltaTValue() );
-                    Foam::Info << "\n deltaT going UP ↑↑↑"
-                               << "deltaT = " << runTime.deltaTValue()  << endl;
-                }
-                break;
-            }
-
-            else // did not converged, try again
-            {
-                h_before = h_after;
-                h_after = h;
-                nCycles++;
-            }
-
-            if(nCycles > 5) // has not converged yet
-            {
-                Foam::Info << "deltaT halved" << endl;
-                runTime.setDeltaT
-                (
-                    min
-                    (
-                        0.5 * runTime.deltaTValue(),
-                        100.0
-                    )
-                );
-
-                Foam::Info << "\n deltaT going DOWN ↓↓↓"
-                            << "deltaT = " << runTime.deltaTValue()  << endl;
-
-                h_after = h;
-                nCycles = 0;
-            }
+            #include "timeControl.H"
             
         }
         
         // Calculate Darcy flow velocity
         U = - soil.K(h) * (fvc::grad(h) + fvc::grad(z));
         phi = fvc::flux(U);
+
+        // Calculate water content
+        theta = soil.waterContentCalculator(h);
 
         //End bits
         runTime.write();
@@ -147,7 +114,7 @@ int main(int argc, char *argv[])
                    << nl << endl;
 
         // nItersDebug++;
-        // if (nItersDebug > 4) { break; }
+        // if (nItersDebug > 1000) { break; }
     }
 
     Foam::Info<< "End\n" << endl;
