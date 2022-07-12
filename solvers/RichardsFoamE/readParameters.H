@@ -1,21 +1,15 @@
 //  Soil properties 
 //  Currently it only supports and unique homogeneous material
 
-Info<< "Reading soilProperties\n" << endl;
-IOdictionary soilProperties
+UnsaturatedSoilParametersField soil
 (
-    IOobject
-    (
-        "soilProperties",
-        runTime.constant(),
-        mesh,
-        IOobject::MUST_READ_IF_MODIFIED,
-        IOobject::NO_WRITE
-    )
+    &theta_s,
+    &theta_r,
+    &K_s,
+    &alpha,
+    &n,
+    &m
 );
-
-#include "UnsaturatedSoilParameters.H"
-UnsaturatedSoilParameters soil {soilProperties};
 
 
 //  Time stepping properties 
@@ -27,8 +21,6 @@ dictionary timeProperties
     mesh.solutionDict().subDict("timeStepping")
 );
 
-# include "timeStepper.H"
 TimeStepper timeControl {timeProperties};
 
-bool adjustTimeStep =
-    runTime.controlDict().lookupOrDefault("adjustTimeStep", false);
+bool adjustTimeStep = runTime.controlDict().lookupOrDefault("adjustTimeStep", true);

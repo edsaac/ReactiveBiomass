@@ -96,3 +96,74 @@ volScalarField hydrConduct
     mesh,
     dimensionedScalar("hydrConduct",dimensionSet(0,1,-1,0,0),scalar(0.0))
 );
+
+////////////////// Constant volScalarFields ////////////////
+volScalarField theta_s
+(
+    IOobject
+    (
+        "theta_s",
+        runTime.constantPath()/"soilParameters",
+        mesh,
+        IOobject::MUST_READ,
+        IOobject::NO_WRITE
+    ),
+    mesh
+);
+
+volScalarField theta_r
+(
+    IOobject
+    (
+        "theta_r",
+        runTime.constantPath()/"soilParameters",
+        mesh,
+        IOobject::MUST_READ,
+        IOobject::NO_WRITE
+    ),
+    mesh
+);
+
+volScalarField K_s
+(
+    IOobject
+    (
+        "K_s",
+        runTime.constantPath()/"soilParameters",
+        mesh,
+        IOobject::MUST_READ,
+        IOobject::NO_WRITE
+    ),
+    mesh
+);
+
+volScalarField alpha
+(
+    IOobject
+    (
+        "alpha",
+        runTime.constantPath()/"soilParameters",
+        mesh,
+        IOobject::MUST_READ,
+        IOobject::NO_WRITE
+    ),
+    mesh
+);
+
+volScalarField n
+(
+    IOobject
+    (
+        "n",
+        runTime.constantPath()/"soilParameters",
+        mesh,
+        IOobject::MUST_READ,
+        IOobject::NO_WRITE
+    ),
+    mesh
+);
+
+volScalarField m
+(
+    1.0 - 1.0/n
+);

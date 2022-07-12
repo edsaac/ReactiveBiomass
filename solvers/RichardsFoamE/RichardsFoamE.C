@@ -39,6 +39,9 @@ Description
 #include "fvCFD.H"
 #include "fvOptions.H"
 
+#include "UnsaturatedSoilParametersField.H"
+#include "timeStepper.H"
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 int main(int argc, char *argv[])
 {
@@ -50,8 +53,8 @@ int main(int argc, char *argv[])
     const label nbMesh = mesh.nCells();
     Foam::Info << "nCells: " << nbMesh;
 
-    #include "readParameters.H"
     #include "createFields.H"
+    #include "readParameters.H"
     #include "createFvOptions.H"
 
     double convergeFlow = 1.0;
@@ -60,16 +63,9 @@ int main(int argc, char *argv[])
 
     Foam::Info << "\nCalculating...\n" << endl;
 
-    // Initialize derived variables
-    hydrConduct = soil.K(h);
-    U = - hydrConduct * (fvc::grad(h) + fvc::grad(z));
-    phi = fvc::flux(U);
-    theta = soil.waterContentCalculator(h);
-
     while (runTime.loop())
     {
-        Foam::Info<< "Time = "   << runTime.timeName() << "\t" 
-                  << "deltaT = " << runTime.deltaTValue()  << endl;
+        Foam::Info<< "Time = "   << runTime.timeName() << endl; 
         
         nCycles = 0;
         h_before = h;
@@ -119,10 +115,11 @@ int main(int argc, char *argv[])
 
         Foam::Info << "ExecutionTime = " << runTime.elapsedCpuTime()   << " s"
                    << "    ClockTime = " << runTime.elapsedClockTime() << " s"
+                   << "       deltaT = " << runTime.deltaTValue()      << " s"
                    << nl << endl;
 
         // nItersDebug++;
-        // if (nItersDebug > 1000) { break; }
+        // if (nItersDebug > 100) { break; }
     }
 
     Foam::Info<< "End\n" << endl;
