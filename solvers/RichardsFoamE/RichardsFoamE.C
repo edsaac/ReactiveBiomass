@@ -47,22 +47,23 @@ int main(int argc, char *argv[])
     #include "createMesh.H"
     
     volScalarField z (mesh.C().component(2));
-      
+    const label nbMesh = mesh.nCells();
+    Foam::Info << "nCells: " << nbMesh;
+
     #include "readParameters.H"
     #include "createFields.H"
     #include "createFvOptions.H"
-   
-    const label nbMesh = mesh.nCells();
-    Foam::Info << "nCells: " << nbMesh;
 
     double convergeFlow = 1.0;
     int nCycles = 0;
     // unsigned int nItersDebug = 0;
 
     Foam::Info << "\nCalculating...\n" << endl;
-    // Calculate Darcy flow velocity
+
+    // Initialize derived variables
     U = - soil.K(h) * (fvc::grad(h) + fvc::grad(z));
     phi = fvc::flux(U);
+    theta = soil.waterContentCalculator(h);
 
     while (runTime.loop())
     {
@@ -80,9 +81,9 @@ int main(int argc, char *argv[])
             fvScalarMatrix richardsEquation
             (
                 fvm::ddt(soil.capillary(h_before), h_after)
-                - fvm::laplacian(soil.K(h_before), h_after)
                 ==
-                - fvc::laplacian(soil.K(h_before), z)
+                fvm::laplacian(soil.K(h_before), h_after)
+                + fvc::laplacian(soil.K(h_before), z)
             );
             richardsEquation.relax();
             fvOptions.constrain(richardsEquation);
@@ -95,8 +96,14 @@ int main(int argc, char *argv[])
             Foam::Info << "nCycles: "    << nCycles      << "\t"
                        << "Converger: " << convergeFlow << endl;
 
-            #include "timeControl.H"
-            
+            if (adjustTimeStep)
+            {
+                #include "timeControl.H"
+            }
+            else 
+            {
+                break;
+            }
         }
         
         // Calculate Darcy flow velocity

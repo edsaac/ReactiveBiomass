@@ -18,7 +18,20 @@ volScalarField h
     mesh
 );
 
-volScalarField h_before = h;
+volScalarField h_before 
+(
+    IOobject
+    (
+        "h_before",
+        runTime.timeName(),
+        mesh,
+        IOobject::NO_READ,
+        IOobject::NO_WRITE
+    ),
+    mesh,
+    dimensionedScalar("h_before",dimensionSet(0,1,0,0,0,0,0),scalar(0.0))
+);
+
 volScalarField h_after = h;
 
 // volScalarField h_tmp

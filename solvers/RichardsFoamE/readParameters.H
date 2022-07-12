@@ -177,3 +177,7 @@ class TimeStepper{
 
 //Biochemical parameters
 TimeStepper timeControl {timeProperties};
+
+// TimeStep adjustable?
+bool adjustTimeStep =
+    runTime.controlDict().lookupOrDefault("adjustTimeStep", false);

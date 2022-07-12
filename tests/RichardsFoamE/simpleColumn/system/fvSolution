@@ -21,14 +21,9 @@ solvers
     {
         solver          PCG;
         preconditioner  FDIC;
-        tolerance       1e-20;
+        tolerance       1e-15;
         relTol          0;
     }
-}
-
-SIMPLE
-{
-    nNonOrthogonalCorrectors 1;
 }
 
 relaxFactor 1.0;
@@ -37,12 +32,12 @@ relaxationFactors
 {
     // fields  //Explicit relaxation
     // {
-
+    //     h           $relaxFactor;
     // }
     
     equations  //Implicit relaxation
     {
-        h        $relaxFactor;
+        h   $relaxFactor;
     }
 }
 
@@ -56,6 +51,6 @@ timeStepping
     maxDeltaT           300;
 
     DownDeltaT_Factor   0.5;
-    minDeltaT           0.001;      
+    minDeltaT           0.0001;      
 }
 // ************************************************************************* //

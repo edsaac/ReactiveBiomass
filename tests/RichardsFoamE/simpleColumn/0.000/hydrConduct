@@ -10,45 +10,44 @@ FoamFile
     version     2.0;
     format      ascii;
     class       volScalarField;
-    object      theta;
+    location    "0.000";
+    object      hydrConduct;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dimensions      [0 0 0 0 0 0 0];
+dimensions      [0 1 -1 0 0 0 0];
 
-internalField   uniform 0.1;
+internalField   uniform 0;
 
 boundaryField
 {
-    front
-    {
-        type       empty;
-    }
-
-    back
-    {
-        type        empty;
-    }
-
-    right
-    {
-        type        empty;
-    }
-
-    left
-    {
-        type        empty;
-    }
-
     top
     {
-        type        zeroGradient;
+        type            calculated;
+        value           uniform 0;
     }
-    
+    left
+    {
+        type            empty;
+    }
+    right
+    {
+        type            empty;
+    }
+    front
+    {
+        type            empty;
+    }
+    back
+    {
+        type            empty;
+    }
     bottom
     {
-        type        zeroGradient;
+        type            calculated;
+        value           uniform 0;
     }
 }
+
 
 // ************************************************************************* //

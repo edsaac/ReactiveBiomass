@@ -10,47 +10,149 @@ FoamFile
     version     2.0;
     format      ascii;
     class       volScalarField;
+    location    "0.000";
     object      h;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 dimensions      [0 1 0 0 0 0 0];
 
-internalField   uniform -1.0;
+internalField   nonuniform List<scalar> 
+101
+(
+-1.00001
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-0.999999
+-0.997544
+-0.292038
+)
+;
 
 boundaryField
 {
-    front
+    top
     {
-        type            empty;
+        type            fixedValue;
+        value           uniform 0.01;
     }
-
-    back
-    {
-        type            empty;
-    }
-
-    right
-    {
-        type            empty;
-    }
-
     left
     {
         type            empty;
     }
-
-    top
+    right
     {
-        type        fixedValue;
-	    value       uniform  0.01;
+        type            empty;
     }
-
+    front
+    {
+        type            empty;
+    }
+    back
+    {
+        type            empty;
+    }
     bottom
     {
-        type        fixedGradient;
-        gradient    uniform -1.0;
+        type            fixedGradient;
+        gradient        uniform -1;
     }
 }
+
 
 // ************************************************************************* //
