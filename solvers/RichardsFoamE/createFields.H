@@ -1,9 +1,6 @@
-/*---------------------------------------------------------------------------*\
-            Declarations of the fields of primary variables
-\*---------------------------------------------------------------------------*/
+//  Hydraulic head H = h + z [m]
+//  We only use h and explicitely handle z
 
-//- Total water pressure (pressure head/matrix potential) [m] at cell centers
-//  primary variable of resolution for Richards equation
 Info<< "Reading field h\n" << endl;
 volScalarField h
 (
@@ -18,7 +15,8 @@ volScalarField h
     mesh
 );
 
-volScalarField h_before 
+//  For Picard loops
+volScalarField h_before
 (
     IOobject
     (
@@ -34,20 +32,6 @@ volScalarField h_before
 
 volScalarField h_after = h;
 
-// volScalarField h_tmp
-// (
-//     IOobject
-//     (
-//         "h_tmp",
-//         runTime.timeName(),
-//         mesh,
-//         IOobject::NO_READ,
-//         IOobject::NO_WRITE
-//     ),
-//     mesh,
-//     dimensionedScalar("h_tmp",dimensionSet(0,1,0,0,0,0,0),scalar(0.0))
-// );
-
 volScalarField err
 (
     IOobject
@@ -62,7 +46,7 @@ volScalarField err
     dimensionedScalar("err",dimensionSet(0,1,0,0,0,0,0),scalar(0.0))
 );
 
-//- Velocity vector field at the center of cells [m/s]
+//  Velocity vector field [m/s]
 Info<< "Reading field U\n" << endl;
 volVectorField U
 (
@@ -78,10 +62,11 @@ volVectorField U
     dimensionedVector("U", dimensionSet(0,1,-1,0,0,0,0) , vector(0.0,0.0,0.0))
 );
 
+//- Face fluxes [m³/s]
 #include "createPhi.H"
 
 //- Water contents and effective water content [-]
-Info<< "Reading field saturation\n" << endl;
+Info<< "Initialize water content field\n" << endl;
 volScalarField theta
 (
     IOobject
@@ -89,70 +74,15 @@ volScalarField theta
         "theta",
         runTime.timeName(),
         mesh,
-        IOobject::MUST_READ,
+        IOobject::NO_READ,
         IOobject::AUTO_WRITE
     ),
-    mesh
-);
-
-volScalarField theta_e
-(
-    IOobject
-    (
-        "theta_e",
-        runTime.timeName(),
-        mesh,
-        IOobject::NO_READ,
-        IOobject::NO_WRITE
-    ),
     mesh,
-    dimensionedScalar("theta_e",dimless,scalar(0.0))
+    dimensionedScalar("theta", dimensionSet(0,0,0,0,0,0,0) , scalar(0.0))
 );
 
-volScalarField innerAlphaPower
-(
-    IOobject
-    (
-        "innerAlphaPower",
-        runTime.timeName(),
-        mesh,
-        IOobject::NO_READ,
-        IOobject::NO_WRITE
-    ),
-    mesh,
-    dimensionedScalar("innerAlphaPower",dimless,scalar(0.0))
-);
-
-volScalarField capillary
-(
-    IOobject
-    (
-        "capillary",
-        runTime.timeName(),
-        mesh,
-        IOobject::NO_READ,
-        IOobject::NO_WRITE
-    ),
-    mesh,
-    dimensionedScalar("capillary",dimensionSet(0,-1,0,0,0),scalar(0.0))
-);
-
-//- Permeability and hydraulic conductivity [-]
-Info<< "Reading relative permeability\n" << endl;
-volScalarField perm
-(
-    IOobject
-    (
-        "perm",
-        runTime.timeName(),
-        mesh,
-        IOobject::NO_READ,
-        IOobject::NO_WRITE
-    ),
-    mesh,
-    dimensionedScalar("perm",dimless,scalar(0.0))
-);
-
+//- Permeability and hydraulic conductivity [m/s]
+Info<< "Initialize hydraulic conductivity\n" << endl;
 volScalarField hydrConduct
 (
     IOobject

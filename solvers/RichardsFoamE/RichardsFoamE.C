@@ -61,7 +61,8 @@ int main(int argc, char *argv[])
     Foam::Info << "\nCalculating...\n" << endl;
 
     // Initialize derived variables
-    U = - soil.K(h) * (fvc::grad(h) + fvc::grad(z));
+    hydrConduct = soil.K(h);
+    U = - hydrConduct * (fvc::grad(h) + fvc::grad(z));
     phi = fvc::flux(U);
     theta = soil.waterContentCalculator(h);
 
@@ -85,7 +86,6 @@ int main(int argc, char *argv[])
                 fvm::laplacian(soil.K(h_before), h_after)
                 + fvc::laplacian(soil.K(h_before), z)
             );
-            richardsEquation.relax();
             fvOptions.constrain(richardsEquation);
             richardsEquation.solve();
             fvOptions.correct(h_after);
@@ -107,10 +107,11 @@ int main(int argc, char *argv[])
         }
         
         // Calculate Darcy flow velocity
-        U = - soil.K(h) * (fvc::grad(h) + fvc::grad(z));
+        hydrConduct = soil.K(h);
+        U = - hydrConduct * (fvc::grad(h) + fvc::grad(z));
         phi = fvc::flux(U);
 
-        // Calculate water content
+        // Calculate derived unsaturated stuff
         theta = soil.waterContentCalculator(h);
 
         //End bits
