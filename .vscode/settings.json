@@ -20,5 +20,6 @@
         "random": "cpp",
         "chrono": "cpp",
         "limits": "cpp"
-    }
+    },
+    "explorer.excludeGitIgnore": true
 }
