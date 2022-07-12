@@ -140,3 +140,4 @@ dmypy.json
 **/postProcessing/
 **/VTK/
 **/log*
+**/*.h5
