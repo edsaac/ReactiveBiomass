@@ -140,4 +140,6 @@ dmypy.json
 **/postProcessing/
 **/VTK/
 **/log*
+
+# Pflotran snapshot
 **/*.h5
