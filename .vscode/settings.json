@@ -16,6 +16,10 @@
         "*.H": "cpp",
         "*.tcc": "cpp",
         "optional": "cpp",
-        "system_error": "cpp"
-    }
+        "system_error": "cpp",
+        "random": "cpp",
+        "chrono": "cpp",
+        "limits": "cpp"
+    },
+    "explorer.excludeGitIgnore": true
 }

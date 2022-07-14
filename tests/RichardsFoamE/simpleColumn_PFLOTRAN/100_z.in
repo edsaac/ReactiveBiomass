@@ -1,0 +1,201 @@
+#Description: 2D Flow and Transport problem
+
+SIMULATION
+  SIMULATION_TYPE SUBSURFACE
+  PROCESS_MODELS
+    SUBSURFACE_FLOW flow
+      MODE RICHARDS
+    /
+  /
+END
+
+SUBSURFACE
+
+#=========================== numerical methods ================================
+NUMERICAL_METHODS FLOW
+
+  NEWTON_SOLVER
+    MAXIMUM_NUMBER_OF_ITERATIONS 50
+  /
+
+END
+
+#=========================== probes ========================================
+OBSERVATION
+  REGION 25cm
+  AT_COORDINATE
+/
+
+REGION 25cm
+  COORDINATE 0.1 0.1 -0.25
+/
+
+OBSERVATION
+  REGION 50cm
+  AT_COORDINATE
+/
+
+REGION 50cm
+  COORDINATE 0.1 0.1 -0.50
+/
+
+OBSERVATION
+  REGION 75cm
+  AT_COORDINATE
+/
+REGION 75cm
+  COORDINATE 0.1 0.1 -0.75
+/
+
+
+#=========================== discretization ===================================
+GRID
+  TYPE STRUCTURED
+  ORIGIN 0.d0 0.d0 0.d0
+  NXYZ 1 1 101
+  BOUNDS 
+    0.d0 0.d0 -1.d0
+    0.2d0 0.2d0 0.d0
+  /
+END
+
+#=========================== fluid properties =================================
+FLUID_PROPERTY
+  DIFFUSION_COEFFICIENT 1.d-9
+END
+
+#=========================== material properties ==============================
+MATERIAL_PROPERTY soil1
+  ID 1
+  POROSITY 0.43
+  TORTUOSITY 1.0
+  CHARACTERISTIC_CURVES sf1
+  PERMEABILITY
+    ISOTROPIC
+    PERM_ISO 2.946E-13
+  /
+END
+
+#=========================== characteristic curves ============================
+CHARACTERISTIC_CURVES sf1
+  SATURATION_FUNCTION VAN_GENUCHTEN
+    M 0.359
+    ALPHA 3.67E-4
+    LIQUID_RESIDUAL_SATURATION 0.1814
+  /
+  PERMEABILITY_FUNCTION MUALEM_VG_LIQ
+    M 0.359
+    LIQUID_RESIDUAL_SATURATION 0.1814
+  /
+END
+
+#=========================== output options ===================================
+OUTPUT
+  SNAPSHOT_FILE
+    FORMAT HDF5
+    PERIODIC TIME 0.25 hour
+    VARIABLES
+      LIQUID_PRESSURE
+      LIQUID_HEAD
+      LIQUID_SATURATION
+      CAPILLARY_PRESSURE
+      LIQUID_DENSITY
+    /
+    VELOCITY_AT_CENTER
+  /
+
+  OBSERVATION_FILE
+    PERIODIC TIME 5.0 minute
+    VARIABLES
+      LIQUID_PRESSURE
+      LIQUID_SATURATION
+      LIQUID_HEAD
+    /
+  /
+END
+
+#=========================== times ============================================
+TIME
+  FINAL_TIME 15 hour
+  INITIAL_TIMESTEP_SIZE 0.1 second
+  MAXIMUM_TIMESTEP_SIZE 0.5 minute 
+END
+
+#=========================== regions ==========================================
+REGION all
+  COORDINATES
+    -1.d20 -1.d20 -1.d20
+    1.d20 1.d20 1.d20
+  /
+END
+
+REGION top
+  FACE TOP
+  COORDINATES
+    -1.d20 -1.d20 0.d0
+    1.d20 1.d20 0.d0
+  /
+END
+
+REGION bottom
+  FACE BOTTOM
+  COORDINATES
+    -1.d20 -1.d20 -1.d0
+    1.d20 1.d20 -1.d0
+  /
+END
+
+#=========================== flow conditions ==================================
+FLOW_CONDITION initial
+  TYPE
+    LIQUID_PRESSURE DIRICHLET
+  /
+  DATUM 0.d0 0.d0 0.d0
+  LIQUID_PRESSURE 91520.9! Pa   # 1atm - 1m
+  #LIQUID_PRESSURE 3284.36! Pa   # 1atm - 10m
+END
+
+FLOW_CONDITION top_bc
+  TYPE
+    LIQUID_PRESSURE DIRICHLET
+  /
+  LIQUID_PRESSURE 101423.0 ! Pa   # 1atm + 0.01m
+END
+
+FLOW_CONDITION bottom_bc
+  TYPE
+    #LIQUID_FLUX NEUMANN
+    #LIQUID_PRESSURE UNIT_GRADIENT
+    LIQUID_PRESSURE SEEPAGE
+  /
+  #LIQUID_FLUX -1 ! [m/s]
+  PRESSURE 101325 ! Pa (Ignored)
+/
+
+#=========================== condition couplers ===============================
+# initial condition
+INITIAL_CONDITION
+  FLOW_CONDITION initial
+  REGION all
+END
+
+# top boundary condition
+BOUNDARY_CONDITION top
+  FLOW_CONDITION top_bc
+  REGION top
+END
+
+#=========================== stratigraphy couplers ============================
+STRATA
+  MATERIAL soil1
+  REGION all
+END
+
+END_SUBSURFACE
+
+
+#=========================== equation of state ================================
+EOS WATER
+  DENSITY CONSTANT 1000.d0 kg/m^3
+  VISCOSITY CONSTANT 1.0E-3 Pa-s
+END
