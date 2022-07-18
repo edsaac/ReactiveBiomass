@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 from natsort import natsorted
 
-def retrieveVariables(path,variables,parseKeyword = "top"):
+def retrieveVariables(path: str, variables: list[str],parseKeyword = "top"):
     listOfFilesInPath = natsorted(os.listdir(path))
     justTimeSteps = [f for f in listOfFilesInPath if f.replace('.','',1).isdigit()][1:]  #Ignore zero time
     #justTimeSteps = [f for f in listOfFilesInPath if f.replace('.','',1).isdigit()]  #Include zero time
