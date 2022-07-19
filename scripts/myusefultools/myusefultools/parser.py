@@ -1,44 +1,58 @@
-import os, pickle
+import os, pickle, shutil
 import numpy as np
 import pandas as pd
 from natsort import natsorted
 
-def retrieveVariables(path: str, variables: list[str],parseKeyword = "top"):
+def pickleVolScalarField(path: str, variables: list[str], keyword = "top"):
+    '''
+    Takes a path for an OpenFoam case and returns a pandas DataFrame
+    with the times and a column for each volScalarField.
+    | Time | Var1 | Var2 | 
+    It uses pcregrep to match the regex
+    It ignores 0 folder.
+    '''
     listOfFilesInPath = natsorted(os.listdir(path))
     justTimeSteps = [f for f in listOfFilesInPath if f.replace('.','',1).isdigit()][1:]  #Ignore zero time
-    #justTimeSteps = [f for f in listOfFilesInPath if f.replace('.','',1).isdigit()]  #Include zero time
     
-    time_float = [float(t) for t in justTimeSteps]
-    results = pd.DataFrame({'Time (s)':np.array(time_float)})
+    #variables = [f for f in os.listdir(path=os.path.join(path,justTimeSteps[-1])) 
+    #             if os.path.isfile(os.path.join(path,justTimeSteps[-1],f))]
     
-    pickledFile = path + "/pickled.pkl"
+    timeAsFloat = [float(t) for t in justTimeSteps]
+    globalDataFrame = pd.DataFrame({'Time (s)':np.array(timeAsFloat)})
     
-    if os.path.exists(pickledFile):
-        with open(pickledFile,'rb') as f:
-            results = pickle.load(f)
-    else:
-        for variable in variables:
-            ## Create a folder for the extracted variable
-            folderForParsedTimesteps =  f"{path}/{variable}All"
-            os.system(f"rm -rf {folderForParsedTimesteps}; mkdir {folderForParsedTimesteps}")
-
-            varList = list()
-
-            for time in justTimeSteps:
-                fileToDump = f"{folderForParsedTimesteps}/{time}"
-                
-                ## This regex fails if the number in scientific notation has no decimal, like if it is 3e-3 
-                grepParser = f'pcregrep -M -o3 "({parseKeyword})\n(^.*\n){{1,20}}[0-9]+\n[(]\n((-?[0-9]*[.].*\n)*)[)]" {path}/{time}/{variable} > {fileToDump}'
-                os.system(grepParser)
-                this = np.loadtxt(fileToDump)
-                varList.append(this)
-
-            results[f"{variable}"] = varList
+    for variable in variables:
         
-        with open(pickledFile,'wb') as f:
-            pickle.dump(results,f)
+        ## Create a folder for the extracted variable
+        folderPickledFields = os.path.join(path,"pickledFields")
 
-    return results
+        ## Check if variable was already parsed
+        pickledVariable = os.path.join(folderPickledFields,f"/{variable}.pkl")
+        if os.path.exists(pickledVariable):
+            with open(pickledVariable,'rb') as f:
+                globalDataFrame[variable] = pickle.load(f)
+
+        ## If variable has not been parsed
+        else:
+            tmpFolderForParsedTimesteps =  f"{path}/Parsed_{variable}"
+            shutil.rmtree(tmpFolderForParsedTimesteps,ignore_errors=True)
+            os.mkdir(tmpFolderForParsedTimesteps)
+
+            tmpVector = [None] * len(justTimeSteps)
+            for i,time in enumerate(justTimeSteps):
+                tmpfileToDump = os.path.join(tmpFolderForParsedTimesteps,time)
+                tmpFileToRead = os.path.join(path,time,variable)
+
+                ## This regex :D 
+                ## To-do: implement this using python re module
+                grepRegex = f"({keyword})\n(^.*\n){{1,20}}[0-9]+\n[(]\n((-?[0-9]*[.]?.*\n)*?)[)]"
+                os.system(f'pcregrep -M -o3 "{grepRegex}" {tmpFileToRead} > {tmpfileToDump}')
+
+                thisTimeData = np.loadtxt(tmpfileToDump)  ## if a volVectorField is passed, it will break here
+                tmpVector[i] = thisTimeData
+
+            globalDataFrame[f"{variable}"] = tmpVector
+
+    return globalDataFrame
 
 def main():
     pass
