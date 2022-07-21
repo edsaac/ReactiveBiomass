@@ -16,7 +16,7 @@ FoamFile
 
 dimensions      [0 1 0 0 0 0 0];
 
-internalField   uniform -10;
+internalField   uniform -5;
 
 boundaryField
 {
@@ -32,25 +32,25 @@ boundaryField
 
     right
     {
-        type        fixedGradient;
-        gradient    uniform 0.0;
+        type        zeroGradient;
         // type		cyclicAMI;
     }
 
     left
     {
   	    // type		cyclicAMI;
-          type        fixedGradient;
-          gradient    uniform 0.0;  // Negative means outside the patch
+        type        zeroGradient;
     }
 
     top
     {
-        type        fixedValue;
-	    value       uniform  0.1; 
+        // //FIXED HEAD
+        // type        fixedValue;
+	    // value       uniform  0.1; 
+        
+        // //HEAD AS A FUNCTION OF POSITION
         // type        codedFixedValue;
         // value       uniform 0.1;
-
         // name        bumpInTheMiddle;
         // code
         // #{
@@ -58,17 +58,43 @@ boundaryField
         //     scalarField& field = *this;
 
         //     const scalar hWet = 0.1;
-        //     const scalar hDry = -10.0;
+        //     const scalar hDry = -5.0;
 
         //     forAll(Cf, faceI)
         //     {
         //         scalar x = Cf[faceI][0];
         //         // field[faceI] = hWet + hDry*sqr(x - 0.5);
-        //         if(x > 0.4 && x < 0.6){field[faceI] = hWet;}
-        //         else{field[faceI] = hDry;}
+        //         if(x > 0.4 && x < 0.6) {field[faceI] = hWet;}
+        //         else {field[faceI] = hDry;}
         //     }
         // #};
+        
+        // //HEAD AS A FUNCTION OF K_S or any other parameter
+        type        codedFixedValue;
+        value       uniform 0.1;
+        name        hFixedByKs;
+        code
+        #{
+            const vectorField& Cf = patch().Cf();
+            scalarField& field = *this;
+            const volScalarField& K_s = this->db().objectRegistry::lookupObject<volScalarField>("K_s");
+            
+            // Foam::Info<< K_s << endl;
 
+            forAll(Cf, faceI)
+            {
+                //scalar x = Cf[faceI][0];
+                field[faceI] = K_s[faceI] * 1.0E+5;
+            }
+        #};
+
+        // // MIXED Gradient/FixedValue
+        // type            mixed;
+	    // refValue        uniform  0.1;
+        // refGradient     uniform  0.1;
+        // valueFraction   0.5;
+        // value       uniform  0.1;
+        
     }
 
     bottom

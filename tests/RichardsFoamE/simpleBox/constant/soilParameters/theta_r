@@ -9,23 +9,27 @@ FoamFile
 {
     version     2.0;
     format      ascii;
-    class       dictionary;
-    location    "constant";
-    object      transportProperties;
+    class       volScalarField;
+    location    "0.000";
+    object      theta_r;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-// [kg m s K mol * *]
 
+dimensions      [0 0 0 0 0 0 0];
 
-theta_s       theta_s       [0 0 0 0 0 0 0]    0.230; // Max water content
-theta_r       theta_r       [0 0 0 0 0 0 0]    0.078; // Residual water content
+internalField   uniform 0.078; 
 
-K_s           K_s           [0 1 -1 0 0 0 0]   2.45E-5; // Saturated hydraulic conduct.
-alpha         alpha         [0 -1 0 0 0 0 0]   4.30;     // Inverse of pc0
-
-n             n             [0 0 0 0 0 0 0]    1.82;    // Van Genutchen exponent
-
-
+boundaryField
+{
+    "(top|left|right|bottom)"
+    {
+        type            zeroGradient;
+    }
+    "(front|back)"
+    {
+        type            empty;
+    }
+}
 
 
 // ************************************************************************* //

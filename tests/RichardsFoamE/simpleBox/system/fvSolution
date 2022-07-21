@@ -17,49 +17,25 @@ FoamFile
 
 solvers
 {
-    // h
-    // {
-    //     solver          PCG;
-    //     preconditioner  DIC;
-    //     tolerance       1e-06;
-    //     relTol          0;
-    // }
-
     h
     {
         solver          PCG;
-        preconditioner  DIC;
-        tolerance       1e-10;
+        preconditioner  FDIC;
+        tolerance       1e-15;
         relTol          0;
     }
-
-    // "(suspendedClay|depositedClay)"
-    // {
-    //     solver          PBiCGStab;
-    //     preconditioner  DILU;
-    //     tolerance       1e-06;
-    //     relTol          0;
-    // }
 }
 
-SIMPLE
+timeStepping
 {
-    nNonOrthogonalCorrectors 1;
+    convergeThreshold   5.0E-04;
+    maxItersToConverge  10;  // Triggers dT down
+
+    UpDeltaT_nIters     2;   // Triggers dT up
+    UpDeltaT_Factor     1.1;
+    maxDeltaT           30;
+
+    DownDeltaT_Factor   0.5;
+    minDeltaT           0.0001;      
 }
-
-// relaxFactor 0.8;
-
-// relaxationFactors
-// {
-//     // fields  //Explicit relaxation
-//     // {
-
-//     // }
-    
-//     equations  //Implicit relaxation
-//     {
-//         h        $relaxFactor;
-//     }
-// }
-
 // ************************************************************************* //

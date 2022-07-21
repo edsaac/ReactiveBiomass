@@ -15,10 +15,10 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-end_hours 2.0;
+end_hours 24.0;
 end_secs #calc "round($end_hours*3600.0)";
 
-write_hours 0.25;
+write_hours 0.50;
 write_secs #calc "round($write_hours*3600.0)";
 
 application     RichardsFoamE;
