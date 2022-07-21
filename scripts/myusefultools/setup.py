@@ -12,7 +12,8 @@ setup(
     install_requires=['numpy',
                       'matplotlib',
                       'pandas',
-                      'natsort'
+                      'natsort',
+                      'pyvista'
                       ],
 
     classifiers=['None'],
