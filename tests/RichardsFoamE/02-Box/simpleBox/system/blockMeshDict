@@ -35,7 +35,7 @@ vertices
     (0 0 $depth)
     ($lenght 0 $depth)
     ($lenght 0.2 $depth)
-    (0 0.2 $depth)    
+    (0 0.2 $depth)
 );
 
 
