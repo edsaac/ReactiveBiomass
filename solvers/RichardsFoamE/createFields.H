@@ -94,7 +94,7 @@ volScalarField hydrConduct
         IOobject::AUTO_WRITE
     ),
     mesh,
-    dimensionedScalar("hydrConduct",dimensionSet(0,1,-1,0,0),scalar(0.0))
+    dimensionedScalar("hydrConduct",dimensionSet(0,1,-1,0,0),scalar(1.0))
 );
 
 ////////////////// Constant volScalarFields ////////////////

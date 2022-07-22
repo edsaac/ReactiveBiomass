@@ -16,7 +16,7 @@ FoamFile
 
 dimensions      [0 1 0 0 0 0 0];
 
-internalField   uniform -5;
+internalField   uniform -1.0;
 
 boundaryField
 {
@@ -48,6 +48,31 @@ boundaryField
         // type        fixedValue;
 	    // value       uniform  0.1; 
         
+        // Fixed Darcy Flux
+        type            codedMixed;
+        refValue        uniform 0;
+        refGradient     uniform 0;
+        valueFraction   uniform 0;          // If 0: fixedGradient, if 1: fixedValue
+        name            DarcyInflux;        // name of generated BC
+    
+        code
+        #{
+            // Read the hydraulic conductivity field
+            const volScalarField& myK = this->db().objectRegistry::lookupObject<volScalarField>("hydrConduct");
+            dimensionedScalar targetDarcyFlow ("targetDarcyFlow", dimensionSet(0,1,-1,0,0,0,0), scalar(2.89E-07));
+            
+            // Assign a gradient to each boundary face 
+            forAll(patch(), faceI)
+            { 
+                //Info << myK[faceI] << endl;
+                this->refGrad()[faceI] = targetDarcyFlow.value() / myK[faceI];
+            }
+            
+            //this->refGrad() = Zero;
+            //this->valueFraction() = 1.0;
+        #};
+        
+
         // //HEAD AS A FUNCTION OF POSITION
         // type        codedFixedValue;
         // value       uniform 0.1;
@@ -70,23 +95,23 @@ boundaryField
         // #};
         
         // //HEAD AS A FUNCTION OF K_S or any other parameter
-        type        codedFixedValue;
-        value       uniform 0.1;
-        name        hFixedByKs;
-        code
-        #{
-            const vectorField& Cf = patch().Cf();
-            scalarField& field = *this;
-            const volScalarField& K_s = this->db().objectRegistry::lookupObject<volScalarField>("K_s");
+        // type        codedFixedValue;
+        // value       uniform 0.1;
+        // name        hFixedByKs;
+        // code
+        // #{
+        //     const vectorField& Cf = patch().Cf();
+        //     scalarField& field = *this;
+        //     const volScalarField& K_s = this->db().objectRegistry::lookupObject<volScalarField>("K_s");
             
-            // Foam::Info<< K_s << endl;
+        //     // Foam::Info<< K_s << endl;
 
-            forAll(Cf, faceI)
-            {
-                //scalar x = Cf[faceI][0];
-                field[faceI] = K_s[faceI] * 1.0E+5;
-            }
-        #};
+        //     forAll(Cf, faceI)
+        //     {
+        //         //scalar x = Cf[faceI][0];
+        //         field[faceI] = K_s[faceI] * 1.0E+5;
+        //     }
+        // #};
 
         // // MIXED Gradient/FixedValue
         // type            mixed;
@@ -99,10 +124,10 @@ boundaryField
 
     bottom
     {
-        type        fixedGradient;
-        gradient    uniform 1.00;   // Set to 1.0 for a NO-FLOW condition
-        // type fixedValue;
-        // value   uniform 0.01;
+        // type        fixedGradient;
+        // gradient    uniform 1.00;   // Set to 1.0 for a NO-FLOW condition
+        type    fixedValue;
+        value   uniform -1.0;
     }
 }
 
