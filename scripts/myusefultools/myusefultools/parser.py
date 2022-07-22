@@ -4,6 +4,14 @@ import pandas as pd
 from natsort import natsorted
 import pyvista as pv
 
+def getVTKList(path:str) -> list[str]:
+    '''
+    Returns the list of VTK files as strings.
+    '''
+    listOfFilesInPath = natsorted(os.listdir(path))
+    jusVTKFiles = [f for f in listOfFilesInPath if f.endswith('.vtk')]
+    return jusVTKFiles
+
 def getTimeList(path:str) -> list[str]:
     '''
     Returns the list of times as strings.
