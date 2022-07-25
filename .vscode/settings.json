@@ -1,13 +1,5 @@
 {
     "files.associations": {
-        "*.in": "yaml",
-        "*Dict": "OpenFOAM",
-        "*Properties": "OpenFOAM",
-        "fvSchemes": "OpenFOAM",
-        "fvSolution": "OpenFOAM",
-        "**/constant/*": "OpenFOAM",
-        "**/0/*": "OpenFOAM",
-        "**/tests/**/system/*": "OpenFOAM",
         "hz_bioCycle.C": "cpp",
         "cloggingFoam.C": "cpp",
         "ostream": "cpp",
@@ -19,7 +11,16 @@
         "system_error": "cpp",
         "random": "cpp",
         "chrono": "cpp",
-        "limits": "cpp"
-    },
+        "limits": "cpp",
+        "*Dict": "OpenFOAM",
+        "*Properties": "OpenFOAM",
+        "fvSchemes": "OpenFOAM",
+        "fvSolution": "OpenFOAM",
+        "**/constant/*": "OpenFOAM",
+        "**/0/*": "OpenFOAM",
+        "**/tests/**/system/*": "OpenFOAM",
+        "**/0*/**/*": "OpenFOAM",
+        "*.in": "yaml",
+        },
     "explorer.excludeGitIgnore": true
 }

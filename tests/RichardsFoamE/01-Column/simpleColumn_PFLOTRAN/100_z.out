@@ -28568,4 +28568,4 @@ maximum iteration: 10000
   newton =   1 [   14652] linear =     1 [     14652] cuts =  0 [ 164]
   --> max chng: dpmx=   5.8208E-11
 
- Wall Clock Time:  5.1602E+00 [sec]   8.6003E-02 [min]   1.4334E-03 [hr]
+ Wall Clock Time:  5.1796E+00 [sec]   8.6326E-02 [min]   1.4388E-03 [hr]
