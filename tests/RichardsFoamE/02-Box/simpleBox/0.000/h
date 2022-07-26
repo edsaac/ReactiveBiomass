@@ -1,0 +1,134 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  7
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volScalarField;
+    object      h;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions      [0 1 0 0 0 0 0];
+
+internalField   uniform -1.0;
+
+boundaryField
+{
+    front
+    {
+        type            empty;
+    }
+
+    back
+    {
+        type            empty;
+    }
+
+    right
+    {
+        type        zeroGradient;
+        // type		cyclicAMI;
+    }
+
+    left
+    {
+  	    // type		cyclicAMI;
+        type        zeroGradient;
+    }
+
+    top
+    {
+        // //FIXED HEAD
+        // type        fixedValue;
+	    // value       uniform  0.1; 
+        
+        // Fixed Darcy Flux
+        type            codedMixed;
+        refValue        uniform 0;
+        refGradient     uniform 0;
+        valueFraction   uniform 0;          // If 0: fixedGradient, if 1: fixedValue
+        name            DarcyInflux;        // name of generated BC
+    
+        code
+        #{
+            // Read the hydraulic conductivity field
+            const volScalarField& myK = this->db().objectRegistry::lookupObject<volScalarField>("hydrConduct");
+            dimensionedScalar targetDarcyFlow ("targetDarcyFlow", dimensionSet(0,1,-1,0,0,0,0), scalar(2.89E-07));
+            
+            // Assign a gradient to each boundary face 
+            forAll(patch(), faceI)
+            { 
+                //Info << myK[faceI] << endl;
+                this->refGrad()[faceI] = targetDarcyFlow.value() / myK[faceI];
+            }
+            
+            //this->refGrad() = Zero;
+            //this->valueFraction() = 1.0;
+        #};
+        
+
+        // //HEAD AS A FUNCTION OF POSITION
+        // type        codedFixedValue;
+        // value       uniform 0.1;
+        // name        bumpInTheMiddle;
+        // code
+        // #{
+        //     const vectorField& Cf = patch().Cf();
+        //     scalarField& field = *this;
+
+        //     const scalar hWet = 0.1;
+        //     const scalar hDry = -5.0;
+
+        //     forAll(Cf, faceI)
+        //     {
+        //         scalar x = Cf[faceI][0];
+        //         // field[faceI] = hWet + hDry*sqr(x - 0.5);
+        //         if(x > 0.4 && x < 0.6) {field[faceI] = hWet;}
+        //         else {field[faceI] = hDry;}
+        //     }
+        // #};
+        
+        // //HEAD AS A FUNCTION OF K_S or any other parameter
+        // type        codedFixedValue;
+        // value       uniform 0.1;
+        // name        hFixedByKs;
+        // code
+        // #{
+        //     const vectorField& Cf = patch().Cf();
+        //     scalarField& field = *this;
+        //     const volScalarField& K_s = this->db().objectRegistry::lookupObject<volScalarField>("K_s");
+            
+        //     // Foam::Info<< K_s << endl;
+
+        //     forAll(Cf, faceI)
+        //     {
+        //         //scalar x = Cf[faceI][0];
+        //         field[faceI] = K_s[faceI] * 1.0E+5;
+        //     }
+        // #};
+
+        // // MIXED Gradient/FixedValue
+        // type            mixed;
+	    // refValue        uniform  0.1;
+        // refGradient     uniform  0.1;
+        // valueFraction   0.5;
+        // value       uniform  0.1;
+        
+    }
+
+    bottom
+    {
+        // type        fixedGradient;
+        // gradient    uniform 1.00;   // Set to 1.0 for a NO-FLOW condition
+        type    fixedValue;
+        value   uniform -1.0;
+    }
+}
+
+// ************************************************************************* //

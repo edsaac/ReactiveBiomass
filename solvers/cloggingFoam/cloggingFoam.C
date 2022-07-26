@@ -110,7 +110,6 @@ int main(int argc, char *argv[])
                   n * katt * clogLimiter * suspendedClay
                 - kdet * depositedClay
             );
-            FiltratedEq.relax();
             fvOptions.constrain(FiltratedEq);
             FiltratedEq.solve();
             fvOptions.correct(depositedClay);
@@ -125,7 +124,6 @@ int main(int argc, char *argv[])
                 - n * katt * clogLimiter * suspendedClay 
                 + kdet * depositedClay
             );
-            SuspendedEq.relax();
             fvOptions.constrain(SuspendedEq);
             SuspendedEq.solve();
             fvOptions.correct(suspendedClay);

@@ -1,0 +1,113 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  7
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      blockMeshDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+convertToMeters 1.0;
+
+lenght   0.2;
+depth    1.0;
+
+deltaLenght 0.2;
+deltaDepth  0.005;
+
+XCells 1;
+YCells 1;
+ZCells #calc "round($depth/$deltaDepth) + 1";
+
+vertices
+(
+    (0 0 0)
+    ($lenght 0 0)
+    ($lenght 0.2 0)
+    (0 0.2 0)
+    (0 0 $depth)
+    ($lenght 0 $depth)
+    ($lenght 0.2 $depth)
+    (0 0.2 $depth)    
+);
+
+
+blocks
+(
+    hex (0 1 2 3 4 5 6 7) mainBlock ($XCells $YCells $ZCells) simpleGrading (1 1 1)
+);
+
+edges
+(
+);
+
+boundary
+(
+    top
+    {
+        type patch;
+        faces
+        (
+            (4 7 6 5)
+        );
+    }
+
+    left
+    {
+        type empty;
+        faces
+        (
+            (0 3 7 4)
+        );
+    }
+
+    right
+    {
+        type empty;
+        faces
+        (
+            (2 1 5 6)
+        );
+    }
+
+    front
+    {
+        type empty;
+        faces
+        (
+            (0 4 5 1)
+        );
+    }
+
+    back
+    {
+        type empty;
+        faces
+        (
+            (3 2 6 7)
+        );
+    }
+    
+    bottom
+    {
+        type patch;
+        faces
+        (
+            (0 1 2 3)
+        );
+    }
+
+);
+
+mergePatchPairs
+(
+);
+
+// ************************************************************************* //

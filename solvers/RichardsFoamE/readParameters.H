@@ -11,6 +11,14 @@ UnsaturatedSoilParametersField soil
     &m
 );
 
+// Initialize all derived fields
+// Calculate Darcy flow velocity
+hydrConduct = soil.K(h);
+U = - hydrConduct * (fvc::grad(h) + fvc::grad(z));
+phi = fvc::flux(U);
+
+    // Calculate derived unsaturated stuff
+theta = soil.waterContentCalculator(h);
 
 //  Time stepping properties 
 //  Currently it only supports and unique homogeneous material
