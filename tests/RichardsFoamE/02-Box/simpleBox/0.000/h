@@ -44,33 +44,34 @@ boundaryField
 
     top
     {
-        // //FIXED HEAD
-        // type        fixedValue;
-	    // value       uniform  0.1; 
+        //FIXED HEAD
+        type        fixedValue;
+	    value       uniform  0.1; 
         
-        // Fixed Darcy Flux
-        type            codedMixed;
-        refValue        uniform 0;
-        refGradient     uniform 0;
-        valueFraction   uniform 0;          // If 0: fixedGradient, if 1: fixedValue
-        name            DarcyInflux;        // name of generated BC
+        // // Fixed Darcy Flux
+        // type            codedMixed;
+        // refValue        uniform 0;
+        // refGradient     uniform 0;
+        // valueFraction   uniform 0;          // If 0: fixedGradient, if 1: fixedValue
+        // name            DarcyInflux;        // name of generated BC
     
-        code
-        #{
-            // Read the hydraulic conductivity field
-            const volScalarField& myK = this->db().objectRegistry::lookupObject<volScalarField>("hydrConduct");
-            dimensionedScalar targetDarcyFlow ("targetDarcyFlow", dimensionSet(0,1,-1,0,0,0,0), scalar(2.89E-07));
+        // code
+        // #{
+        //     // Read the hydraulic conductivity field
+        //     const volScalarField& myK = this->db().objectRegistry::lookupObject<volScalarField>("hydrConduct");
+        //     dimensionedScalar targetDarcyFlow ("targetDarcyFlow", dimensionSet(0,1,-1,0,0,0,0), scalar(2.89E-07));
+        //     //dimensionedScalar targetDarcyFlow ("targetDarcyFlow", dimensionSet(0,1,-1,0,0,0,0), scalar(0.00));
             
-            // Assign a gradient to each boundary face 
-            forAll(patch(), faceI)
-            { 
-                //Info << myK[faceI] << endl;
-                this->refGrad()[faceI] = targetDarcyFlow.value() / myK[faceI];
-            }
+        //     // Assign a gradient to each boundary face 
+        //     forAll(patch(), faceI)
+        //     { 
+        //         //Info << myK[faceI] << endl;
+        //         this->refGrad()[faceI] = targetDarcyFlow.value() / myK[faceI];
+        //     }
             
-            //this->refGrad() = Zero;
-            //this->valueFraction() = 1.0;
-        #};
+        //     //this->refGrad() = Zero;
+        //     //this->valueFraction() = 1.0;
+        // #};
         
 
         // //HEAD AS A FUNCTION OF POSITION
@@ -124,10 +125,12 @@ boundaryField
 
     bottom
     {
-        // type        fixedGradient;
-        // gradient    uniform 1.00;   // Set to 1.0 for a NO-FLOW condition
-        type    fixedValue;
-        value   uniform -1.0;
+        // Set to 1.0 for a NO-FLOW condition
+        // Set to 0.0 for a unit gradient drain
+        type        fixedGradient;
+        gradient    uniform 0.00;   
+        // type    fixedValue;
+        // value   uniform 0.0;
     }
 }
 
