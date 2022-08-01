@@ -46,6 +46,9 @@ Description
         |___,_________,___ n
             nMin     nRef
 
+    Implemented models in:
+    https://www.desmos.com/calculator/sg2jg37j2n
+
 SourceFiles
     cloggingModel.C
     cloggingModelNew.C
