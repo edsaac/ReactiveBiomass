@@ -5,7 +5,7 @@
             "includePath": [
                 "${workspaceFolder}/**",
                 "${FOAM_SRC}/**",
-                "${workspaceFolder}/libs/**"
+                "${FOAM_USER_LIBBIN}/**"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/gcc",

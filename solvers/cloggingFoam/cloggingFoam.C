@@ -44,6 +44,7 @@ Description
 #include "fvOptions.H"
 #include "simpleControl.H"
 
+#include "cloggingModel.H"
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 int main(int argc, char *argv[])
@@ -66,18 +67,10 @@ int main(int argc, char *argv[])
 
         //Info << "\nUpdate clog space limitation" << endl;
         clogLimiter = 1.0 - depositedClay/XMAX;
-        n  = n_0 - depositedClay/rho_clay;
+        n  = clogging->nRef() - depositedClay/rho_clay;
 
         //Calculate hydraulic head using mass balance + Darcy's equation
-        if (cloggingSwitch)
-        {
-            perm  = ((perm_0 - perm_c) * Foam::pow((n - n_c)/(n_0 - n_c),3) * pos(n - n_c)) + perm_c;
-        }
-        else
-        {
-            perm = perm_0;
-        }
-
+        if (cloggingSwitch) { clogging->calcPerm();}
         hydraulicCond = perm * g * rho / mu;
 
         while (simple.correctNonOrthogonal())

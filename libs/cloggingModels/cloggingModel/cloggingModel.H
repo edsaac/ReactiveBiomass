@@ -33,6 +33,19 @@ Class
 Description
     An abstract base class for incompressible cloggingModels.
 
+    All clogging models must be bounded to a minimum and reference
+    porosity and permeability, such that:
+
+       k(n)
+        |
+   kRef |             ______
+        |          .-'  
+        |       .-'     
+        |    .-'
+   kMin |___/ 
+        |___,_________,___ n
+            nMin     nRef
+
 SourceFiles
     cloggingModel.C
     cloggingModelNew.C
@@ -68,12 +81,16 @@ protected:
     dictionary cloggingProperties_;
     const volScalarField& n_;
     volScalarField* ptrperm_;
+    
+    dimensionedScalar permMin_;
+    dimensionedScalar permRef_;
+    dimensionedScalar nMin_;
+    dimensionedScalar nRef_;
 
 public:
     
     //- Runtime type information
     TypeName("cloggingModel");
-
 
     // Declare run-time constructor selection table
 
@@ -132,6 +149,27 @@ public:
 
         //- Update the permeability field
         virtual void calcPerm() = 0;
+
+        //- Getters for reference values
+        inline dimensionedScalar permRef()
+        {
+            return permRef_;
+        }
+
+        inline dimensionedScalar permMin()
+        {
+            return permMin_;
+        }
+
+        inline dimensionedScalar nRef()
+        {
+            return nRef_;
+        }
+
+        inline dimensionedScalar nMin()
+        {
+            return nMin_;
+        }
 
         //- Read transportProperties dictionary
         virtual bool read(const dictionary& cloggingProperties) = 0;

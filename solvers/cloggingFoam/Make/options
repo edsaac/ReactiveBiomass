@@ -1,8 +1,11 @@
 EXE_INC = \
     -I$(LIB_SRC)/finiteVolume/lnInclude \
-    -I$(LIB_SRC)/meshTools/lnInclude
+    -I$(LIB_SRC)/meshTools/lnInclude \
+    -I../../libs/cloggingModels/lnInclude 
 
 EXE_LIBS = \
     -lfiniteVolume \
     -lfvOptions \
-    -lmeshTools
+    -lmeshTools \
+    -L$(FOAM_USER_LIBBIN) -lcloggingModel
+

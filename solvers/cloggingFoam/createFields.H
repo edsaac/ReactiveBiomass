@@ -89,9 +89,31 @@ volScalarField depositedClay
     mesh
 );
 
+////////////////////
+IOdictionary cloggingProperties
+(
+    IOobject
+    (
+        "cloggingProperties",
+        runTime.constant(),
+        mesh,
+        IOobject::MUST_READ_IF_MODIFIED,
+        IOobject::NO_WRITE
+    )
+);
+
+Foam::Info << "Switch for clogging?? (cloggingSwitch)\n" << endl;
+Foam::Switch cloggingSwitch(cloggingProperties.lookup("clog?"));
+
+autoPtr<cloggingModel> clogging
+(
+    cloggingModel::New("clog",cloggingProperties,n,&perm)
+);
+
+clogging->read(cloggingProperties);
 
 // Calculate deposited mass and clogLimiter
-dimensionedScalar XMAX ((n_0 - n_c) * rho_clay);
+dimensionedScalar XMAX ((clogging->nRef() - clogging->nMin()) * rho_clay);
 Foam::Info << "Calculate max possible deposited mass: " << XMAX.value() << "\n";
 
 volScalarField clogLimiter (1.0 - depositedClay/XMAX);
@@ -100,3 +122,5 @@ volScalarField clogLimiter (1.0 - depositedClay/XMAX);
 #include "initializeCFT.H"
 #include "createPhi.H"
 #include "createFvOptions.H"
+
+

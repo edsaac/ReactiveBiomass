@@ -76,31 +76,3 @@ dimensionedScalar kdet(transportProperties.lookup("kdet"));
 
 
 ////////////////////////////////////////////////////////////
-
-IOdictionary cloggingProperties
-(
-    IOobject
-    (
-        "cloggingProperties",
-        runTime.constant(),
-        mesh,
-        IOobject::MUST_READ_IF_MODIFIED,
-        IOobject::NO_WRITE
-    )
-);
-
-Foam::Info << "Switch for clogging?? (cloggingSwitch)\n" << endl;
-Foam::Switch cloggingSwitch(cloggingProperties.lookup("clog?"));
-
-Foam::Info << "Initial porosity (n_0)\n" << endl;
-dimensionedScalar n_0 (cloggingProperties.lookup("n_0"));
-
-Foam::Info << "Initial relative permeability (perm_0)\n" << endl;
-dimensionedScalar perm_0 (cloggingProperties.lookup("perm_0"));
-
-Foam::Info << "Critical porosity (n_c)\n" << endl;
-dimensionedScalar n_c(cloggingProperties.lookup("n_c"));
-
-Foam::Info << "Minimum relative permeability (perm_c)\n" << endl;
-dimensionedScalar perm_c(cloggingProperties.lookup("perm_c"));
-

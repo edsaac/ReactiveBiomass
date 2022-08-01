@@ -25,20 +25,23 @@ Class
     Foam::cloggingModel::powerLaw
 
 Description
-     Standard power-law clogging model.
+     Kozeny-Carman clogging model.
 
-     perm = (permRef - permMin) * ((n-nMin)/(nRef-nMin))^nExponent
-          + permMin
+     perm = (permRef - permMin) 
+            * ((n-nMin)/(nRef-nMin))^nExponent
+            * ((1-nRef)/(1-n))^mExponent
+            + permMin
 
 Usage
     In the cloggingProperties dictionary
 
     /verbatim
-        cloggingModel powerLaw;
+        cloggingModel kozenyCarman;
 
-        powerLawCoeffs
+        kozenyCarmanCoeffs
         {
             nExponent dimless 3.0;
+            mExponent dimless 2.0;
         }
     /endverbatim
 
@@ -65,26 +68,27 @@ namespace cloggingModels
                            Class powerLaw Declaration
 \*---------------------------------------------------------------------------*/
 
-class powerLaw
+class kozenyCarman
 :
     public cloggingModel
 {
     // Private Data
 
-        dictionary powerLawCoeffs_;
+        dictionary kozenyCarmanCoeffs_;
         dimensionedScalar nExponent_;
+        dimensionedScalar mExponent_;
 
     // Private Member Functions
 
 public:
 
     //- Runtime type information
-    TypeName("powerLaw");
+    TypeName("kozenyCarman");
 
     // Constructors
 
         //- Construct from components
-        powerLaw
+        kozenyCarman
         (
             const word& name,
             const dictionary& cloggingProperties,
@@ -94,7 +98,7 @@ public:
 
 
     //- Destructor
-    virtual ~powerLaw()
+    virtual ~kozenyCarman()
     {}
 
 

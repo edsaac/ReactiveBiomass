@@ -64,10 +64,6 @@ Foam::cloggingModels::powerLaw::powerLaw
 :
     cloggingModel(name, cloggingProperties, n, ptrperm),
     powerLawCoeffs_(cloggingProperties.optionalSubDict(typeName + "Coeffs")),
-    permMin_("permMin", dimensionSet(0,2,0,0,0,0,0), powerLawCoeffs_),
-    permRef_("permRef",  dimensionSet(0,2,0,0,0,0,0), powerLawCoeffs_),
-    nMin_("nMin", dimless, powerLawCoeffs_),
-    nRef_("nRef", dimless, powerLawCoeffs_),
     nExponent_("nExponent", dimless, powerLawCoeffs_)
 {}
 
@@ -82,11 +78,7 @@ bool Foam::cloggingModels::powerLaw::read
     cloggingModel::read(cloggingProperties);
 
     powerLawCoeffs_ = cloggingProperties.optionalSubDict(typeName + "Coeffs");
-
-    powerLawCoeffs_.lookup("permMin") >> permMin_;
-    powerLawCoeffs_.lookup("permRef") >> permRef_;
-    powerLawCoeffs_.lookup("nMin") >> nMin_;
-    powerLawCoeffs_.lookup("nMax") >> nRef_;
+    powerLawCoeffs_.lookup("nExponent") >> nExponent_;
 
     return true;
 }

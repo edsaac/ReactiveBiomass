@@ -23,22 +23,42 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "cloggingModel.H"
-#include "volFields.H"
-#include "fvcGrad.H"
+#include "kozenyCarman.H"
+#include "addToRunTimeSelectionTable.H"
+#include "surfaceFields.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
 namespace Foam
 {
-    defineTypeNameAndDebug(cloggingModel, 0);
-    defineRunTimeSelectionTable(cloggingModel, dictionary);
+namespace cloggingModels
+{
+    defineTypeNameAndDebug(kozenyCarman, 0);
+
+    addToRunTimeSelectionTable
+    (
+        cloggingModel,
+        kozenyCarman,
+        dictionary
+    );
+}
+}
+
+// * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * * //
+
+void Foam::cloggingModels::kozenyCarman::calcPerm()
+{
+    *ptrperm_ = ((permRef_ - permMin_) 
+                * Foam::pow((n_ - nMin_)/(nRef_ - nMin_),nExponent_.value()) 
+                * Foam::pow((1.0 - nRef_)/(1.0 - n_),mExponent_.value())
+                * pos(n_ - nMin_)) 
+                + permMin_;
 }
 
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-Foam::cloggingModel::cloggingModel
+Foam::cloggingModels::kozenyCarman::kozenyCarman
 (
     const word& name,
     const dictionary& cloggingProperties,
@@ -46,22 +66,25 @@ Foam::cloggingModel::cloggingModel
     volScalarField* ptrperm
 )
 :
-    name_(name),
-    cloggingProperties_(cloggingProperties),
-    n_(n),
-    ptrperm_(ptrperm),
-    permMin_(cloggingProperties.lookup("permMin")),
-    permRef_(cloggingProperties.lookup("permRef")),
-    nMin_(cloggingProperties.lookup("nMin")),
-    nRef_(cloggingProperties.lookup("nRef"))
+    cloggingModel(name, cloggingProperties, n, ptrperm),
+    kozenyCarmanCoeffs_(cloggingProperties.optionalSubDict(typeName + "Coeffs")),
+    nExponent_("nExponent", dimless, kozenyCarmanCoeffs_),
+    mExponent_("mExponent", dimless, kozenyCarmanCoeffs_)
 {}
 
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
-bool Foam::cloggingModel::read(const dictionary& cloggingProperties)
+bool Foam::cloggingModels::kozenyCarman::read
+(
+    const dictionary& cloggingProperties
+)
 {
-    cloggingProperties_ = cloggingProperties;
+    cloggingModel::read(cloggingProperties);
+
+    kozenyCarmanCoeffs_ = cloggingProperties.optionalSubDict(typeName + "Coeffs");
+    kozenyCarmanCoeffs_.lookup("nExponent") >> nExponent_;
+    kozenyCarmanCoeffs_.lookup("mExponent") >> mExponent_;
 
     return true;
 }
