@@ -1,3 +1,3 @@
-testRandomStuff.C
+mathConstants.C
 
 EXE = $(FOAM_USER_APPBIN)/randomApp_Foam
