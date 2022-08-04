@@ -47,6 +47,8 @@ SourceFiles
 #include "surfaceFieldsFwd.H"
 #include "dimensionedScalar.H"
 #include "runTimeSelectionTables.H"
+#include "Time.H"
+#include "fvMesh.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -67,6 +69,10 @@ protected:
     word name_;
     dictionary attachmentProperties_;  
     volScalarField* ptrkatt_;
+    const fvMesh& mesh_;
+    const Time& runTime_;
+    const volVectorField& U_;
+    const volScalarField& n_;
 
 public:
     
@@ -83,9 +89,13 @@ public:
         (
             const word& name,
             const dictionary& attachmentProperties,
-            volScalarField* ptrkatt
+            volScalarField* ptrkatt,
+            const fvMesh& mesh,
+            const Time& runTime,
+            const volVectorField& U,
+            const volScalarField& n
         ),
-        (name, attachmentProperties, ptrkatt)
+        (name, attachmentProperties, ptrkatt, mesh, runTime, U, n)
     );
 
 
@@ -96,7 +106,11 @@ public:
     (
         const word& name,
         const dictionary& attachmentProperties,
-        volScalarField* ptrkatt
+        volScalarField* ptrkatt,
+        const fvMesh& mesh,
+        const Time& runTime,
+        const volVectorField& U,
+        const volScalarField& n
     );
 
     //- Disallow default bitwise copy construction
@@ -109,7 +123,11 @@ public:
     (
         const word& name,
         const dictionary& attachmentProperties,
-        volScalarField* ptrkatt
+        volScalarField* ptrkatt,
+        const fvMesh& mesh,
+        const Time& runTime,
+        const volVectorField& U,
+        const volScalarField& n
     );
 
     //- Destructor

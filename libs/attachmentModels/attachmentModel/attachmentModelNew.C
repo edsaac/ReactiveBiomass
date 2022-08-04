@@ -33,12 +33,16 @@ Foam::autoPtr<Foam::attachmentModel> Foam::attachmentModel::New
 (
     const word& name,
     const dictionary& attachmentProperties,
-     volScalarField* ptrkatt
+    volScalarField* ptrkatt,
+    const Foam::fvMesh& mesh,
+    const Foam::Time& runTime,
+    const volVectorField& U,
+    const volScalarField& n
 )
 {
     const word modelType(attachmentProperties.lookup("attachmentModel"));
 
-    Info<< "Selecting clogging model " << modelType << endl;
+    Info<< "Selecting attachment model " << modelType << endl;
 
     dictionaryConstructorTable::iterator cstrIter =
         dictionaryConstructorTablePtr_->find(modelType);
@@ -54,7 +58,7 @@ Foam::autoPtr<Foam::attachmentModel> Foam::attachmentModel::New
     }
 
     return autoPtr<attachmentModel>
-        (cstrIter()(name, attachmentProperties, ptrkatt));
+        (cstrIter()(name, attachmentProperties, ptrkatt, mesh, runTime, U, n));
 }
 
 

@@ -110,7 +110,6 @@ SourceFiles
 #include "volFields.H"
 
 #include "constants.H"
-
 #define MATH_PI Foam::constant::mathematical::pi
 #define KBOLTZ Foam::constant::physicoChemical::k
 
@@ -151,9 +150,6 @@ class colloidFiltrationTheory
         volScalarField lambda_;
         volScalarField eta_;
 
-        const volScalarField& U_;
-        const volScalarField& n_;
-
     // Private Member Functions
   
         virtual void updateLambda_();
@@ -174,6 +170,8 @@ public:
             const word& name,
             const dictionary& attachmentProperties,
             volScalarField* ptrkatt,
+            const fvMesh& mesh,
+            const Time& runTime,
             const volVectorField& U,
             const volScalarField& n
         );

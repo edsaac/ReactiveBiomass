@@ -49,7 +49,7 @@ void Foam::attachmentModels::colloidFiltrationTheory::updateLambda_()
 {
     lambda_ = 
         min(
-            3.0 * (1.0 - n_) * alpha_ * eta_ / (2.0 * dc_),
+            3.0 * (1.0 - this->n_) * alpha_ * eta_ / (2.0 * dc_),
             dimensionedScalar(
                 "maxLambda",
                 dimensionSet(0,-1,0,0,0,0,0),
@@ -89,9 +89,9 @@ void Foam::attachmentModels::colloidFiltrationTheory::updatelogAs_()
 {
     logAs_ = 
         log( 
-            8.99992117 * sqr(1.0/n_) 
+            8.99992117 * sqr(1.0/this->n_) 
             + 
-            -7.49203318 * (1.0/n_) 
+            -7.49203318 * (1.0/this->n_) 
             + 
             0.4119361
             );
@@ -99,7 +99,7 @@ void Foam::attachmentModels::colloidFiltrationTheory::updatelogAs_()
 
 void Foam::attachmentModels::colloidFiltrationTheory::updatelogNP_()
 {
-    logNP_ = (mag(U_) * dc_) / (n_ * DiffusionCoef_);
+    logNP_ = (mag(this->U_) * dc_) / (this->n_ * DiffusionCoef_);
 }
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
@@ -109,13 +109,15 @@ Foam::attachmentModels::colloidFiltrationTheory::colloidFiltrationTheory
     const word& name,
     const dictionary& attachmentProperties,
     volScalarField* ptrkatt,
+    const fvMesh& mesh,
+    const Time& runTime,
     const volVectorField& U,
     const volScalarField& n
 )
 :
-    attachmentModel(name, attachmentProperties, ptrkatt),
-    colloidFiltrationTheoryCoeffs_(attachmentProperties.optionalSubDict(typeName + "Coeffs")),
+    attachmentModel(name, attachmentProperties, ptrkatt, mesh, runTime,U,n),
     
+    colloidFiltrationTheoryCoeffs_(attachmentProperties.optionalSubDict(typeName + "Coeffs")),
     dc_("collectorSize", dimLength, colloidFiltrationTheoryCoeffs_),
     dp_("particleSize", dimLength, colloidFiltrationTheoryCoeffs_),
     rhof_("fluidDensity", dimDensity, colloidFiltrationTheoryCoeffs_),
@@ -130,12 +132,12 @@ Foam::attachmentModels::colloidFiltrationTheory::colloidFiltrationTheory
         IOobject
         (
             "logAs",
-            runTime.timeName(),
-            mesh,
+            this->runTime_.timeName(),
+            this->mesh_,
             IOobject::NO_READ,
             IOobject::NO_WRITE
         ),
-        mesh,
+        this->mesh_,
         dimensionedScalar("logAs", dimless,1.0)),
 
     logNR_( log(dp_/dc_) ),
@@ -144,12 +146,12 @@ Foam::attachmentModels::colloidFiltrationTheory::colloidFiltrationTheory
         IOobject
         (
             "logNP",
-            runTime.timeName(),
-            mesh,
+            this->runTime_.timeName(),
+            this->mesh_,
             IOobject::NO_READ,
             IOobject::NO_WRITE
         ),
-        mesh,
+        this->mesh_,
         dimensionedScalar("logNP", dimless,1.0)),
     
     logNv_( log(Hamaker_/(KBOLTZ*Temp_)) ),
@@ -165,37 +167,36 @@ Foam::attachmentModels::colloidFiltrationTheory::colloidFiltrationTheory
         IOobject
         (
             "Lambda",
-            runTime.timeName(),
-            mesh,
+            this->runTime_.timeName(),
+            this->mesh_,
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
-        mesh,
+        this->mesh_,
         dimensionedScalar("Lambda", dimensionSet(0,-1,0,0,0,0,0) , 0.0)),
 
     eta_(
         IOobject
         (
             "eta",
-            runTime.timeName(),
-            mesh,
+            this->runTime_.timeName(),
+            this->mesh_,
             IOobject::NO_READ,
             IOobject::NO_WRITE
         ),
-        mesh,
-        dimensionedScalar("eta", dimless, 1.0)),
-    
-    U_(U),
-    n_(n)
+        this->mesh_,
+        dimensionedScalar("eta", dimless, 1.0))
 {}
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
 void Foam::attachmentModels::colloidFiltrationTheory::calcAttachment()
 {   
+    updatelogAs_();
+    updatelogNP_();
     updateEta_();
     updateLambda_();
-    *ptrkatt_ = lambda_ * mag(U_) / n_;
+    *ptrkatt_ = lambda_ * mag(this->U_) / this->n_;
 }
 
 

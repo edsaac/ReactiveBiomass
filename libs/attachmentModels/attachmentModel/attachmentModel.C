@@ -42,12 +42,20 @@ Foam::attachmentModel::attachmentModel
 (
     const word& name,
     const dictionary& attachmentProperties,
-    volScalarField* ptrkatt
+    volScalarField* ptrkatt,
+    const fvMesh& mesh,
+    const Time& runTime,
+    const volVectorField& U,
+    const volScalarField& n
 )
 :
     name_(name),
     attachmentProperties_(attachmentProperties),
-    ptrkatt_(ptrkatt)
+    ptrkatt_(ptrkatt),
+    mesh_(mesh),
+    runTime_(runTime),
+    U_(U),
+    n_(n)
 {}
 
 
@@ -56,6 +64,7 @@ Foam::attachmentModel::attachmentModel
 bool Foam::attachmentModel::read(const dictionary& attachmentProperties)
 {
     attachmentProperties_ = attachmentProperties;
+    
     return true;
 }
 
