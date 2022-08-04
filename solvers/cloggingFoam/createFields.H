@@ -1,6 +1,6 @@
 const dimensionedScalar GRAVITY ("g",dimAcceleration,9.81);
-const dimensionedScalar WATERDENSITY ("rhoWater",dimDensity,1000.0);
-const dimensionedScalar WATERDYNAMICVISCOSITY ("muWater",dimDynamicViscosity,0.001);
+const dimensionedScalar WATERDENSITY ("rhoWater",dimDensity,999.79);
+const dimensionedScalar WATERDYNAMICVISCOSITY ("muWater",dimDynamicViscosity,0.0008891);
 
 Foam::Info << "Reading transportProperties\n" << endl;
 
@@ -167,10 +167,18 @@ IOdictionary attachmentProperties
 
 autoPtr<attachmentModel> attachment
 (
-    attachmentModel::New("attach",attachmentProperties,&katt,mesh,runTime,U,n)
+    attachmentModel::New(
+        "attach",
+        attachmentProperties,
+        &katt,
+        mesh,
+        runTime,
+        U,
+        n)
 );
 
 attachment->read(attachmentProperties);
+Info<< attachment->attachmentProperties() << endl;
 
 // Calculate deposited mass and clogLimiter
 dimensionedScalar XMAX ((clogging->nRef() - clogging->nMin()) * rho_clog);

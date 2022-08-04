@@ -68,10 +68,16 @@ int main(int argc, char *argv[])
 
         //Info << "\nUpdate clog space limitation" << endl;
         clogLimiter = 1.0 - depositedClay/XMAX;
+        
+        Foam::Info << "\n Update porosity field (n):" << endl;
         n  = clogging->nRef() - depositedClay/rho_clog;
 
         //Calculate hydraulic head using mass balance + Darcy's equation
-        if (cloggingSwitch) { clogging->calcPerm();}
+        if (cloggingSwitch) 
+        { 
+            clogging->calcPerm();
+        }
+
         hydraulicCond = perm * WATERDENSITY * GRAVITY / WATERDYNAMICVISCOSITY;
 
         while (simple.correctNonOrthogonal())
@@ -86,7 +92,6 @@ int main(int argc, char *argv[])
         }
 
         // Update flow field
-        Foam::Info << "\n Update porosity field (n):" << endl;
         U   = - hydraulicCond * fvc::grad(h);
         phi = fvc::flux(U);
 
@@ -131,6 +136,8 @@ int main(int argc, char *argv[])
         Foam::Info << "ExecutionTime = " << runTime.elapsedCpuTime()   << " s"
                    << "    ClockTime = " << runTime.elapsedClockTime() << " s"
                    << nl << endl;
+
+        //break;
     }
 
     Foam::Info<< "End\n" << endl;

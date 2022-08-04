@@ -152,10 +152,10 @@ class colloidFiltrationTheory
 
     // Private Member Functions
   
-        virtual void updateLambda_();
-        virtual void updateEta_();       
         virtual void updatelogAs_();
         virtual void updatelogNP_();
+        virtual void updateEta_();       
+        virtual void updateLambda_();
 
 public:
    
@@ -185,7 +185,7 @@ public:
     // Member Functions
 
         //- Update the permeability field
-        virtual void calcAttachment();
+        void calcAttachment();
 
         //- Read attachmentProperties dictionary
         virtual bool read(const dictionary& attachmentProperties);

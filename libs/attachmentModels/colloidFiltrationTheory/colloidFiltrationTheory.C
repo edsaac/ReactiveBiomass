@@ -99,7 +99,12 @@ void Foam::attachmentModels::colloidFiltrationTheory::updatelogAs_()
 
 void Foam::attachmentModels::colloidFiltrationTheory::updatelogNP_()
 {
-    logNP_ = (mag(this->U_) * dc_) / (this->n_ * DiffusionCoef_);
+    logNP_ = 
+        log(
+            ( mag(this->U_) * dc_ )
+            /
+            ( this->n_ * DiffusionCoef_ )
+        );
 }
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
@@ -138,7 +143,7 @@ Foam::attachmentModels::colloidFiltrationTheory::colloidFiltrationTheory
             IOobject::NO_WRITE
         ),
         this->mesh_,
-        dimensionedScalar("logAs", dimless,1.0)),
+        dimensionedScalar("logAs", dimless,SMALL)),
 
     logNR_( log(dp_/dc_) ),
 
@@ -152,7 +157,7 @@ Foam::attachmentModels::colloidFiltrationTheory::colloidFiltrationTheory
             IOobject::NO_WRITE
         ),
         this->mesh_,
-        dimensionedScalar("logNP", dimless,1.0)),
+        dimensionedScalar("logNP", dimless,SMALL)),
     
     logNv_( log(Hamaker_/(KBOLTZ*Temp_)) ),
     logNg_( 
@@ -170,10 +175,10 @@ Foam::attachmentModels::colloidFiltrationTheory::colloidFiltrationTheory
             this->runTime_.timeName(),
             this->mesh_,
             IOobject::NO_READ,
-            IOobject::AUTO_WRITE
+            IOobject::NO_WRITE
         ),
         this->mesh_,
-        dimensionedScalar("Lambda", dimensionSet(0,-1,0,0,0,0,0) , 0.0)),
+        dimensionedScalar("Lambda", dimensionSet(0,-1,0,0,0,0,0) , SMALL)),
 
     eta_(
         IOobject
@@ -185,7 +190,7 @@ Foam::attachmentModels::colloidFiltrationTheory::colloidFiltrationTheory
             IOobject::NO_WRITE
         ),
         this->mesh_,
-        dimensionedScalar("eta", dimless, 1.0))
+        dimensionedScalar("eta", dimless, SMALL))
 {}
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
@@ -197,6 +202,20 @@ void Foam::attachmentModels::colloidFiltrationTheory::calcAttachment()
     updateEta_();
     updateLambda_();
     *ptrkatt_ = lambda_ * mag(this->U_) / this->n_;
+
+    // Info<< "Debugging CFT " << nl;
+    // Info<< "********************** " << nl;
+    // Info<< "Diffusion coeff" << DiffusionCoef_ <<endl;
+    // Info<< "AS \n" << exp(logAs_) << endl;
+    // Info<< "NR \n" << exp(logNR_) << endl;
+    // Info<< "NP \n" << exp(logNP_) << endl;
+    // Info<< "Nv \n" << exp(logNv_) << endl;
+    // Info<< "Ng \n" << exp(logNg_) << endl;
+
+    // Info<< "ETA \n" << eta_ << endl;
+    // Info<< "LAMBDA \n" << lambda_ << endl;
+    // Info<< "POROSITY \n" << n_ << endl;
+    // Info<< "VELOCITY \n" << U_ << endl;
 }
 
 
