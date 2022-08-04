@@ -45,6 +45,7 @@ Description
 #include "simpleControl.H"
 
 #include "cloggingModel.H"
+#include "attachmentModel.H"
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 int main(int argc, char *argv[])
@@ -67,11 +68,11 @@ int main(int argc, char *argv[])
 
         //Info << "\nUpdate clog space limitation" << endl;
         clogLimiter = 1.0 - depositedClay/XMAX;
-        n  = clogging->nRef() - depositedClay/rho_clay;
+        n  = clogging->nRef() - depositedClay/rho_clog;
 
         //Calculate hydraulic head using mass balance + Darcy's equation
         if (cloggingSwitch) { clogging->calcPerm();}
-        hydraulicCond = perm * g * rho / mu;
+        hydraulicCond = perm * WATERDENSITY * GRAVITY / WATERDYNAMICVISCOSITY;
 
         while (simple.correctNonOrthogonal())
         {
@@ -90,11 +91,13 @@ int main(int argc, char *argv[])
         phi = fvc::flux(U);
 
         #include "CourantNo.H"
-        #include "calculateCFT.H"
         
         // Transport equations
         while (simple.correctNonOrthogonal())
         {
+            // Calculate attachment rate
+            attachment->calcAttachment();
+
             //Info << "\nDeposited fine particles (depositedClay)" << endl;
             fvScalarMatrix FiltratedEq
             (
