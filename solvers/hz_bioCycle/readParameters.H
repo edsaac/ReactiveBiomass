@@ -12,25 +12,12 @@ IOdictionary transportProperties
     )
 );
 
-// Diameters
-Foam::Info << "Reading bed grain size (ds)\n" << endl;
-dimensionedScalar ds(transportProperties.lookup("ds"));
-
-Foam::Info << "Reading clay size (dp)\n" << endl;
-dimensionedScalar dp(transportProperties.lookup("dp"));
-
 // Densities
 Foam::Info << "Reading water density (rho)\n" << endl;
 dimensionedScalar rho(transportProperties.lookup("rho"));
 
-Foam::Info << "Reading clay density (rho_clay)\n" << endl;
-dimensionedScalar rho_clay(transportProperties.lookup("rho_clay"));
-
 Foam::Info << "Reading biomass density (rho_X)\n" << endl;
 dimensionedScalar rho_X(transportProperties.lookup("rho_X"));
-
-Foam::Info << "Reading sand density (rho_sand)\n" << endl;
-dimensionedScalar rho_sand(transportProperties.lookup("rho_sand"));
 
 //Other physical stuff
 Foam::Info << "Reading gravity (g)\n" << endl;
@@ -39,38 +26,13 @@ dimensionedScalar g(transportProperties.lookup("g"));
 Foam::Info << "Reading dynamic viscosity (mu)\n" << endl;
 dimensionedScalar mu(transportProperties.lookup("mu"));
 
-//Foam::Info << "Reading Slope\n" << endl;
-//dimensionedVector Slope(transportProperties.lookup("Slope"));
-
-//Dispersion + Diffusion
-// Foam::Info << "Longitudinal dispersion \n" << endl;
-// dimensionedScalar LongDisp(transportProperties.lookup("LongDisp"));
-
-// Foam::Info << "Transversal dispersion \n" << endl;
-// dimensionedScalar TransDisp(transportProperties.lookup("TransDisp"));
-
-// Foam::Info << "Molecular diffusion\n" << endl;
-// dimensionedScalar molDiff(transportProperties.lookup("molDiff"));
-
+// Diffusion and dispersion
 Foam::Info << "Molecular diffusion\n" << endl;
 dimensionedTensor molDiff(transportProperties.lookup("molDiff"));
 
 Foam::Info << "Dispersion tensor\n" << endl;
 dimensionedTensor DispTensor(transportProperties.lookup("DispTensor"));
 
-//Dynamic-var Filtration
-Foam::Info << "Reading attachement efficiency (alpha)\n" << endl;
-dimensionedScalar alpha(transportProperties.lookup("alpha"));
-
-//Chemical parameters
-Foam::Info << "Reading Hamaker constant (Hamaker)\n" << endl;
-dimensionedScalar Hamaker(transportProperties.lookup("Hamaker"));
-
-Foam::Info << "Reading Boltzmann constan (kBoltz)\n" << endl;
-dimensionedScalar kBoltz(transportProperties.lookup("kBoltz"));
-
-Foam::Info << "Reading Temperature (Temp)\n" << endl;
-dimensionedScalar Temp(transportProperties.lookup("Temp"));
 
 //Static-vars for kinetic filtration
 
@@ -86,9 +48,6 @@ dimensionedScalar kdet_EPS(transportProperties.lookup("kdet_EPS"));
 Foam::Info << "Detachment of XI to POCr (first order rate)\n" << endl;
 dimensionedScalar kdet_XI(transportProperties.lookup("kdet_XI"));
 
-//Max growth due space
-//Foam::Info << "Max biomass concentration\n" << endl;
-//dimensionedScalar X_max(transportProperties.lookup("X_max"));
 
 ////////////////////////////////////////////////////////////
 
