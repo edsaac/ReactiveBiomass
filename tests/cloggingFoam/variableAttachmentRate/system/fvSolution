@@ -36,7 +36,7 @@ solvers
 
 SIMPLE
 {
-    nNonOrthogonalCorrectors 3;
+    nNonOrthogonalCorrectors 1;
 }
 
 // relaxationFactors

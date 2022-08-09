@@ -221,12 +221,24 @@ volScalarField POCr
 //    (kBoltz*Temp)/(3.0*ppi*mu*dp)
 //);
 //Foam::Info << "D_diff: ("<< D_diffusion.value() <<")\n" << endl;
+////////////////////
 
-Foam::Info << "Calculate total biomass and clogLimiter \n" << endl;
-dimensionedScalar XMAX ((n_0 - n_c) * rho_X);
+Foam::Info << "Switch for clogging?? (cloggingSwitch)\n" << endl;
+Foam::Switch cloggingSwitch(cloggingProperties.lookup("clog?"));
+
+autoPtr<cloggingModel> clogging
+(
+    cloggingModel::New("clog",cloggingProperties,n,&perm)
+);
+
+clogging->read(cloggingProperties);
+
+// Calculate deposited mass and clogLimiter
+dimensionedScalar XMAX ((clogging->nRef() - clogging->nMin()) * rho_X);
+Foam::Info << "Calculate max possible deposited mass: " << XMAX << "\n";
+
 volScalarField totalBiomass (XAR + XN + XDN + XI + EPS);
 volScalarField clogLimiter (1.0 - totalBiomass/XMAX);
-clogLimiter *= Foam::pos(clogLimiter);
 
 // Reaction utilization rates
 //// Aerobic heterotrophs

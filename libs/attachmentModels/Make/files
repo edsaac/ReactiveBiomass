@@ -1,0 +1,5 @@
+attachmentModel/attachmentModel.C
+attachmentModel/attachmentModelNew.C
+colloidFiltrationTheory/colloidFiltrationTheory.C
+
+LIB = $(FOAM_USER_LIBBIN)/libattachmentModel

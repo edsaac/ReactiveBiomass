@@ -209,7 +209,7 @@ def noDim_SizeRatio(dp,dc):
     return dp/dc
 
 
-def noDim_Péclet(q,dc,Dm):
+def noDim_Péclet(q,theta,dc,Dm):
     '''
     Returns 
     ----------
@@ -221,12 +221,14 @@ def noDim_Péclet(q,dc,Dm):
     ----------
     q : float
         Darcy velocity [m/s]
+    theta : float
+        Porosity [-]
     dc : float
         Collector diameter $d$ [m]
     Dm : float
         Molecular diffusion coefficient [m²/s]
     '''
-    return q*dc/Dm
+    return q*dc/(Dm*theta)
 
 
 def noDim_vanderWaals(A,T):
@@ -311,6 +313,8 @@ def attachmentRate(q,theta,dp,dc,visco,rho_f,rho_p,A,T,alpha=1.0,debug=False):
         Collector diameter $d$ [m]
     q : float
         Darcy velocity [m/s]
+    theta: float
+        Porosity [-]
     visco: float
         Fluid dynamic viscosity $\\mu$ [N·s/m²]
     rho_f : float
@@ -336,7 +340,7 @@ def attachmentRate(q,theta,dp,dc,visco,rho_f,rho_p,A,T,alpha=1.0,debug=False):
     #Non-dimensional numbers
     As  = happelParameter(theta)
     NR  = noDim_SizeRatio(dp,dc)
-    NPe = noDim_Péclet(q,dc,Dm)
+    NPe = noDim_Péclet(q,theta,dc,Dm)
     NvW = noDim_vanderWaals(A,T)
     NGr = noDim_Gravitational(dp,rho_f,rho_p,T)
     

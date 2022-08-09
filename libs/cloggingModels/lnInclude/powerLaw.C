@@ -1,0 +1,1 @@
+../powerLaw/powerLaw.C

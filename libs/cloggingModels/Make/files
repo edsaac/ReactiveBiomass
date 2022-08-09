@@ -1,0 +1,6 @@
+cloggingModel/cloggingModel.C
+cloggingModel/cloggingModelNew.C
+powerLaw/powerLaw.C
+kozenyCarman/kozenyCarman.C
+
+LIB = $(FOAM_USER_LIBBIN)/libcloggingModel

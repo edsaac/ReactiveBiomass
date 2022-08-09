@@ -3,8 +3,10 @@
         {
             "name": "Linux",
             "includePath": [
+                "${FOAM_SRC}/**",
+                "${FOAM_USER_LIBBIN}/**",
                 "${workspaceFolder}/**",
-                "${FOAM_SRC}/**"
+                "${workspaceFolder}/libs/**"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/gcc",

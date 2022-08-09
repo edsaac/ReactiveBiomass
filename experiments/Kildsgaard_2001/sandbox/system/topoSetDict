@@ -1,0 +1,63 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  7
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      topoSetDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+actions
+(
+    {       // Set the injection hole
+    name    injectionHoleCellSet;
+    type    cellSet;
+    action  new;
+    source  cylinderToCell ;
+    sourceInfo
+    {
+        p1          (0.15 0.00 0.038);
+        p2          (0.15 0.01 0.038);
+        radius      0.01;
+    }
+  }
+  {
+    name    injectionHole;
+    type    cellZoneSet;
+    action  new;
+    source  setToCellZone;
+    sourceInfo
+    {
+        set     injectionHoleCellSet;
+    }
+  }
+
+  {       // Set the inoculum  strip
+    name    inoculumStripCellSet;
+    type    cellSet;
+    action  new;
+    source  boxToCell ;
+    sourceInfo
+    {
+        box     (0.000 0.000 0.140) (0.300 0.010 0.270);
+    }
+  }
+  
+  {
+    name    inoculumStrip;
+    type    cellZoneSet;
+    action  new;
+    source  setToCellZone;
+    sourceInfo
+    {
+        set     inoculumStripCellSet;
+    }
+  }
+);

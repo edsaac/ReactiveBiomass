@@ -1,5 +1,8 @@
 {
     "files.associations": {
+        "0.000/*": "OpenFOAM",
+        "constant/*": "OpenFOAM",
+        "system/*": "OpenFOAM",
         "hz_bioCycle.C": "cpp",
         "cloggingFoam.C": "cpp",
         "ostream": "cpp",
@@ -21,6 +24,7 @@
         "**/tests/**/system/*": "OpenFOAM",
         "**/0*/**/*": "OpenFOAM",
         "*.in": "yaml",
-        },
+        "type_traits": "cpp"
+    },
     "explorer.excludeGitIgnore": true
 }

@@ -1,0 +1,183 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  7
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      changeDictionaryDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+// Replacement entries starting with '~' will remove the entry.
+
+BAP                          // field to change
+{
+    boundaryField
+    {
+        "(left|right)"      // entry to change
+        {
+            type            zeroGradient;
+        }
+    }
+}
+
+DOC
+{
+    boundaryField
+    {
+        "(left|right)"
+        {
+            type            zeroGradient;
+        }
+    }
+}
+
+EPS
+{
+    boundaryField
+    {
+        "(left|right)"
+        {
+            type            zeroGradient;
+        }
+    }
+}
+
+h
+{
+    boundaryField
+    {
+        "(left|right)"
+        {
+            type            zeroGradient;
+        }
+    }
+}
+
+n
+{
+    boundaryField
+    {
+        "(left|right)"
+        {
+            type            zeroGradient;
+        }
+    }
+}
+
+NH4
+{
+    boundaryField
+    {
+        "(left|right)"
+        {
+            type            zeroGradient;
+        }
+    }
+}
+
+NO3
+{
+    boundaryField
+    {
+        "(left|right)"
+        {
+            type            zeroGradient;
+        }
+    }
+}
+
+O2
+{
+    boundaryField
+    {
+        "(left|right)"
+        {
+            type            zeroGradient;
+        }
+    }
+}
+
+perm
+{
+    boundaryField
+    {
+        "(left|right)"
+        {
+            type            zeroGradient;
+        }
+    }
+}
+
+POCr
+{
+    boundaryField
+    {
+        "(left|right)"
+        {
+            type            zeroGradient;
+        }
+    }
+}
+
+UAP
+{
+    boundaryField
+    {
+        "(left|right)"
+        {
+            type            zeroGradient;
+        }
+    }
+}
+
+XAR
+{
+    boundaryField
+    {
+        "(left|right)"
+        {
+            type            zeroGradient;
+        }
+    }
+}
+
+XDN
+{
+    boundaryField
+    {
+        "(left|right)"
+        {
+            type            zeroGradient;
+        }
+    }
+}
+
+XI
+{
+    boundaryField
+    {
+        "(left|right)"
+        {
+            type            zeroGradient;
+        }
+    }
+}
+
+XN
+{
+    boundaryField
+    {
+        "(left|right)"
+        {
+            type            zeroGradient;
+        }
+    }
+}

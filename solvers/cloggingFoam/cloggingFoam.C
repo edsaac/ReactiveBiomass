@@ -44,6 +44,8 @@ Description
 #include "fvOptions.H"
 #include "simpleControl.H"
 
+#include "cloggingModel.H"
+#include "attachmentModel.H"
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 int main(int argc, char *argv[])
@@ -66,19 +68,17 @@ int main(int argc, char *argv[])
 
         //Info << "\nUpdate clog space limitation" << endl;
         clogLimiter = 1.0 - depositedClay/XMAX;
-        n  = n_0 - depositedClay/rho_clay;
+        
+        Foam::Info << "\n Update porosity field (n):" << endl;
+        n  = clogging->nRef() - depositedClay/rho_clog;
 
         //Calculate hydraulic head using mass balance + Darcy's equation
-        if (cloggingSwitch)
-        {
-            perm  = ((perm_0 - perm_c) * Foam::pow((n - n_c)/(n_0 - n_c),3) * pos(n - n_c)) + perm_c;
-        }
-        else
-        {
-            perm = perm_0;
+        if (cloggingSwitch) 
+        { 
+            clogging->calcPerm();
         }
 
-        hydraulicCond = perm * g * rho / mu;
+        hydraulicCond = perm * WATERDENSITY * GRAVITY / WATERDYNAMICVISCOSITY;
 
         while (simple.correctNonOrthogonal())
         {
@@ -92,16 +92,17 @@ int main(int argc, char *argv[])
         }
 
         // Update flow field
-        Foam::Info << "\n Update porosity field (n):" << endl;
         U   = - hydraulicCond * fvc::grad(h);
         phi = fvc::flux(U);
 
         #include "CourantNo.H"
-        #include "calculateCFT.H"
         
         // Transport equations
         while (simple.correctNonOrthogonal())
         {
+            // Calculate attachment rate
+            attachment->calcAttachment();
+
             //Info << "\nDeposited fine particles (depositedClay)" << endl;
             fvScalarMatrix FiltratedEq
             (
@@ -135,6 +136,8 @@ int main(int argc, char *argv[])
         Foam::Info << "ExecutionTime = " << runTime.elapsedCpuTime()   << " s"
                    << "    ClockTime = " << runTime.elapsedClockTime() << " s"
                    << nl << endl;
+
+        //break;
     }
 
     Foam::Info<< "End\n" << endl;
