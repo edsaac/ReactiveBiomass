@@ -109,6 +109,14 @@ int main(int argc, char *argv[])
         //Info << "\nUpdate clog space limitation" << endl;
         totalBiomass = XAR + XN + XDN + XI + EPS;
         clogLimiter = 1.0 - totalBiomass/XMAX;
+
+        if (Foam::min(clogLimiter) < dimensionedScalar("zero",dimless,0.0))
+        {
+            Foam::SeriousError<< "Total biomass greater that XMAX" << endl;            
+            runTime.write();
+            break;
+        }
+
         n  = clogging->nRef() - totalBiomass/rho_X;
 
         //Calculate hydraulic head using mass balance + Darcy's equation

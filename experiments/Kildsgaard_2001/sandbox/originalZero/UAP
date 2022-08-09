@@ -37,13 +37,13 @@ boundaryField
     {
         type            zeroGradient;
     }
-    top
+    bottom
     {
         type            uniformInletOutlet;
         uniformInletValue constant 0;
         phi             phi;
     }
-    bottom
+    top
     {
         type            zeroGradient;
     }

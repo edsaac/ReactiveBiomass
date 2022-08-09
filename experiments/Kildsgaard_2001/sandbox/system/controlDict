@@ -15,7 +15,7 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-end_days 1.0;
+end_days 30.0;
 end_secs #calc "round($end_days*86400.0)";
 
 write_days 0.5;
@@ -31,7 +31,7 @@ endTime	        $end_secs;
 writeControl    runTime;
 writeInterval   $write_secs;
 
-deltaT          1500;//1000;
+deltaT          10;//1000;
 purgeWrite      0;
 
 writeFormat     ascii;

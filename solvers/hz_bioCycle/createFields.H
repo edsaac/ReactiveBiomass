@@ -235,7 +235,7 @@ clogging->read(cloggingProperties);
 
 // Calculate deposited mass and clogLimiter
 dimensionedScalar XMAX ((clogging->nRef() - clogging->nMin()) * rho_X);
-Foam::Info << "Calculate max possible deposited mass: " << XMAX.value() << "\n";
+Foam::Info << "Calculate max possible deposited mass: " << XMAX << "\n";
 
 volScalarField totalBiomass (XAR + XN + XDN + XI + EPS);
 volScalarField clogLimiter (1.0 - totalBiomass/XMAX);

@@ -24,7 +24,7 @@ deltaLenght 0.005;
 deltaWidth  0.005;
 
 LCells #calc "round($lenght/$deltaLenght)";
-WCells #calc "round($width/$deltaWidth)";
+WCells #calc "round($width/$deltaWidth) + 1";
 DCells 1;
 
 vertices
