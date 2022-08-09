@@ -15,7 +15,7 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-end_days 30.0;
+end_days 20.0;
 end_secs #calc "round($end_days*86400.0)";
 
 write_days 0.5;

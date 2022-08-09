@@ -78,8 +78,8 @@ void Foam::attachmentModels::rittmannShearPower::calcAttachment()
         *
         pow
         (
-            (100.0 * mu_ * mag(this->U_) * pow(1.0 - this->n_,3)
-            / (sqr(dc_) * pow(this->n_,3) * (6.0/dc_)))
+            (100.0 * mu_ * mag(this->U_) * pow3(1.0 - this->n_)
+            / (sqr(dc_) * pow3(this->n_) * (6.0/dc_)))
             / dimensionedScalar("dynecm2ToNm2",dimPressure,10.0),
             exponent_)
         /
