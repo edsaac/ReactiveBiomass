@@ -33,15 +33,6 @@ dimensionedTensor molDiff(transportProperties.lookup("molDiff"));
 Foam::Info << "Dispersion tensor\n" << endl;
 dimensionedTensor DispTensor(transportProperties.lookup("DispTensor"));
 
-
-//Static-vars for kinetic filtration
-
-Foam::Info << "Attachment of BAP to EPS (first order rate)\n" << endl;
-dimensionedScalar katt_BAP(transportProperties.lookup("katt_BAP"));
-
-Foam::Info << "Attachment of POCr to XI (first order rate)\n" << endl;
-dimensionedScalar katt_POCr(transportProperties.lookup("katt_POCr"));
-
 Foam::Info << "Detachment of EPS to BAP (first order rate)\n" << endl;
 dimensionedScalar kdet_EPS(transportProperties.lookup("kdet_EPS"));
 

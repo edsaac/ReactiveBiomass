@@ -82,6 +82,7 @@ ENDIGNORE
 #include "simpleControl.H"
 
 #include "cloggingModel.H"
+#include "attachmentModel.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -104,7 +105,7 @@ int main(int argc, char *argv[])
 
     while (simple.loop(runTime))
     {
-        Info<< "Time = " << runTime.timeName() << nl << endl;
+        Foam::Info<< "Time = " << runTime.timeName() << nl << endl;
 
         //Info << "\nUpdate clog space limitation" << endl;
         totalBiomass = XAR + XN + XDN + XI + EPS;
@@ -139,6 +140,10 @@ int main(int argc, char *argv[])
         U   = - hydraulicCond * fvc::grad(h);
         phi = fvc::flux(U);
         #include "CourantNo.H"
+
+        // Calculate attachment rates
+        attachment_BAP->calcAttachment();
+        attachment_POCr->calcAttachment();
 
         // Transport equations
         while (simple.correctNonOrthogonal())
