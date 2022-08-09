@@ -33,12 +33,6 @@ dimensionedTensor molDiff(transportProperties.lookup("molDiff"));
 Foam::Info << "Dispersion tensor\n" << endl;
 dimensionedTensor DispTensor(transportProperties.lookup("DispTensor"));
 
-Foam::Info << "Detachment of EPS to BAP (first order rate)\n" << endl;
-dimensionedScalar kdet_EPS(transportProperties.lookup("kdet_EPS"));
-
-Foam::Info << "Detachment of XI to POCr (first order rate)\n" << endl;
-dimensionedScalar kdet_XI(transportProperties.lookup("kdet_XI"));
-
 
 ////////////////////////////////////////////////////////////
 

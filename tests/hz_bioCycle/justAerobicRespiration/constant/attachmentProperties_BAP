@@ -20,7 +20,7 @@ attachmentModel constantRate;
 
 constantRateCoeffs
 {
-    value   2.0E-6;
+    value   1.967E-6;
 }
 
 // ************************************************************************* //

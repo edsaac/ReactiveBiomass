@@ -141,10 +141,13 @@ int main(int argc, char *argv[])
         phi = fvc::flux(U);
         #include "CourantNo.H"
 
-        // Calculate attachment rates
+        // Calculate attach/detach rates
         attachment_BAP->calcAttachment();
         attachment_POCr->calcAttachment();
 
+        detachment_EPS->calcAttachment();
+        detachment_XI->calcAttachment();
+        
         // Transport equations
         while (simple.correctNonOrthogonal())
         {
