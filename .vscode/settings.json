@@ -26,5 +26,8 @@
         "*.in": "yaml",
         "type_traits": "cpp"
     },
-    "explorer.excludeGitIgnore": true
+    "explorer.excludeGitIgnore": true,
+    
+    // Shows the nested current scopes during the scroll at the top of the editor.
+	"editor.experimental.stickyScroll.enabled": true
 }

@@ -139,6 +139,7 @@ dmypy.json
 **/processor[0-9]*/
 **/postProcessing/
 **/VTK/
+**/VTK*
 **/log*
 
 # Pflotran snapshot
