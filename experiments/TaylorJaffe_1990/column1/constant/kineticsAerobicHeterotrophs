@@ -17,11 +17,31 @@ FoamFile
 // [kg m s K mol * *]
 
 // Biochemical parameters
-//// Aerobic respirators
-qhat     qhat     [0 0 -1 0 0 0 0]     8.102E-5; //
-Kdonor   Kdonor   [1 -3 0 0 0 0 0]     0.010;    //
+//      Aerobic respirators
+
+// Maximum growth rate 
+//      ♦ 9.0E-7 1/day (Brovelli et al. 2009)
+//      Note: This is a really low growth value
+//            Let's assume it's actually 9.0E-7
+qhat     qhat     [0 0 -1 0 0 0 0]     1.04E-11;
+
+// Half-saturation constant (e- donor)
+//      ♦ 8.0E-4 mol[methanol]/L = 0.0256 kg/m³
+Kdonor   Kdonor   [1 -3 0 0 0 0 0]     0.0256;   
+
+// Half-saturation constant (e- acceptor)
+//      ♦ Never near anoxic but keep this low reference value
 Kaccep   Kaccep   [1 -3 0 0 0 0 0]     0.0005;   //
-yield    yield    [0 0  0 0 0 0 0]     0.49;     //
+
+// Half-saturation constant (e- acceptor)
+//      ♦ 0.2 
+//        Note: assuming g[Biomass]/g[Methanol]
+yield    yield    [0 0  0 0 0 0 0]     0.20;     //
+
+// Decay first-order rate
+//      ♦ Not specified
+//        Note: assume 0.30 1/d from Table 8.2 
+//              Rittmann & McCarty (2020)
 bdie     bdie     [0 0 -1 0 0 0 0]     3.472E-6; //
 
 // ************************************************************************* //
