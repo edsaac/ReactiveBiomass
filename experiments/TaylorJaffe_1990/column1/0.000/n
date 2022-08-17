@@ -17,6 +17,9 @@ FoamFile
 
 dimensions      [ 0 0 0 0 0 0 0 ];
 
+/*
+    Taylor & Jaffé (1993): Table 1  >> Porosity = 0.347
+*/
 internalField   uniform 0.347;
 
 boundaryField

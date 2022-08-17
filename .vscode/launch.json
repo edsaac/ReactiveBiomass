@@ -5,7 +5,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Streamlit: Current File",
+            "name": "Streamlit: Current File - debug",
             "type": "python",
             "request": "launch",
             "program": "/home/edsaa/venv/bin/streamlit",

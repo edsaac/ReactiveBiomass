@@ -45,7 +45,30 @@ for f in all_csv_paths:
     experimentalResults[timefromfile] = experiment_df
 
 
-chemOptions = ["perm","DOC","BAP","EPS","XAR","XN","XDN","XI","O2","NH4","NO3","POCr","n"]
+chemOptions = [
+  "perm",
+  "BAP",
+  "DOC",
+  "EPS",
+  "NH4",
+  "NO3",
+  "O2",
+  "POCr",
+  "XAR",
+  "XDN",
+  "XI",
+  "XN",
+  "h",
+  "katt_BAP",
+  "katt_POCr",
+  "kdet_EPS",
+  "kdet_XI",
+  "n",
+  "rDN",
+  "rH",
+  "rN",
+  "U"
+]
 
 chem = st.sidebar.selectbox("Select the variable:",options=chemOptions,index=0)
 
@@ -58,7 +81,8 @@ if chem:
     
     fig.update_layout(
         autosize=False,
-        height=600,
+        hovermode='closest',
+        height=800,
         # width=800,
         title={
             'text': chem,
@@ -66,11 +90,14 @@ if chem:
             'x': 0.5,
             'xanchor': 'center',
             'yanchor': 'top'},
-        xaxis_title="Value",
+        xaxis={
+            'title':"Value",
+            'exponentformat' : "power"},
         yaxis_title="Depth",
         legend={
+            'orientation':"h",
             'yanchor':"top",
-            'y':-0.05,
+            'y':-0.1,
             'xanchor':"left",
             'x':0.01,
             'title':None,
@@ -109,6 +136,7 @@ if chem:
             data = dataLine[chem]
 
             if chem == "perm": data = data/REFERENCE_PERMEABILITY
+            if chem == "U": data = data.T[-1]  #Shows only the Z-component
 
             depthArray = np.where(dataLine['vtkValidPointMask'],dataLine['Distance'],np.NaN)
         
@@ -120,6 +148,11 @@ if chem:
                     legendgrouptitle_text="Numerical model",
                     line={
                         'color':color,
-                        'width':5}))
+                        'width':5},
+                    hovertemplate = '<b>%{x:.2E}</b>'))
       
     st.plotly_chart(fig,use_container_width=True)
+    st.write(dataLine)
+    # st.write(dataLine["U"])
+    # st.write(dataLine["U"].T[-1])
+    # st.write(dataLine.array_names)

@@ -42,7 +42,21 @@ volScalarField perm
     mesh
 );
 
-volScalarField hydraulicCond (perm * rho * g / mu);
+volScalarField hydraulicCond
+(
+    IOobject
+    (
+        "hydraulicCond",
+        runTime.timeName(),
+        mesh,
+        IOobject::NO_READ,
+        IOobject::NO_WRITE
+    ),
+    mesh,
+    dimensionedScalar("hydraulicCond0",dimVelocity,1.0)
+);
+
+hydraulicCond = perm * rho * g / mu;
 
 // U in this code refers to the Darcy velocity (a.k.a q)
 volVectorField U

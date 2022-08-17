@@ -1,0 +1,37 @@
+{
+    "files.associations": {
+        "0.000/*": "OpenFOAM",
+        "constant/*": "OpenFOAM",
+        "system/*": "OpenFOAM",
+        "hz_bioCycle.C": "cpp",
+        "cloggingFoam.C": "cpp",
+        "ostream": "cpp",
+        "GeometricField.C": "cpp",
+        "*.C": "cpp",
+        "*.H": "cpp",
+        "*.tcc": "cpp",
+        "optional": "cpp",
+        "system_error": "cpp",
+        "random": "cpp",
+        "chrono": "cpp",
+        "limits": "cpp",
+        "*Dict": "OpenFOAM",
+        "*Properties": "OpenFOAM",
+        "fvSchemes": "OpenFOAM",
+        "fvSolution": "OpenFOAM",
+        "**/constant/*": "OpenFOAM",
+        "**/0/*": "OpenFOAM",
+        "**/tests/**/system/*": "OpenFOAM",
+        "**/0*/**/*": "OpenFOAM",
+        "*.in": "yaml",
+        "type_traits": "cpp"
+    },
+
+    // Controls whether entries in .gitignore should be parsed and excluded from the explorer. Similar to `files.exclude`.
+	"explorer.excludeGitIgnore": true,
+    
+    // Shows the nested current scopes during the scroll at the top of the editor.
+	"editor.experimental.stickyScroll.enabled": true,
+
+    "python.languageServer": "Pylance",
+}

@@ -17,7 +17,7 @@ FoamFile
 
 dimensions      [ 0 1 0 0 0 0 0 ];
 
-internalField   uniform 0.001;
+internalField   uniform 1e-6;
 
 boundaryField
 {
@@ -40,12 +40,57 @@ boundaryField
     top
     {
         type            fixedValue;
-        value           uniform 0.001;
+        value           uniform 1e-6;
     }
     bottom
     {
-        type            fixedGradient;
-        gradient        uniform 0.04346;
+        // type            fixedGradient;
+        // gradient        uniform 0.04345;
+              
+        /*
+        Taylor & Jaffé (1993) Table 2
+        ------------
+        Flow rate Q = 13.3 cm³/min = 2.217E-7 m³/s
+        Diameter D = 5.08cm = 0.0508 m
+            Cross-area A = π*D²/4
+                         = π*(0.0508)²/4 = 0.00203 m²
+            Darcy vel. q = Q/A 
+                         = 2.217E-7 m³/s / 0.00203 m² = 1.093E-04 m/s
+        
+        Darcy Law - if no clogging
+            q = - K • grad(h) 
+            1.093E-04 m/s = 2.517E-3 m/s • grad(h);
+            grad(h) = 0.04345
+        
+        */
+
+        //- ♣ Fixed Darcy Flux
+
+        type            codedMixed;
+        refValue        uniform 0;
+        refGradient     uniform 0;
+        valueFraction   uniform 0;          // If 0: fixedGradient, if 1: fixedValue
+        name            DarcyInflux;        // name of generated BC
+    
+        code
+        #{
+            // Read the hydraulic conductivity field
+            const volScalarField& myK = this->db().objectRegistry::lookupObject<volScalarField>("hydraulicCond");
+            
+            // Specify the target Darcy flow velocity
+            dimensionedScalar targetDarcyFlow ("targetDarcyFlow", dimensionSet(0,1,-1,0,0,0,0), scalar(1.093E-04));
+            
+            // Assign the corresponding gradient to each boundary face 
+            forAll(patch(), faceI)
+            { 
+                Info << myK[faceI] << endl;
+                this->refGrad()[faceI] = targetDarcyFlow.value() / myK[faceI];
+            }
+            
+            //this->refGrad() = Zero;
+            //this->valueFraction() = 1.0;
+        #};
+
     }
 }
 
