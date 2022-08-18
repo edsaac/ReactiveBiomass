@@ -11,16 +11,9 @@ from natsort import natsorted
 import re
 
 import streamlit as st
-st.set_page_config(layout="wide",initial_sidebar_state="collapsed")
-st.markdown(
-    '''
-    <style>
-    .stDataFrame {
-        width: 100%;
-    }
-    </style>
-    ''',unsafe_allow_html=True)
 
+st.title("Taylor & Jaffé (1990)",anchor="main_title")
+col1,col2 = st.columns([1,3])
 
 PATH_TO_VTK = "./column1/VTK"
 all_vtk_paths = [os.path.join(PATH_TO_VTK,f) for f in getVTKList(PATH_TO_VTK)]
@@ -70,9 +63,10 @@ chemOptions = [
   "U"
 ]
 
-chem = st.sidebar.selectbox("Select the variable:",options=chemOptions,index=0)
+with col1: 
+    selected_chem = st.selectbox("Select the variable:",options=chemOptions)
 
-if chem:
+if selected_chem:
     cmap = get_cmap('cool')
     deltaTime = 1.0
     totalFiles = len(all_vtk_paths)
@@ -83,9 +77,8 @@ if chem:
         autosize=False,
         hovermode='closest',
         height=800,
-        # width=800,
         title={
-            'text': chem,
+            'text': selected_chem,
             'y': 0.9,
             'x': 0.5,
             'xanchor': 'center',
@@ -93,7 +86,9 @@ if chem:
         xaxis={
             'title':"Value",
             'exponentformat' : "power"},
-        yaxis_title="Depth",
+        yaxis={
+            'title':"Depth (m)",
+            'exponentformat' : "power"},
         legend={
             'orientation':"h",
             'yanchor':"top",
@@ -107,7 +102,7 @@ if chem:
             'color': "darkblue"}
         )
     
-    if chem == 'perm': 
+    if selected_chem == 'perm': 
         fig.update_xaxes(type="log")
 
         ## Experimental data
@@ -133,10 +128,10 @@ if chem:
             grid = pv.read(vtk_file)
             color = to_hex(cmap(i/totalFiles))
             dataLine = grid.sample_over_line((0, 0, 0.52),(0, 0, 0),resolution=99)
-            data = dataLine[chem]
+            data = dataLine[selected_chem]
 
-            if chem == "perm": data = data/REFERENCE_PERMEABILITY
-            if chem == "U": data = data.T[-1]  #Shows only the Z-component
+            if selected_chem == "perm": data = data/REFERENCE_PERMEABILITY
+            if selected_chem == "U": data = data.T[-1]  #Shows only the Z-component
 
             depthArray = np.where(dataLine['vtkValidPointMask'],dataLine['Distance'],np.NaN)
         
@@ -150,9 +145,6 @@ if chem:
                         'color':color,
                         'width':5},
                     hovertemplate = '<b>%{x:.2E}</b>'))
-      
-    st.plotly_chart(fig,use_container_width=True)
-    st.write(dataLine)
-    # st.write(dataLine["U"])
-    # st.write(dataLine["U"].T[-1])
-    # st.write(dataLine.array_names)
+    with col2: 
+        st.plotly_chart(fig,use_container_width=True)
+        st.write(dataLine)

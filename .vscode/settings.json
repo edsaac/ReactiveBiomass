@@ -32,6 +32,4 @@
     
     // Shows the nested current scopes during the scroll at the top of the editor.
 	"editor.experimental.stickyScroll.enabled": true,
-
-    "python.languageServer": "Pylance",
 }
