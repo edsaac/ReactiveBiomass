@@ -16,20 +16,35 @@ FoamFile
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 // [kg m s K mol * *]
 
-// Clogging parameters
+
+/* Clogging parameters
+    
+    All clogging models must be bounded to a minimum and a reference
+    porosity and permeability, such that:
+
+       k(n)
+        |
+   kRef |             ______
+        |          .-'  
+        |       .-'     
+        |    .-'
+   kMin |___/ 
+        |___,_________,___ n
+            nMin     nRef
+*/
 clog?     true;
 
-nMin       nMin       [0 0 0 0 0 0 0]    0.05;     // Minimum porosity
-permMin    permMin    [0 2 0 0 0 0 0]    2.566e-14;  // Minimum permeability
+nMin       nMin       [0 0 0 0 0 0 0]    0.05;       // Minimum porosity
+permMin    permMin    [0 2 0 0 0 0 0]    2.566e-13;  // Minimum permeability
 
-nRef       nRef       [0 0 0 0 0 0 0]    0.347;     // Reference porosity
+nRef       nRef       [0 0 0 0 0 0 0]    0.347;      // Reference porosity
 permRef    permRef    [0 2 0 0 0 0 0]    2.566e-10;  // Reference permeability
 
 cloggingModel powerLaw;
 
 powerLawCoeffs
 {
-    nExponent dimless 3;     //- 19/6 if Clement et al. (1996) 
+    nExponent dimless 3.5;     //- 19/6 if Clement et al. (1996) 
 }
 
 kozenyCarmanCoeffs

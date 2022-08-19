@@ -12,10 +12,10 @@ import re
 
 import streamlit as st
 
-st.title("Taylor & Jaffé (1990)",anchor="main_title")
-col1,col2 = st.columns([1,3])
+st.header("Taylor & Jaffé (1990)",anchor="main_title")
+whichVTK = st.selectbox("Option run:", ["previous","current"],index=1)
+PATH_TO_VTK = f"./column1/VTK_{whichVTK}"
 
-PATH_TO_VTK = "./column1/VTK"
 all_vtk_paths = [os.path.join(PATH_TO_VTK,f) for f in getVTKList(PATH_TO_VTK)]
 
 PATH_TO_CSV = "./experimentalData"
@@ -63,8 +63,7 @@ chemOptions = [
   "U"
 ]
 
-with col1: 
-    selected_chem = st.selectbox("Select the variable:",options=chemOptions)
+selected_chem = st.selectbox("Select the variable:",options=chemOptions)
 
 if selected_chem:
     cmap = get_cmap('cool')
@@ -85,10 +84,14 @@ if selected_chem:
             'yanchor': 'top'},
         xaxis={
             'title':"Value",
-            'exponentformat' : "power"},
+            'exponentformat' : "power",
+            'gridwidth':1,
+            'gridcolor':"CadetBlue"},
         yaxis={
             'title':"Depth (m)",
-            'exponentformat' : "power"},
+            'exponentformat' : "power",
+            'gridwidth':0.2,
+            'gridcolor':"CadetBlue"},
         legend={
             'orientation':"h",
             'yanchor':"top",
@@ -98,8 +101,7 @@ if selected_chem:
             'title':None,
             'groupclick':"toggleitem"},
         font={
-            'size': 14,
-            'color': "darkblue"}
+            'size': 14}
         )
     
     if selected_chem == 'perm': 
@@ -124,7 +126,7 @@ if selected_chem:
     for i,vtk_file in enumerate(all_vtk_paths):
         timestep = i * deltaTime
         
-        if timestep % 7 == 0 and timestep > 0:
+        if timestep % 14 == 0 and timestep > 0:
             grid = pv.read(vtk_file)
             color = to_hex(cmap(i/totalFiles))
             dataLine = grid.sample_over_line((0, 0, 0.52),(0, 0, 0),resolution=99)
@@ -145,6 +147,17 @@ if selected_chem:
                         'color':color,
                         'width':5},
                     hovertemplate = '<b>%{x:.2E}</b>'))
-    with col2: 
-        st.plotly_chart(fig,use_container_width=True)
-        st.write(dataLine)
+    
+    st.plotly_chart(fig,use_container_width=True)
+    st.write(dataLine)
+
+st.markdown("""<style>
+h2 {
+  position: sticky;
+  top: 10px;
+  padding: 5px;
+  background-color: #cae8ca;
+  border: 2px solid #4CAF50;
+  text-align:left;
+}
+</style>""",unsafe_allow_html=True)
