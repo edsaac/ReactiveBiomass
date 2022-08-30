@@ -144,3 +144,11 @@ dmypy.json
 
 # Pflotran snapshot
 **/*.h5
+
+# OstrichModel run
+**/OstrichRun_*/
+**/OstOutput*.txt
+**/OstModel*.txt
+**/OstResiduals*.txt
+**/OstProgress*.txt
+**/OstStatus*.txt

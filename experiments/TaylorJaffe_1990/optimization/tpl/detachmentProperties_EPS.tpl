@@ -11,30 +11,26 @@ FoamFile
     format      ascii;
     class       dictionary;
     location    "constant";
-    object      transportProperties_POCr;
+    object      detachmentProperties_EPS;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 // [kg m s K mol * *]
+
+attachmentModel rittmannShearPower;
+
+rittmannShearPowerCoeffs
+{
+    collectorSize   2.0E-3;
+    fluidViscosity  0.0008891;
+    rittmannCoeff   <<DET_EPS>>;
+    rittmannExpon   0.58;
+}
 
 // attachmentModel constantRate;
 
 // constantRateCoeffs
 // {
-//     value   1.0E-6;
+//     value   0; //0.6E-7;
 // }
-
-attachmentModel colloidFiltrationTheory;
-
-colloidFiltrationTheoryCoeffs
-{
-    collectorSize   2.0E-3;
-    particleSize    10.0E-6;
-    fluidDensity    999.79;
-    particleDensity 1050.0;
-    fluidViscosity  0.0008891;
-    alphaEfficiency 1.458950E-03;  // From Ostrich Calibration
-    hamakerConst    5.0E-21;
-    refTemperature  283.0;
-}
 
 // ************************************************************************* //

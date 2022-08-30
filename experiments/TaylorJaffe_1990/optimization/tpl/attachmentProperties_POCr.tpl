@@ -32,7 +32,7 @@ colloidFiltrationTheoryCoeffs
     fluidDensity    999.79;
     particleDensity 1050.0;
     fluidViscosity  0.0008891;
-    alphaEfficiency 1.458950E-03;  // From Ostrich Calibration
+    alphaEfficiency <<ATT_POC>>;
     hamakerConst    5.0E-21;
     refTemperature  283.0;
 }

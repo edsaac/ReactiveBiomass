@@ -23,7 +23,7 @@ rittmannShearPowerCoeffs
     collectorSize   2.0E-3;
     fluidViscosity  0.0008891;
     // rittmannCoeff   9.745E-6;
-    rittmannCoeff   50.0E-6;
+    rittmannCoeff   9.111333E-05;
     rittmannExpon   0.58;
 }
 

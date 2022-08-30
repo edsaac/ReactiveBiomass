@@ -13,8 +13,7 @@ import re
 import streamlit as st
 
 st.header("Taylor & Jaffé (1990)",anchor="main_title")
-whichVTK = st.selectbox("Option run:", ["previous","current"],index=1)
-PATH_TO_VTK = f"./column1/VTK_{whichVTK}"
+PATH_TO_VTK = f"./column1/VTK"
 
 all_vtk_paths = [os.path.join(PATH_TO_VTK,f) for f in getVTKList(PATH_TO_VTK)]
 

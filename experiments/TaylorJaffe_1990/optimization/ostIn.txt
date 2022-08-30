@@ -1,92 +1,102 @@
 #Configuration File for Ostrich Program
-ProgramType Levenberg-Marquardt
-ObjectiveFunction WSSE
-ModelSubdir model
+
+#ProgramType         Levenberg-Marquardt
+ProgramType         ParticleSwarm
+ObjectiveFunction   WSSE
+ModelSubdir         OstrichRun_
+ModelExecutable     ./modelExecutable.sh
+OstrichWarmStart    yes
+RandomSeed          1
 
 BeginExtraDirs
 model_template/0.000
 model_template/constant
 model_template/system
+model_template/dynamicCode
 EndExtraDirs
 
 BeginFilePairs    
-model_template/constant/transportProperties.tpl ; constant/transportProperties
+tpl/transportProperties.tpl ; constant/transportProperties
+tpl/detachmentProperties_XI.tpl ; constant/detachmentProperties_XI
+tpl/detachmentProperties_EPS.tpl ; constant/detachmentProperties_EPS
+tpl/attachmentProperties_BAP.tpl ; constant/attachmentProperties_BAP
+tpl/attachmentProperties_POCr.tpl ; constant/attachmentProperties_POCr
 EndFilePairs
-
-BeginExtraFiles
-## Maybe here the postprocessing script
-EndExtraFiles
-
-ModelExecutable    ./modelExecutable.sh
 
 #Parameter Specification
 BeginParams
-#Parameter	init.	low	  high	 tx_in   tx_ost	 tx_out
-<<RHO_X>>		      1	    1	  100  	none  	none	   none
+#Parameter	init.	low	    high	tx_in   tx_ost	tx_out
+<<RHO_X>>   random    1.00  100.00  none    none    none
+<<DET_EPS>> random  1.0E-8  1.0E-4  none  	log10	none
+<<ATT_BAP>> random    0.00	0.20  	none  	none	none
 EndParams
+
+BeginTiedParams
+<<DET_XI>>  1   <<DET_EPS>> linear  1.0     0.0
+<<ATT_POC>> 1   <<ATT_BAP>> linear  1.0     0.0
+EndTiedParams
 
 #Observation Configuration
 BeginObservations
-#observation	value	weight	file		keyword		line	column
-obs1		68.23	1	headerr.dat	computed	2	3 
-obs2		68.10	1	headerr.dat	computed	3	3 
-obs3		68.23	1	headerr.dat	computed	4	3 
-obs4		68.06	1	headerr.dat	computed	5	3 
-obs5		68.15	1	headerr.dat	computed	6	3 
-obs6		66.00	1	headerr.dat	computed	7	3 
-obs7		65.53	1	headerr.dat	computed	8	3 
-obs8		65.97	1	headerr.dat	computed	9	3 
-obs9		65.51	1	headerr.dat	computed	10	3 
-obs10		65.76	1	headerr.dat	computed	11	3 
-obs11		69.02	1	headerr.dat	computed	12	3 
-obs12		67.61	1	headerr.dat	computed	13	3 
-obs13		66.16	1	headerr.dat	computed	14	3 
-obs14		64.75	1	headerr.dat	computed	15	3 
-obs15		68.98	1	headerr.dat	computed	16	3 
-obs16		66.91	1	headerr.dat	computed	17	3 
-obs17		65.48	1	headerr.dat	computed	18	3 
-obs18		64.32	1	headerr.dat	computed	19	3 
-obs19		66.57	1	headerr.dat	computed	20	3 
-obs20		67.21	1	headerr.dat	computed	21	3 
-obs21		67.34	1	headerr.dat	computed	22	3 
-obs22		64.64	1	headerr.dat	computed	23	3 
-obs23		64.54	1	headerr.dat	computed	24	3 
-obs24		68.72	1	headerr.dat	computed	25	3 
-obs25		68.92	1	headerr.dat	computed	26	3 
+#<name1><value1><wgt1><file1><sep1><key1><line1><col1><tok1><aug1><grp1>
+d14.5202	1.42E-10	1	postProcessing/singleGraph/1209600.000/line_perm.csv	OST_NULL	1	2	','	d14
+d14.3605	2.21E-10	2	postProcessing/singleGraph/1209600.000/line_perm.csv	OST_NULL	2	2	','	d14
+d14.2623	2.16E-10	3	postProcessing/singleGraph/1209600.000/line_perm.csv	OST_NULL	3	2	','	d14
+d14.2018	1.53E-10	4	postProcessing/singleGraph/1209600.000/line_perm.csv	OST_NULL	4	2	','	d14
+d14.1421	1.37E-10	5	postProcessing/singleGraph/1209600.000/line_perm.csv	OST_NULL	5	2	','	d14
+d14.1210	1.34E-10	6	postProcessing/singleGraph/1209600.000/line_perm.csv	OST_NULL	6	2	','	d14
+d14.1110	1.33E-10	7	postProcessing/singleGraph/1209600.000/line_perm.csv	OST_NULL	7	2	','	d14
+d14.1018	1.32E-10	8	postProcessing/singleGraph/1209600.000/line_perm.csv	OST_NULL	8	2	','	d14
+d14.0970	1.21E-10	9	postProcessing/singleGraph/1209600.000/line_perm.csv	OST_NULL	9	2	','	d14
+d14.0807	8.65E-11	10	postProcessing/singleGraph/1209600.000/line_perm.csv	OST_NULL	10	2	','	d14
+d14.0720	6.78E-11	11	postProcessing/singleGraph/1209600.000/line_perm.csv	OST_NULL	11	2	','	d14
+d14.0623	7.01E-11	12	postProcessing/singleGraph/1209600.000/line_perm.csv	OST_NULL	12	2	','	d14
+d14.0500	6.60E-11	13	postProcessing/singleGraph/1209600.000/line_perm.csv	OST_NULL	13	2	','	d14
+d14.0430	6.37E-11	14	postProcessing/singleGraph/1209600.000/line_perm.csv	OST_NULL	14	2	','	d14
+d14.0300	2.50E-11	15	postProcessing/singleGraph/1209600.000/line_perm.csv	OST_NULL	15	2	','	d14
+d14.0202	1.62E-12	16	postProcessing/singleGraph/1209600.000/line_perm.csv	OST_NULL	16	2	','	d14
+d14.0114	1.12E-13	17	postProcessing/singleGraph/1209600.000/line_perm.csv	OST_NULL	17	2	','	d14
+d28.5202	1.42E-10	1	postProcessing/singleGraph/2419200.000/line_perm.csv	OST_NULL	1	2	','	d28
+d28.3605	2.21E-10	2	postProcessing/singleGraph/2419200.000/line_perm.csv	OST_NULL	2	2	','	d28
+d28.2623	2.16E-10	3	postProcessing/singleGraph/2419200.000/line_perm.csv	OST_NULL	3	2	','	d28
+d28.2018	1.53E-10	4	postProcessing/singleGraph/2419200.000/line_perm.csv	OST_NULL	4	2	','	d28
+d28.1421	1.37E-10	5	postProcessing/singleGraph/2419200.000/line_perm.csv	OST_NULL	5	2	','	d28
+d28.1210	1.34E-10	6	postProcessing/singleGraph/2419200.000/line_perm.csv	OST_NULL	6	2	','	d28
+d28.1110	1.33E-10	7	postProcessing/singleGraph/2419200.000/line_perm.csv	OST_NULL	7	2	','	d28
+d28.1018	1.32E-10	8	postProcessing/singleGraph/2419200.000/line_perm.csv	OST_NULL	8	2	','	d28
+d28.0970	1.04E-10	9	postProcessing/singleGraph/2419200.000/line_perm.csv	OST_NULL	9	2	','	d28
+d28.0807	7.49E-12	10	postProcessing/singleGraph/2419200.000/line_perm.csv	OST_NULL	10	2	','	d28
+d28.0720	1.93E-12	11	postProcessing/singleGraph/2419200.000/line_perm.csv	OST_NULL	11	2	','	d28
+d28.0623	1.07E-12	12	postProcessing/singleGraph/2419200.000/line_perm.csv	OST_NULL	12	2	','	d28
+d28.0500	5.47E-13	13	postProcessing/singleGraph/2419200.000/line_perm.csv	OST_NULL	13	2	','	d28
+d28.0430	4.26E-13	14	postProcessing/singleGraph/2419200.000/line_perm.csv	OST_NULL	14	2	','	d28
+d28.0300	2.02E-13	15	postProcessing/singleGraph/2419200.000/line_perm.csv	OST_NULL	15	2	','	d28
+d28.0202	1.54E-13	16	postProcessing/singleGraph/2419200.000/line_perm.csv	OST_NULL	16	2	','	d28
+d28.0114	1.12E-13	17	postProcessing/singleGraph/2419200.000/line_perm.csv	OST_NULL	17	2	','	d28
 EndObservations
 
 #Configuration for Levenberg-Marquardt algorithm
 BeginLevMar
-InitialLambda    10.0
+#InitialLambda    10.0
+InitialLambda    5.0
 LambdaScaleFactor    1.1
-MoveLimit    0.1
+MoveLimit    0.5
 AlgorithmConvergenceValue    0.0001
 LambdaPhiRatio    0.3
 LambdaRelReduction    0.01
 MaxLambdas    10
-MaxIterations    20
+MaxIterations    200
 EndLevMar
+
+BeginParticleSwarm
+SwarmSize               40
+NumGenerations          15
+InitPopulationMethod    LHS
+EndParticleSwarm
 
 BeginMathAndStats
 DiffType    forward
 DiffRelIncrement    0.001
-#Default
 AllStats
-#NoStats
-#StdDev
-#StdErr
-#CorrCoeff
-#Beale
-#Linssen
-#CooksD
-#DFBETAS
-#Confidence
-#Sensitivity
+WriteResidualsEachIteration
 EndMathAndStats
-
-BeginGeneticAlg
-PopulationSize 10
-MutationRate 0.05
-Survivors 1
-NumGenerations 50
-EndGeneticAlg

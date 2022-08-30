@@ -1,4 +1,7 @@
+foamListTimes -rm
+if [ -d "postProcessing" ]; then
+  echo "postProcessing does exist. Let's remove it"
+  rm -r postProcessing
+fi
 hz_bioCycle > /dev/null
-
-# Transform line_perm.xy into a relative permeability list sampled at the same 
-# coordinates that the observations are.
+echo "Ended :smilyface:"
