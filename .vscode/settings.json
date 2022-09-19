@@ -30,8 +30,6 @@
     },
 
     // Controls whether entries in .gitignore should be parsed and excluded from the explorer. Similar to `files.exclude`.
-	"explorer.excludeGitIgnore": true,
-    
-    // Shows the nested current scopes during the scroll at the top of the editor.
-	"editor.experimental.stickyScroll.enabled": true,
+    "explorer.excludeGitIgnore": true,
+    "editor.stickyScroll.enabled": true,
 }

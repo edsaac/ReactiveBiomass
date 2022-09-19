@@ -138,11 +138,11 @@ Foam::Info << "Minimum concentration of NH4 as N-source (K_minN)\n" << endl;
 dimensionedScalar K_minN(biochemicalProperties.lookup("K_minN"));
 
 // Hydrolisis of particulates into dissolved carbon
-Foam::Info << "BAP hydrolisis rate into DOC (khyd_BAP)\n" << endl;
-dimensionedScalar khyd_BAP(biochemicalProperties.lookup("khyd_BAP"));
+Foam::Info << "Labile species hydrolisis rate into DOC (khyd_labil)\n" << endl;
+dimensionedScalar khyd_labil(biochemicalProperties.lookup("khyd_labil"));
 
-Foam::Info << "POCr hydrolisis rate into DOC (khyd_POCr)\n" << endl;
-dimensionedScalar khyd_POCr(biochemicalProperties.lookup("khyd_POCr"));
+Foam::Info << "Recalcitrant species hydrolisis rate into DOC (khyd_recal)\n" << endl;
+dimensionedScalar khyd_recal(biochemicalProperties.lookup("khyd_recal"));
 
 Foam::Info << "EPS formation coefficient (kEPS)\n" << endl;
 dimensionedScalar kEPS(biochemicalProperties.lookup("kEPS"));
