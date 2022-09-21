@@ -112,7 +112,8 @@ int main(int argc, char *argv[])
 
         //Info << "\nUpdate clog space limitation" << endl;
         totalBiomass = XAR + XN + XDN + XI + EPS;
-        clogLimiter = 1.0 - totalBiomass/XMAX;
+        // clogLimiter = 1.0 - totalBiomass/XMAX;
+        clogLimiter = 1.0;
 
         if (Foam::min(clogLimiter) < dimensionedScalar("zero",dimless,0.0))
         {
@@ -195,8 +196,8 @@ int main(int argc, char *argv[])
                 + fvm::div(phi, XARp)
                 - fvm::laplacian(n*(mag(U)*DispTensor + molDiff), XARp)
                 ==
-                pXAR.yield * rH * XARp                  //Growth
-                - pXAR.bDie * XARp                      //Decay XARp -> BAP + POCr
+                n * pXAR.yield * rH * XARp                  //Growth
+                - n * pXAR.bDie * XARp                  //Decay XARp -> BAP + POCr
                 + kdet * XAR                            //Detachment XAR -> XARp
                 - n * katt * clogLimiter * XARp         //Attachment XARp -> XAR
             );
@@ -210,7 +211,7 @@ int main(int argc, char *argv[])
             (
                 fvm::ddt(XN)
                 ==
-                pXN.yield * rN  * XN                    //Growth
+                  pXN.yield * rN * XN                    //Growth
                 - pXN.bDie * XN                         //Decay XN -> EPS + XI
                 - kdet * XN                             //Detachment XN -> XNp
                 + n * katt * clogLimiter * XNp          //Attachment XNp -> XN
@@ -227,8 +228,8 @@ int main(int argc, char *argv[])
                 + fvm::div(phi, XNp)
                 - fvm::laplacian(n*(mag(U)*DispTensor + molDiff), XNp)
                 ==
-                pXN.yield * rN * XNp                    //Growth
-                - pXN.bDie * XNp                        //Decay XNp -> BAP + POCr
+                n * pXN.yield * rN * XNp                    //Growth
+                - n * pXN.bDie * XNp                        //Decay XNp -> BAP + POCr
                 + kdet * XN                             //Detachment XN -> XNp
                 - n * katt * clogLimiter * XNp          //Attachment XNp -> XN
             );
@@ -259,8 +260,8 @@ int main(int argc, char *argv[])
                 + fvm::div(phi, XDNp)
                 - fvm::laplacian(n*(mag(U)*DispTensor + molDiff), XDNp)
                 ==
-                pXDN.yield * rDN * XDNp                 //Growth
-                - pXDN.bDie * XDNp                      //Decay XDN -> BAP + POCr
+                n * pXDN.yield * rDN * XDNp                 //Growth
+                - n * pXDN.bDie * XDNp                      //Decay XDN -> BAP + POCr
                 + kdet * XDN                            //Detachment XDN -> XDNp
                 - n * katt * clogLimiter * XDNp         //Attachment XDNp -> XDN
             );
@@ -318,10 +319,12 @@ int main(int argc, char *argv[])
                 ==
                 - rH * XAR                              //Metabolism XAR
                 - rDN * XDN                             //Metabolism XDN
-                + n * khyd_labil * BAP                    //Hydrolisis BAP -> DOC
-                + n * khyd_recal * POCr                  //Hydrolisis POCr -> DOC
-                + n * khyd_labil * EPS                    //Hydrolysis of EPS -> DOC
-                + n * khyd_recal * XI                    //Hydrolysis of XI -> DOC
+                + n * (
+                    khyd_labil * BAP                    //Hydrolisis BAP -> DOC
+                    + khyd_recal * POCr                 //Hydrolisis POCr -> DOC
+                    + khyd_labil * EPS                  //Hydrolysis of EPS -> DOC
+                    + khyd_recal * XI                   //Hydrolysis of XI -> DOC
+                )
             );
             DissolvedCarbonTransport.relax();
             fvOptions.constrain(DissolvedCarbonTransport);
@@ -355,9 +358,12 @@ int main(int argc, char *argv[])
                     pXAR.bDie*XAR                       //Decay XAR
                     + pXN.bDie*XN                       //Decay XN
                     + pXDN.bDie*XDN                     //Decay XDN
-                    + pXAR.bDie*XARp                    //Decay XARp
+                    )
+                + gamma_N * fd * n * (                      
+                    pXAR.bDie*XARp                      //Decay XARp
                     + pXN.bDie*XNp                      //Decay XNp
-                    + pXDN.bDie*XDNp)                   //Decay XDNp
+                    + pXDN.bDie*XDNp                    //Decay XDNp
+                    )                   
                 - gamma_N * pXAR.yield * rH * XAR       //Metabolism XAR
                 - n * gamma_N * pXAR.yield * rH * XARp  //Metabolism XARp
             );
@@ -373,11 +379,7 @@ int main(int argc, char *argv[])
                 + fvm::div(phi, NO3) 
                 - fvm::laplacian(n*(mag(U)*DispTensor + molDiff), NO3)
                 ==
-                (
-                    1.0 
-                    - 0.31*pXN.yield 
-                    - kEPS
-                ) * rN * (XN + n*XNp)                   //Metabolism XN
+                (1.0 - 0.31*pXN.yield - kEPS) * rN * (XN + n*XNp)                   //Metabolism XN
                 - beta_1 * rDN * (XDN + n*XDNp)         //Metabolism XDN
             );
             NitrateTransport.relax();

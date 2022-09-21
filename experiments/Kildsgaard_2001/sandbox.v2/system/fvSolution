@@ -25,7 +25,7 @@ solvers
         relTol          0;
     }
 
-    "(DOC|POC|O2|NO3|NH4|XAR|XN|XDN|XI|EPS|UAP|BAP|POCr)"
+    "(DOC|POC|O2|NO3|NH4|XAR|XN|XDN|XARp|XNp|XDNp|XI|EPS|UAP|BAP|POCr)"
     {
         solver          PBiCGStab;
         preconditioner  DILU;

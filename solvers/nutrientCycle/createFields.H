@@ -310,10 +310,11 @@ volScalarField rH
         IOobject::NO_READ,
         IOobject::AUTO_WRITE
     ),
-    pXAR.qhat 
-        * DOC/(pXAR.Kdonor + DOC) 
-        * O2/(pXAR.Kaccep + O2) 
-        * NH4/(K_minN + NH4) * clogLimiter
+    pXAR.qhat  
+        * DOC/(pXAR.Kdonor + DOC)
+        * O2/(pXAR.Kaccep + O2)
+        * NH4/(K_minN + NH4)
+        * clogLimiter
 );
 
 Foam::Info << "Calculate initial rates of utilization rN \n" << endl;
@@ -359,7 +360,7 @@ volScalarField rDN
 // beta1   = 0.35 * (1. - 1.42*pXDN.Y - pXDN.kEPS) #gNO3/gBOD
 
 Foam::Info << "Ratio of mg O2 / mg VSS-Xa from DOC (alpha_1)\n" << endl;
-dimensionedScalar alpha_1(1.0 - 1.42*pXAR.yield - kEPS);
+dimensionedScalar alpha_1(1.0 * (1.0 - 1.42*pXAR.yield - kEPS));
 
 Foam::Info << "Ratio of mg O2 / mg VSS-Xn (alpha_N)\n" << endl;
 dimensionedScalar alpha_N(4.57 * (1.0 - 0.31*pXN.yield - kEPS));   

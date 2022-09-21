@@ -11,17 +11,18 @@ FoamFile
     format      ascii;
     class       dictionary;
     location    "constant";
-    object      transportProperties;
+    object      kineticsDenitrifiers;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 // [kg m s K mol * *]
 
 // Biochemical parameters
 //// Denitrifiers
-qhat     qhat     [0 0 -1 0 0 0 0]     1.389E-4; //
-Kdonor   Kdonor   [1 -3 0 0 0 0 0]     0.001;    //
-Kaccep   Kaccep   [1 -3 0 0 0 0 0]     0.0005;   //
-yield    yield    [0 0  0 0 0 0 0]     0.20;     //
-bdie     bdie     [0 0 -1 0 0 0 0]     5.787E-7; //
+yield    yield    [0 0  0 0 0 0 0]     0.20;      //
+qhat     qhat     [0 0 -1 0 0 0 0]     1.3889E-4; //
+bdie     bdie     [0 0 -1 0 0 0 0]     5.7870E-7; //
+Kdonor   Kdonor   [1 -3 0 0 0 0 0]     1.0E-3;    //
+Kaccep   Kaccep   [1 -3 0 0 0 0 0]     0.5E-3;    //
+
 
 // ************************************************************************* //

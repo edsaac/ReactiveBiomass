@@ -15,13 +15,13 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-end_days 30.0;
+end_days 10.0;
 end_secs #calc "round($end_days*86400.0)";
 
 write_days 2.0;
 write_secs #calc "round($write_days*86400.0)";
 
-application     hz_justO2Foam;
+application     nutrientCycle;
 
 startFrom       latestTime;
 startTime       0;
@@ -31,7 +31,7 @@ endTime	        $end_secs;
 writeControl    runTime;
 writeInterval   $write_secs;
 
-deltaT          1000;//1000;
+deltaT          500;
 purgeWrite      0;
 
 writeFormat     ascii;

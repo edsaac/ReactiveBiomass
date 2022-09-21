@@ -12,7 +12,7 @@ Description
 
 #includeEtc "caseDicts/postProcessing/probes/probes.cfg"
 
-fields (DOC BAP EPS XAR XN XDN XI O2 NH4 NO3 POCr U);
+fields (XAR XN XDN XARp XNp XDNp EPS XI BAP POCr DOC NH4 NO3 O2 U katt n);
 probeLocations
 (
     (0 0 0)

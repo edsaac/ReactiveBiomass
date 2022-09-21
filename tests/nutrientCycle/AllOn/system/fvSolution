@@ -21,15 +21,15 @@ solvers
     {
         solver          PCG;
         preconditioner  DIC;
-        tolerance       1e-06;
+        tolerance       1e-09;
         relTol          0;
     }
 
-    "(DOC|POC|O2|NO3|NH4|XAR|XN|XDN|XI|EPS|UAP|BAP|POCr)"
+    "(DOC|POC|O2|NO3|NH4|XAR|XN|XDN|XI|EPS|UAP|BAP|POCr|XARp|XNp|XDNp)"
     {
         solver          PBiCGStab;
         preconditioner  DILU;
-        tolerance       1e-06;
+        tolerance       1e-09;
         relTol          0;
     }
 
@@ -37,14 +37,14 @@ solvers
     {
         solver          PBiCGStab;
         preconditioner  DILU;
-        tolerance       1e-06;
+        tolerance       1e-09;
         relTol          0;
     }
 }
 
 SIMPLE
 {
-    nNonOrthogonalCorrectors 3;
+    nNonOrthogonalCorrectors 1;
 }
 
 // relaxationFactors
@@ -65,6 +65,7 @@ SIMPLE
 //     }
 // }
 
+/*
 relaxFactor 0.8;
 
 relaxationFactors
@@ -84,6 +85,6 @@ relaxationFactors
         NO3        $relaxFactor;
         POCr       $relaxFactor;
     }
-}
+}*/
 
 // ************************************************************************* //

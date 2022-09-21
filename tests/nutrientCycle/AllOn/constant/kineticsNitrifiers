@@ -11,17 +11,17 @@ FoamFile
     format      ascii;
     class       dictionary;
     location    "constant";
-    object      transportProperties;
+    object      kineticsNitrifiers;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 // [kg m s K mol * *]
 
 // Biochemical parameters
 //// Nitrifiers
+yield    yield    [0 0  0 0 0 0 0]     0.11;     //
 qhat     qhat     [0 0 -1 0 0 0 0]     6.481E-5; //
+bdie     bdie     [0 0 -1 0 0 0 0]     1.157E-6; //
 Kdonor   Kdonor   [1 -3 0 0 0 0 0]     0.0005;    //
 Kaccep   Kaccep   [1 -3 0 0 0 0 0]     0.0005;   //
-yield    yield    [0 0  0 0 0 0 0]     0.11;     //
-bdie     bdie     [0 0 -1 0 0 0 0]     1.157E-6; //
 
 // ************************************************************************* //

@@ -25,16 +25,16 @@ colloidFiltrationTheoryCoeffs
     fluidDensity    999.79;
     particleDensity 1050.0;
     fluidViscosity  0.0008891;
-    alphaEfficiency 1.5E-03;
+    alphaEfficiency 0.01;
     hamakerConst    5.0E-21;
     refTemperature  283.0;
 }
 
-/*attachmentModel constantRate;
+// attachmentModel constantRate;
 
-constantRateCoeffs
-{
-    value   0.0;
-}*/
+// constantRateCoeffs
+// {
+//     value   0.0;
+// }
 
 // ************************************************************************* //

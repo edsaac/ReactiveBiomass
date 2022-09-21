@@ -21,8 +21,8 @@ kEPS     kEPS     [0 0  0 0 0 0 0]     0.18;     // Formation of EPS
 gamma_N  gamma_N  [0 0  0 0 0 0 0]     0.124;    // N/Biomass
 
 // Hydrolisis of particulates
-khyd_BAP    khyd_BAP    [0 0 -1 0 0 0 0]     1.968E-6; //1.0E-12;
-khyd_POCr   khyd_POCr   [0 0 -1 0 0 0 0]     1.968E-7; //1.0E-12;
+khyd_labil    khyd_BAP    [0 0 -1 0 0 0 0]     1.968E-6; //1.0E-12;
+khyd_recal   khyd_POCr   [0 0 -1 0 0 0 0]     1.968E-7; //1.0E-12;
 
 // Inhibitors and switches
 K_I         K_I         [1 -3 0 0 0 0 0]     0.0006;   //
