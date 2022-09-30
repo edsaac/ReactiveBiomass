@@ -86,14 +86,14 @@ Usage
 
         colloidFiltrationTheoryCoeffs
         {
-            collectorSize   dimLength   <value>;
-            particleSize    dimLength   <value>;
-            fluidDensity    dimDensity  <value>;
-            particleDensity dimDensity  <value>;
-            fluidViscosity  dimDynamicViscosity <value>;
-            alphaEfficiency dimless     <value>;
-            hamakerConst    dims??      <value>;
-            refTemperature  dimTemperature  <value>;
+            collectorSize   <value>;
+            particleSize    <value>;
+            fluidDensity    <value>;
+            particleDensity <value>;
+            fluidViscosity  <value>;
+            alphaEfficiency <value>;
+            hamakerConst    <value>;
+            refTemperature  <value>;
         }
     /endverbatim
 

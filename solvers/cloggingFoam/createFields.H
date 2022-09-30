@@ -187,7 +187,21 @@ Foam::Info << "Calculate max possible deposited mass: " << XMAX.value() << "\n";
 volScalarField clogLimiter (1.0 - depositedClay/XMAX);
 //clogLimiter *= Foam::pos(clogLimiter);
 
-volScalarField hydraulicCond (perm * WATERDENSITY * GRAVITY / WATERDYNAMICVISCOSITY);
+volScalarField hydraulicCond
+(
+    IOobject
+    (
+        "hydraulicCond",
+        runTime.timeName(),
+        mesh,
+        IOobject::NO_READ,
+        IOobject::NO_WRITE
+    ),
+    mesh,
+    dimensionedScalar("hydraulicCond0", dimVelocity, 1.0)
+);
+
+hydraulicCond = perm * WATERDENSITY * GRAVITY / WATERDYNAMICVISCOSITY;
 
 #include "createPhi.H"
 #include "createFvOptions.H"

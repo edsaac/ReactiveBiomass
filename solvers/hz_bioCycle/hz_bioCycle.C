@@ -82,6 +82,7 @@ ENDIGNORE
 #include "simpleControl.H"
 
 #include "cloggingModel.H"
+#include "attachmentModel.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -104,7 +105,7 @@ int main(int argc, char *argv[])
 
     while (simple.loop(runTime))
     {
-        Info<< "Time = " << runTime.timeName() << nl << endl;
+        Foam::Info<< "Time = " << runTime.timeName() << nl << endl;
 
         //Info << "\nUpdate clog space limitation" << endl;
         totalBiomass = XAR + XN + XDN + XI + EPS;
@@ -140,6 +141,13 @@ int main(int argc, char *argv[])
         phi = fvc::flux(U);
         #include "CourantNo.H"
 
+        // Calculate attach/detach rates
+        attachment_BAP->calcAttachment();
+        attachment_POCr->calcAttachment();
+
+        detachment_EPS->calcAttachment();
+        detachment_XI->calcAttachment();
+        
         // Transport equations
         while (simple.correctNonOrthogonal())
         {
@@ -214,7 +222,7 @@ int main(int argc, char *argv[])
                 + (kEPS*rN  + fd*pXN.bDie)  * XN
                 + (kEPS*rDN + fd*pXDN.bDie) * XDN
                 - kdet_EPS * EPS
-                + n * katt_BAP * BAP
+                + n * katt_BAP * clogLimiter* BAP
             );
             EPSTransport.relax();
             fvOptions.constrain(EPSTransport);
@@ -228,7 +236,7 @@ int main(int argc, char *argv[])
                 ==
                 (1-fd) * (pXAR.bDie*XAR + pXN.bDie*XN + pXDN.bDie*XDN)
                 - kdet_XI * XI
-                + n * katt_POCr * POCr
+                + n * katt_POCr * clogLimiter * POCr
             );
             InertGeneration.relax();
             fvOptions.constrain(InertGeneration);
@@ -306,7 +314,7 @@ int main(int argc, char *argv[])
                 - fvm::laplacian(n*(mag(U)*DispTensor + molDiff), BAP)
                 ==
                 kdet_EPS * EPS
-                - n * katt_BAP * BAP
+                - n * katt_BAP * clogLimiter * BAP
                 - n * khyd_BAP * BAP
             );
             BAPTransport.relax();
@@ -322,7 +330,7 @@ int main(int argc, char *argv[])
                 - fvm::laplacian(mag(U)*DispTensor, POCr)
                 ==
                 kdet_XI * XI
-                - n * katt_POCr * POCr
+                - n * katt_POCr * clogLimiter * POCr
                 - n * khyd_POCr * POCr
             );
             POCrGeneration.relax();

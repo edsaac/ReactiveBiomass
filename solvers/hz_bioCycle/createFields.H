@@ -42,7 +42,21 @@ volScalarField perm
     mesh
 );
 
-volScalarField hydraulicCond (perm * rho * g / mu);
+volScalarField hydraulicCond
+(
+    IOobject
+    (
+        "hydraulicCond",
+        runTime.timeName(),
+        mesh,
+        IOobject::NO_READ,
+        IOobject::NO_WRITE
+    ),
+    mesh,
+    dimensionedScalar("hydraulicCond0",dimVelocity,1.0)
+);
+
+hydraulicCond = perm * rho * g / mu;
 
 // U in this code refers to the Darcy velocity (a.k.a q)
 volVectorField U
@@ -308,3 +322,179 @@ dimensionedScalar alpha_N(4.57 * (1.0 - 0.31*pXN.yield - kEPS));
 
 Foam::Info << "Ratio of mg NO3 / mg VSS-Xdn from DOC (beta_1)\n" << endl;
 dimensionedScalar beta_1(0.35 * (1.0 - 1.42*pXDN.yield - kEPS));
+
+
+//////////// Attachment rate calculators
+//Attachment kinetics 
+
+Foam::Info << "Attachment of BAP to EPS (first order rate)\n" << endl;
+
+volScalarField katt_BAP
+(
+    IOobject
+    (
+        "katt_BAP",
+        runTime.timeName(),
+        mesh,
+        IOobject::NO_READ,
+        IOobject::AUTO_WRITE
+    ),
+    mesh,
+    dimensionedScalar("katt_BAP", dimensionSet(0,0,-1,0,0,0,0) , 0.0)
+);
+
+IOdictionary attachmentProperties_BAP
+(
+    IOobject
+    (
+        "attachmentProperties_BAP",
+        runTime.constant(),
+        mesh,
+        IOobject::MUST_READ_IF_MODIFIED,
+        IOobject::NO_WRITE
+    )
+);
+
+autoPtr<attachmentModel> attachment_BAP
+(
+    attachmentModel::New(
+        "attachBAP",
+        attachmentProperties_BAP,
+        &katt_BAP,
+        mesh,
+        runTime,
+        U,
+        n)
+);
+
+attachment_BAP->read(attachmentProperties_BAP);
+Info<< attachment_BAP->attachmentProperties() << endl;
+
+/////////
+
+Foam::Info << "Attachment of POCr to XI (first order rate)\n" << endl;
+
+volScalarField katt_POCr
+(
+    IOobject
+    (
+        "katt_POCr",
+        runTime.timeName(),
+        mesh,
+        IOobject::NO_READ,
+        IOobject::AUTO_WRITE
+    ),
+    mesh,
+    dimensionedScalar("katt_POCr", dimensionSet(0,0,-1,0,0,0,0) , 0.0)
+);
+
+IOdictionary attachmentProperties_POCr
+(
+    IOobject
+    (
+        "attachmentProperties_POCr",
+        runTime.constant(),
+        mesh,
+        IOobject::MUST_READ_IF_MODIFIED,
+        IOobject::NO_WRITE
+    )
+);
+
+autoPtr<attachmentModel> attachment_POCr
+(
+    attachmentModel::New(
+        "attachPOCr",
+        attachmentProperties_POCr,
+        &katt_POCr,
+        mesh,
+        runTime,
+        U,
+        n)
+);
+
+attachment_POCr->read(attachmentProperties_POCr);
+Info<< attachment_POCr->attachmentProperties() << endl;
+
+Foam::Info << "Detachment of EPS to BAP (first order rate)\n" << endl;
+volScalarField kdet_EPS
+(
+    IOobject
+    (
+        "kdet_EPS",
+        runTime.timeName(),
+        mesh,
+        IOobject::NO_READ,
+        IOobject::AUTO_WRITE
+    ),
+    mesh,
+    dimensionedScalar("kdet_EPS", dimensionSet(0,0,-1,0,0,0,0) , 0.0)
+);
+
+IOdictionary detachmentProperties_EPS
+(
+    IOobject
+    (
+        "detachmentProperties_EPS",
+        runTime.constant(),
+        mesh,
+        IOobject::MUST_READ_IF_MODIFIED,
+        IOobject::NO_WRITE
+    )
+);
+
+autoPtr<attachmentModel> detachment_EPS
+(
+    attachmentModel::New(
+        "detachEPS",
+        detachmentProperties_EPS,
+        &kdet_EPS,
+        mesh,
+        runTime,
+        U,
+        n)
+);
+
+detachment_EPS->read(detachmentProperties_EPS);
+Info<< detachment_EPS->attachmentProperties() << endl;
+
+Foam::Info << "Detachment of XI to POCr (first order rate)\n" << endl;
+volScalarField kdet_XI
+(
+    IOobject
+    (
+        "kdet_XI",
+        runTime.timeName(),
+        mesh,
+        IOobject::NO_READ,
+        IOobject::AUTO_WRITE
+    ),
+    mesh,
+    dimensionedScalar("kdet_XI", dimensionSet(0,0,-1,0,0,0,0) , 0.0)
+);
+
+IOdictionary detachmentProperties_XI
+(
+    IOobject
+    (
+        "detachmentProperties_XI",
+        runTime.constant(),
+        mesh,
+        IOobject::MUST_READ_IF_MODIFIED,
+        IOobject::NO_WRITE
+    )
+);
+
+autoPtr<attachmentModel> detachment_XI
+(
+    attachmentModel::New(
+        "detachXI",
+        detachmentProperties_XI,
+        &kdet_XI,
+        mesh,
+        runTime,
+        U,
+        n)
+);
+
+detachment_XI->read(detachmentProperties_XI);
+Info<< detachment_XI->attachmentProperties() << endl;

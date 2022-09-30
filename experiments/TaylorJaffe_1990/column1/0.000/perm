@@ -1,0 +1,62 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  7
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volScalarField;
+    location    "0.000";
+    object      perm;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions      [ 0 2 0 0 0 0 0 ];
+/*
+    K = k rho g / mu
+
+Taylor & Jaffé (1993): Table 1 
+    Hydraulic conductivity K = 15.1 cm/min = 217.4 m/d = 2.517E-3 m/s
+    Water density rho = 1000 kg/m³
+    Dynamic viscosity mu = 0.001 Ns/m²
+    
+Permeability k = K mu / rho g
+    k = 2.157E-3 * 0.001 / 9.81 * 1000
+      = 2.566e-10 m²
+*/
+internalField   uniform 2.566e-10;
+
+boundaryField
+{
+    front
+    {
+        type            empty;
+    }
+    back
+    {
+        type            empty;
+    }
+    right
+    {
+        type            empty;
+    }
+    left
+    {
+        type            empty;
+    }
+    top
+    {
+        type            zeroGradient;
+    }
+    bottom
+    {
+        type            zeroGradient;
+    }
+}
+
+
+// ************************************************************************* //

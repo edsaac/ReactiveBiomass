@@ -1,0 +1,102 @@
+#Configuration File for Ostrich Program
+
+#ProgramType         Levenberg-Marquardt
+ProgramType         ParticleSwarm
+ObjectiveFunction   WSSE
+ModelSubdir         OstrichRun_
+ModelExecutable     ./modelExecutable.sh
+OstrichWarmStart    yes
+RandomSeed          1
+
+BeginExtraDirs
+model_template/0.000
+model_template/constant
+model_template/system
+model_template/dynamicCode
+EndExtraDirs
+
+BeginFilePairs    
+tpl/transportProperties.tpl ; constant/transportProperties
+tpl/detachmentProperties_XI.tpl ; constant/detachmentProperties_XI
+tpl/detachmentProperties_EPS.tpl ; constant/detachmentProperties_EPS
+tpl/attachmentProperties_BAP.tpl ; constant/attachmentProperties_BAP
+tpl/attachmentProperties_POCr.tpl ; constant/attachmentProperties_POCr
+EndFilePairs
+
+#Parameter Specification
+BeginParams
+#Parameter	init.	low	    high	tx_in   tx_ost	tx_out
+<<RHO_X>>   random    1.00  100.00  none    none    none
+<<DET_EPS>> random  1.0E-8  1.0E-4  none  	log10	none
+<<ATT_BAP>> random    0.00	0.20  	none  	none	none
+EndParams
+
+BeginTiedParams
+<<DET_XI>>  1   <<DET_EPS>> linear  1.0     0.0
+<<ATT_POC>> 1   <<ATT_BAP>> linear  1.0     0.0
+EndTiedParams
+
+#Observation Configuration
+BeginObservations
+#<name1><value1><wgt1><file1><sep1><key1><line1><col1><tok1><aug1><grp1>
+d14.5202	1.42E-10	1	postProcessing/singleGraph/1209600.000/line_perm.csv	OST_NULL	1	2	','	d14
+d14.3605	2.21E-10	2	postProcessing/singleGraph/1209600.000/line_perm.csv	OST_NULL	2	2	','	d14
+d14.2623	2.16E-10	3	postProcessing/singleGraph/1209600.000/line_perm.csv	OST_NULL	3	2	','	d14
+d14.2018	1.53E-10	4	postProcessing/singleGraph/1209600.000/line_perm.csv	OST_NULL	4	2	','	d14
+d14.1421	1.37E-10	5	postProcessing/singleGraph/1209600.000/line_perm.csv	OST_NULL	5	2	','	d14
+d14.1210	1.34E-10	6	postProcessing/singleGraph/1209600.000/line_perm.csv	OST_NULL	6	2	','	d14
+d14.1110	1.33E-10	7	postProcessing/singleGraph/1209600.000/line_perm.csv	OST_NULL	7	2	','	d14
+d14.1018	1.32E-10	8	postProcessing/singleGraph/1209600.000/line_perm.csv	OST_NULL	8	2	','	d14
+d14.0970	1.21E-10	9	postProcessing/singleGraph/1209600.000/line_perm.csv	OST_NULL	9	2	','	d14
+d14.0807	8.65E-11	10	postProcessing/singleGraph/1209600.000/line_perm.csv	OST_NULL	10	2	','	d14
+d14.0720	6.78E-11	11	postProcessing/singleGraph/1209600.000/line_perm.csv	OST_NULL	11	2	','	d14
+d14.0623	7.01E-11	12	postProcessing/singleGraph/1209600.000/line_perm.csv	OST_NULL	12	2	','	d14
+d14.0500	6.60E-11	13	postProcessing/singleGraph/1209600.000/line_perm.csv	OST_NULL	13	2	','	d14
+d14.0430	6.37E-11	14	postProcessing/singleGraph/1209600.000/line_perm.csv	OST_NULL	14	2	','	d14
+d14.0300	2.50E-11	15	postProcessing/singleGraph/1209600.000/line_perm.csv	OST_NULL	15	2	','	d14
+d14.0202	1.62E-12	16	postProcessing/singleGraph/1209600.000/line_perm.csv	OST_NULL	16	2	','	d14
+d14.0114	1.12E-13	17	postProcessing/singleGraph/1209600.000/line_perm.csv	OST_NULL	17	2	','	d14
+d28.5202	1.42E-10	1	postProcessing/singleGraph/2419200.000/line_perm.csv	OST_NULL	1	2	','	d28
+d28.3605	2.21E-10	2	postProcessing/singleGraph/2419200.000/line_perm.csv	OST_NULL	2	2	','	d28
+d28.2623	2.16E-10	3	postProcessing/singleGraph/2419200.000/line_perm.csv	OST_NULL	3	2	','	d28
+d28.2018	1.53E-10	4	postProcessing/singleGraph/2419200.000/line_perm.csv	OST_NULL	4	2	','	d28
+d28.1421	1.37E-10	5	postProcessing/singleGraph/2419200.000/line_perm.csv	OST_NULL	5	2	','	d28
+d28.1210	1.34E-10	6	postProcessing/singleGraph/2419200.000/line_perm.csv	OST_NULL	6	2	','	d28
+d28.1110	1.33E-10	7	postProcessing/singleGraph/2419200.000/line_perm.csv	OST_NULL	7	2	','	d28
+d28.1018	1.32E-10	8	postProcessing/singleGraph/2419200.000/line_perm.csv	OST_NULL	8	2	','	d28
+d28.0970	1.04E-10	9	postProcessing/singleGraph/2419200.000/line_perm.csv	OST_NULL	9	2	','	d28
+d28.0807	7.49E-12	10	postProcessing/singleGraph/2419200.000/line_perm.csv	OST_NULL	10	2	','	d28
+d28.0720	1.93E-12	11	postProcessing/singleGraph/2419200.000/line_perm.csv	OST_NULL	11	2	','	d28
+d28.0623	1.07E-12	12	postProcessing/singleGraph/2419200.000/line_perm.csv	OST_NULL	12	2	','	d28
+d28.0500	5.47E-13	13	postProcessing/singleGraph/2419200.000/line_perm.csv	OST_NULL	13	2	','	d28
+d28.0430	4.26E-13	14	postProcessing/singleGraph/2419200.000/line_perm.csv	OST_NULL	14	2	','	d28
+d28.0300	2.02E-13	15	postProcessing/singleGraph/2419200.000/line_perm.csv	OST_NULL	15	2	','	d28
+d28.0202	1.54E-13	16	postProcessing/singleGraph/2419200.000/line_perm.csv	OST_NULL	16	2	','	d28
+d28.0114	1.12E-13	17	postProcessing/singleGraph/2419200.000/line_perm.csv	OST_NULL	17	2	','	d28
+EndObservations
+
+#Configuration for Levenberg-Marquardt algorithm
+BeginLevMar
+#InitialLambda    10.0
+InitialLambda    5.0
+LambdaScaleFactor    1.1
+MoveLimit    0.5
+AlgorithmConvergenceValue    0.0001
+LambdaPhiRatio    0.3
+LambdaRelReduction    0.01
+MaxLambdas    10
+MaxIterations    200
+EndLevMar
+
+BeginParticleSwarm
+SwarmSize               40
+NumGenerations          15
+InitPopulationMethod    LHS
+EndParticleSwarm
+
+BeginMathAndStats
+DiffType    forward
+DiffRelIncrement    0.001
+AllStats
+WriteResidualsEachIteration
+EndMathAndStats
