@@ -29,9 +29,9 @@ regions
         name    inoculumStrip;
         fieldValues
         (
-            volScalarFieldValue XAR 0.0000
-            volScalarFieldValue XDN 0.0127
-            volScalarFieldValue XN  0.0000
+            volScalarFieldValue XAR 0.0127
+            volScalarFieldValue XDN 0
+            volScalarFieldValue XN  0
         );
     }
 );

@@ -52,7 +52,7 @@ dimensions      [ 1 -3 0 0 0 0 0 ];
         So the COD of the influent was 20mg[glucose]/L = 16.7mg[COD]/L
 */
 
-internalField   uniform 0;
+internalField   uniform 0.0167;
 
 boundaryField
 {
