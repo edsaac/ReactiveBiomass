@@ -15,10 +15,10 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-end_days 5.0;//21.0;
+end_days 21.0;
 end_secs #calc "round($end_days*86400.0)";
 
-write_days 0.1;
+write_days 0.5;
 write_secs #calc "round($write_days*86400.0)";
 
 application     hz_bioCycle;
