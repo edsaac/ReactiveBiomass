@@ -1,0 +1,92 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  7
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volScalarField;
+    location    "0.000";
+    object      h;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+/*
+    For the low flowrate experiment
+        Q_in = 1 mL/min = 1.667E-8 m³/s
+    
+    The column's cross sectional area is
+        A = π D²/4 = π (0.080 m)²/4 = 5.03E-3 m²
+    
+    Targeted constant flow is 
+        q_in = Q_in/A = 3.316E-6 m/s
+*/
+
+dimensions      [0 1 0 0 0 0 0];
+
+internalField   uniform -1;
+
+boundaryField
+{
+    top
+    {
+        // type            fixedValue;
+        // value           uniform 0.01;
+
+        //- ♣ Fixed Darcy Flux
+
+        type            codedMixed;
+        refValue        uniform 0;
+        refGradient     uniform 0;
+        valueFraction   uniform 0;          // If 0: fixedGradient, if 1: fixedValue
+        name            DarcyInflux;        // name of generated BC
+    
+        code
+        #{
+            // Read the hydraulic conductivity field
+            const volScalarField& myK = this->db().objectRegistry::lookupObject<volScalarField>("hydrConduct");
+            
+            // Specify the target Darcy flow velocity (Pay attention to the direction)
+            dimensionedScalar targetDarcyFlow ("targetDarcyFlow", dimVelocity, scalar(3.316E-6));
+            
+            // Assign the corresponding gradient to each boundary face 
+            forAll(patch(), faceI)
+            { 
+                Info << myK[faceI] << endl;
+                this->refGrad()[faceI] = targetDarcyFlow.value()/ myK[faceI] + 1.0;
+            }
+            
+            //this->refGrad() = Zero;
+            //this->valueFraction() = 1.0;
+        #};
+    }
+    
+    left
+    {
+        type            empty;
+    }
+    right
+    {
+        type            empty;
+    }
+    front
+    {
+        type            empty;
+    }
+    back
+    {
+        type            empty;
+    }
+    bottom
+    {
+        type            fixedValue;
+        value           uniform  1e-10;
+    }
+}
+
+
+// ************************************************************************* //
