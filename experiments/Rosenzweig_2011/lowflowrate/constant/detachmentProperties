@@ -16,22 +16,22 @@ FoamFile
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 // [kg m s K mol * *]
 
-// attachmentModel rittmannShearPower;
+attachmentModel rittmannShearPower;
 
-// rittmannShearPowerCoeffs
-// {
-//     collectorSize   2.0E-3;
-//     fluidViscosity  0.0008891;
-//     // rittmannCoeff   9.745E-6;
-//     rittmannCoeff   9.111333E-05;
-//     rittmannExpon   0.58;
-// }
-
-attachmentModel constantRate;
-
-constantRateCoeffs
+rittmannShearPowerCoeffs
 {
-    value   0.6E-7;
+    collectorSize   300.0E-6;
+    fluidViscosity  0.0008891;
+    // rittmannCoeff   9.745E-6;
+    rittmannCoeff   1e-3;
+    rittmannExpon   0.5; //0.58;
 }
+
+// attachmentModel constantRate;
+
+// constantRateCoeffs
+// {
+//     value   0.6E-7;
+// }
 
 // ************************************************************************* //

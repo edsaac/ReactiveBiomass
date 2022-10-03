@@ -50,10 +50,10 @@ volScalarField hydraulicCond
         runTime.timeName(),
         mesh,
         IOobject::NO_READ,
-        IOobject::NO_WRITE
+        IOobject::AUTO_WRITE
     ),
     mesh,
-    dimensionedScalar("hydraulicCond0",dimVelocity,1.0)
+    dimensionedScalar("hydraulicCond0", dimVelocity, 1.0)
 );
 
 hydraulicCond = perm * rho * g / mu;

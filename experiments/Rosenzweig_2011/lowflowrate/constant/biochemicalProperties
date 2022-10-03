@@ -38,8 +38,8 @@ kEPS     kEPS     [0 0  0 0 0 0 0]     0.18;
 gamma_N  gamma_N  [0 0  0 0 0 0 0]     0.124;
 
 /*  ♦ Hydrolisis of particulates */
-khyd_labil   khyd_labil   [0 0 -1 0 0 0 0]     0;//1.968E-6;
-khyd_recal   khyd_recal   [0 0 -1 0 0 0 0]     0;//1.968E-7;
+khyd_labil   khyd_labil   [0 0 -1 0 0 0 0]     1.968E-6;
+khyd_recal   khyd_recal   [0 0 -1 0 0 0 0]     1.968E-7;
 
 /*  ♦ Inhibitors and switches */
 /*

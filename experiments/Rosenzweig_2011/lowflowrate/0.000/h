@@ -72,12 +72,17 @@ boundaryField
             const volScalarField& myK = this->db().objectRegistry::lookupObject<volScalarField>("hydraulicCond");
             
             // Specify the target Darcy flow velocity (Pay attention to the direction)
-            dimensionedScalar targetDarcyFlow ("targetDarcyFlow", dimensionSet(0,1,-1,0,0,0,0), scalar(3.32E-6));
+            dimensionedScalar targetDarcyFlow (
+                "targetDarcyFlow", 
+                dimensionSet(0,1,-1,0,0,0,0), 
+                scalar(3.32E-6));
             
             // Assign the corresponding gradient to each boundary face 
             forAll(patch(), faceI)
             { 
-                Info << myK[faceI] << endl;
+                Info << "Hydraulic conductivity at the patch is " << myK[faceI] << endl;
+                Info << "Target Darcy flow is " << targetDarcyFlow.value() << endl;
+                
                 this->refGrad()[faceI] = targetDarcyFlow.value() / myK[faceI];
             }
             

@@ -16,30 +16,7 @@ FoamFile
 
 actions
 (
-    {       // Set the injection hole
-    name    injectionHoleCellSet;
-    type    cellSet;
-    action  new;
-    source  cylinderToCell ;
-    sourceInfo
-    {
-        p1          (0.15 0.00 0.038);
-        p2          (0.15 0.01 0.038);
-        radius      0.01;
-    }
-  }
-  {
-    name    injectionHole;
-    type    cellZoneSet;
-    action  new;
-    source  setToCellZone;
-    sourceInfo
-    {
-        set     injectionHoleCellSet;
-    }
-  }
-
-  {       // Set the inoculum  strip
+  {       // Set an inoculum  strip
     name    inoculumStripCellSet;
     type    cellSet;
     action  new;
@@ -47,7 +24,7 @@ actions
     sourceInfo
     {
         //box     (0.000 0.000 0.140) (0.300 0.010 0.270);
-        box     (0.000 0.000 0.140) (0.300 0.010 0.400);
+        box     (0.000 0.000 0.00) (0.08 0.08 0.600);
     }
   }
   
