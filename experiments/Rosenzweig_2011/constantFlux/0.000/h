@@ -84,7 +84,7 @@ boundaryField
     bottom
     {
         type            fixedValue;
-        value           uniform  1e-10;
+        value           uniform  -1;
     }
 }
 
