@@ -21,41 +21,41 @@ FoamFile
     {
         type            patch;
         nFaces          1;
-        startFace       119;
+        startFace       123;
     }
     left
     {
         type            empty;
         inGroups        List<word> 1(empty);
-        nFaces          120;
-        startFace       120;
+        nFaces          124;
+        startFace       124;
     }
     right
     {
         type            empty;
         inGroups        List<word> 1(empty);
-        nFaces          120;
-        startFace       240;
+        nFaces          124;
+        startFace       248;
     }
     front
     {
         type            empty;
         inGroups        List<word> 1(empty);
-        nFaces          120;
-        startFace       360;
+        nFaces          124;
+        startFace       372;
     }
     back
     {
         type            empty;
         inGroups        List<word> 1(empty);
-        nFaces          120;
-        startFace       480;
+        nFaces          124;
+        startFace       496;
     }
     bottom
     {
         type            patch;
         nFaces          1;
-        startFace       600;
+        startFace       620;
     }
 )
 
