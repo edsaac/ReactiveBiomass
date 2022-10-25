@@ -1,0 +1,56 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  7
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      fvSolution;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+solvers
+{
+    h
+    {
+        solver          PCG;
+        preconditioner  FDIC;
+        tolerance       1e-15;
+        relTol          0;
+    }
+}
+
+// relaxFactor 1.0;
+
+// relaxationFactors
+// {
+//     // fields  //Explicit relaxation
+//     // {
+//     //     h           $relaxFactor;
+//     // }
+    
+//     equations  //Implicit relaxation
+//     {
+//         h   $relaxFactor;
+//     }
+// }
+
+timeStepping
+{
+    convergeThreshold   5.0E-04;
+    maxItersToConverge  10;  // Triggers dT down
+
+    UpDeltaT_nIters     2;   // Triggers dT up
+    UpDeltaT_Factor     1.1;
+    maxDeltaT           120;
+
+    DownDeltaT_Factor   0.5;
+    minDeltaT           0.0001;      
+}
+// ************************************************************************* //

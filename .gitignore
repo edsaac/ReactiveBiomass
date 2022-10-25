@@ -138,6 +138,7 @@ dmypy.json
 **/dynamicCode/
 **/processor[0-9]*/
 **/postProcessing/
+**/postProcessing*/
 **/VTK/
 **/VTK*
 **/log*
@@ -152,3 +153,6 @@ dmypy.json
 **/OstResiduals*.txt
 **/OstProgress*.txt
 **/OstStatus*.txt
+
+# Experimental data
+.hiddendata/

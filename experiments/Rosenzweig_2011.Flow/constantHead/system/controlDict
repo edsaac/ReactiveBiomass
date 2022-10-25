@@ -1,0 +1,55 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  7
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      controlDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+application     RichardsFoam;
+
+startFrom       latestTime;
+startTime       0;
+stopAt          endTime;
+
+/*
+End time for low flow experiment is 
+548h × 3600s/h = 1972800s
+*/
+
+endTime	        3600;
+writeControl    runTime;
+writeInterval   60;
+
+deltaT          1.0;
+purgeWrite      0;
+
+writeFormat     ascii;
+writePrecision  6;
+writeCompression off;
+
+timeFormat      fixed;
+timePrecision   3;
+runTimeModifiable true;
+adjustTimeStep  yes;
+
+maxCo           1.0;
+debug           1;
+
+// To plot breakthrough curve
+
+functions
+    {
+      #includeFunc    probes
+    };
+
+
+// ************************************************************************* //
