@@ -25,9 +25,9 @@ End time for low flow experiment is
 548h × 3600s/h = 1972800s
 */
 
-endTime	        3600;
+endTime	        360000;
 writeControl    runTime;
-writeInterval   60;
+writeInterval   3600;
 
 deltaT          1.0;
 purgeWrite      0;

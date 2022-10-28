@@ -74,13 +74,19 @@ int main(int argc, char *argv[])
         // Solve saturation from Richards Equation    
         while(true)
         {
-            // Solve Richard's equation    
+
+            // Calculate grad(K(h)) and extract z-component
+            grad_k = fvc::grad(soil.K(h_before));
+            grad_kz = grad_k.component(vector::Z);
+
+            // Solve Richard's equation
             fvScalarMatrix richardsEquation
             (
                 fvm::ddt(soil.capillary(h_before), h_after)
                 ==
                 fvm::laplacian(soil.K(h_before), h_after)
-                + fvc::laplacian(soil.K(h_before), z)
+                + grad_kz
+                // + fvc::laplacian(soil.K(h_before), z)
             );
             fvOptions.constrain(richardsEquation);
             richardsEquation.solve();

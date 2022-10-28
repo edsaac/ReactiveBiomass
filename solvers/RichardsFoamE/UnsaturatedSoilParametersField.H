@@ -58,10 +58,10 @@ class UnsaturatedSoilParametersField
     volScalarField capillary(const volScalarField& h)
     {
         // C(h)
-        return - ((*ptr_theta_s) - (*ptr_theta_r)) 
-            * (*ptr_m) * (*ptr_n) * innerVanGenuchtenCalculator(h) 
-            * vanGenuchtenCalculator(h) 
-            / (h * (innerVanGenuchtenCalculator(h) + 1.0));
+        return ((*ptr_theta_s) - (*ptr_theta_r)) 
+            * (*ptr_alpha) * (*ptr_m) * (*ptr_n)
+            * Foam::pow(-(*ptr_alpha) * h * Foam::neg(h), *ptr_n - 1)
+            * Foam::pow(1.0 + innerVanGenuchtenCalculator(h), -(*ptr_m)-1)  ;
     }
 
     volScalarField K(const volScalarField& h)

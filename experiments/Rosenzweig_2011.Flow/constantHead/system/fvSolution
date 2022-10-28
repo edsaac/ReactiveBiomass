@@ -48,7 +48,7 @@ timeStepping
 
     UpDeltaT_nIters     2;   // Triggers dT up
     UpDeltaT_Factor     1.1;
-    maxDeltaT           120;
+    maxDeltaT           3600;
 
     DownDeltaT_Factor   0.5;
     minDeltaT           0.0001;      

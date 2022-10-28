@@ -36,7 +36,7 @@ boundaryField
     {
         // //- ♣ Fixed head value
         type            fixedValue;
-        value           uniform -4.290E-01;
+        value           uniform <<h_VALUE>>;
 
         // //- ♣ Fixed gradient
         // type            fixedGradient;
