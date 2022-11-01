@@ -44,7 +44,8 @@ boundaryField
 
         // //- ♣ Fixed mixed
         // type            mixed;
-        // refValue        uniform -0.69;
+        // refValue        unifo
+        // type            codedMm -0.69;
         // refGradient     uniform -1.0001;
         // valueFraction   uniform 0.5;          // If 0: fixedGradient, if 1: fixedValue
 
