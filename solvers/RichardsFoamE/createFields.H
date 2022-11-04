@@ -27,7 +27,7 @@ volScalarField h_before
         IOobject::NO_WRITE
     ),
     mesh,
-    dimensionedScalar("h_before",dimensionSet(0,1,0,0,0,0,0),scalar(0.0))
+    dimensionedScalar("h_before", dimLength, scalar(0.0))
 );
 
 volScalarField h_after = h;
@@ -43,7 +43,7 @@ volScalarField err
         IOobject::NO_WRITE
     ),
     mesh,
-    dimensionedScalar("err",dimensionSet(0,1,0,0,0,0,0),scalar(0.0))
+    dimensionedScalar("err", dimLength, scalar(0.0))
 );
 
 //  Velocity vector field [m/s]
@@ -59,7 +59,7 @@ volVectorField U
         IOobject::AUTO_WRITE
     ),
     mesh,
-    dimensionedVector("U", dimensionSet(0,1,-1,0,0,0,0) , vector(0.0,0.0,0.0))
+    dimensionedVector("U", dimVelocity , vector(0.0,0.0,0.0))
 );
 
 //- Face fluxes [m³/s]
@@ -78,7 +78,7 @@ volScalarField theta
         IOobject::AUTO_WRITE
     ),
     mesh,
-    dimensionedScalar("theta", dimensionSet(0,0,0,0,0,0,0) , scalar(0.0))
+    dimensionedScalar("theta", dimless , scalar(0.0))
 );
 
 //- Permeability and hydraulic conductivity [m/s]
@@ -94,7 +94,7 @@ volScalarField hydrConduct
         IOobject::AUTO_WRITE
     ),
     mesh,
-    dimensionedScalar("hydrConduct",dimensionSet(0,1,-1,0,0),scalar(1.0))
+    dimensionedScalar("hydrConduct", dimVelocity, scalar(1.0))
 );
 
 ////////////////// Constant volScalarFields ////////////////

@@ -9,54 +9,52 @@ FoamFile
 {
     version     2.0;
     format      ascii;
-    class       polyBoundaryMesh;
-    location    "constant/polyMesh";
-    object      boundary;
+    class       volScalarField;
+    location    "0.000";
+    object      theta_s;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-6
-(
+/*
+    See Table 4.1 from Rosenzweig thesis (2011)
+    For Caesarea sand without added xantan, van Genuchten parameters are:
+        thera_r = 0.012
+        theta_s = 0.385
+        n = 7.26
+        alpha = 0.0279 1/cm
+*/
+
+dimensions      [0 0 0 0 0 0 0];
+
+internalField   uniform 0.385; 
+
+boundaryField
+{
     top
     {
-        type            patch;
-        nFaces          1;
-        startFace       599;
+        type            zeroGradient;
     }
     left
     {
         type            empty;
-        inGroups        List<word> 1(empty);
-        nFaces          600;
-        startFace       600;
     }
     right
     {
         type            empty;
-        inGroups        List<word> 1(empty);
-        nFaces          600;
-        startFace       1200;
     }
     front
     {
         type            empty;
-        inGroups        List<word> 1(empty);
-        nFaces          600;
-        startFace       1800;
     }
     back
     {
         type            empty;
-        inGroups        List<word> 1(empty);
-        nFaces          600;
-        startFace       2400;
     }
     bottom
     {
-        type            patch;
-        nFaces          1;
-        startFace       3000;
+        type            zeroGradient;
     }
-)
+}
+
 
 // ************************************************************************* //

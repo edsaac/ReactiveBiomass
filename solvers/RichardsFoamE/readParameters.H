@@ -24,6 +24,11 @@ volScalarField grad_kz( grad_k.component(vector::Z) );
 // Calculate derived unsaturated stuff
 theta = soil.waterContentCalculator(h);
 
+// Write in first timestep?
+theta.write();
+hydrConduct.write();
+U.write();
+
 //  Time stepping properties 
 //  Currently it only supports and unique homogeneous material
 

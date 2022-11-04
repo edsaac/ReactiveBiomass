@@ -9,54 +9,45 @@ FoamFile
 {
     version     2.0;
     format      ascii;
-    class       polyBoundaryMesh;
-    location    "constant/polyMesh";
-    object      boundary;
+    class       volScalarField;
+    location    "0.000";
+    object      theta;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-6
-(
+dimensions      [0 0 0 0 0 0 0];
+
+internalField   uniform 0.0181351;
+
+boundaryField
+{
     top
     {
-        type            patch;
-        nFaces          1;
-        startFace       599;
+        type            calculated;
+        value           uniform 0.380407;
     }
     left
     {
         type            empty;
-        inGroups        List<word> 1(empty);
-        nFaces          600;
-        startFace       600;
     }
     right
     {
         type            empty;
-        inGroups        List<word> 1(empty);
-        nFaces          600;
-        startFace       1200;
     }
     front
     {
         type            empty;
-        inGroups        List<word> 1(empty);
-        nFaces          600;
-        startFace       1800;
     }
     back
     {
         type            empty;
-        inGroups        List<word> 1(empty);
-        nFaces          600;
-        startFace       2400;
     }
     bottom
     {
-        type            patch;
-        nFaces          1;
-        startFace       3000;
+        type            calculated;
+        value           uniform 0.0181351;
     }
-)
+}
+
 
 // ************************************************************************* //

@@ -28,15 +28,27 @@ FoamFile
 
 dimensions      [0 1 0 0 0 0 0];
 
-internalField   uniform -6.500E-01;
+internalField   uniform <<h_INITIAL_CONDITION>>;
 
 boundaryField
 {
     top
     {
-        // //- ♣ Fixed head value
-        type            fixedValue;
-        value           uniform -3.500E-01;
+        // //- ♣ Fixed but time-dependent head value
+        type            uniformFixedValue;
+        uniformValue    sine;
+        uniformValueCoeffs
+            {
+                frequency   <<h_SINE_FREQUENCY>>;
+                amplitude   <<h_SINE_AMPLITUDE>>;
+                scale       1.0; 
+                level       <<h_SINE_LEVEL>>;  // offset
+                t0          0;      // shift this for a Cosinus
+            }
+
+        // // //- ♣ Fixed head value
+        // type            fixedValue;
+        // value           uniform -3.500E-01;
 
         // //- ♣ Fixed gradient
         // type            fixedGradient;

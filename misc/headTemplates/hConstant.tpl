@@ -28,7 +28,7 @@ FoamFile
 
 dimensions      [0 1 0 0 0 0 0];
 
-internalField   uniform -6.500E-01;
+internalField   uniform <<h_INITIAL_CONDITION>>;
 
 boundaryField
 {
@@ -36,7 +36,7 @@ boundaryField
     {
         // //- ♣ Fixed head value
         type            fixedValue;
-        value           uniform -3.500E-01;
+        value           uniform <<h_TOP_BOUNDARY>>;
 
         // //- ♣ Fixed gradient
         // type            fixedGradient;

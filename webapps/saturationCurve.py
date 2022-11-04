@@ -29,14 +29,14 @@ qtarget = 3.32E-6 #m/s
 
 with st.sidebar:
     with st.form("Parameters:"):
-        h_lowerbound = st.slider("Head range h", -50.0, -1.0, -5.0)
-        α = st.number_input("Cappillary α [1/m]:", 0.0, 10.0, α)
-        θs = st.number_input("Saturated water content θs [m³/m³]:", 0.0, 1.0, θs)
-        θr = st.number_input("Residual water content θs [m³/m³]:", 0.0, 1.0, θr)
-        n = st.number_input("Van Genuchten exponent [-]:", 1.1, 10.0, n)
+        h_lowerbound = st.number_input("Capillary head lower bound ", -50.0, -1.0, -2.0, format="%.3f")
+        α = st.number_input("Capillary head scale parameter α [1/m]:", 0.0, 10.0, α, format="%.3f")
+        θs = st.number_input("Saturated water content θs [m³/m³]:", 0.0, 1.0, θs, format="%.3f")
+        θr = st.number_input("Residual water content θs [m³/m³]:", 0.0, 1.0, θr, format="%.3f")
+        n = st.number_input("Van Genuchten fit exponent [-]:", 1.1, 10.0, n, format="%.2f")
         m = 1 - 1/n
-        Ks = st.number_input("Saturated hydraulic conductivity [m/s]:", 1.0E-8, 1.0E-2, Ks, format="%.2E")
-        qtarget = st.number_input("Target infiltration rate [m/s]:", 1.0E-10, 1.0E-2, qtarget, format="%.2E")
+        Ks = st.number_input("Saturated hydraulic conductivity [m/s]:", 1.0E-8, 1.0E-2, Ks, format="%.2e")
+        qtarget = st.number_input("Target infiltration rate [m/s]:", 1.0E-10, 1.0E-2, qtarget, format="%.2e")
         st.form_submit_button("Calculate!", help="Calculate water content functions")
 
 def vanGenuchten(h:np.array) -> np.array:
@@ -87,7 +87,7 @@ with tabs[0]:
 
 
     fig, ax = plt.subplots(figsize=[5,4])
-    ax.plot(h,θe, label="Van Genuchten eq.")
+    ax.plot(h,θe, label=r"$\theta_e(h)$")
     ax.set_ylabel("Relative water content \t $θ_e$")
     ax.set_xlabel("Capillary head \t $h$ [m]")
     ax.set_ylim(-0.02, 1.02)
@@ -103,7 +103,7 @@ with tabs[1]:
         st.latex(r"\theta = \theta_e \left( \theta_s - \theta_r \right) + \theta_r")
 
     fig, ax = plt.subplots(figsize=[5,4])
-    ax.plot(h,θ, label="Van Genuchten eq.")
+    ax.plot(h,θ, label=r"$\theta(h)$")
     ax.axhline(y=θs, ls='dashed', lw=1, c='darkorange', label=fr"$\theta_s={θs}$")
     # ax.axhline(y=θfc, label=rf"$\theta_{{fc}}=${θfc:.3f}", ls=":", lw=1, c="purple")
     ax.axhline(y=θr, ls='dashed', lw=1, c='orange', label=fr"$\theta_r={θr}$")

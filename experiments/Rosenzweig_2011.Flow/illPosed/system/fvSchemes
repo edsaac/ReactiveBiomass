@@ -11,46 +11,40 @@ FoamFile
     format      ascii;
     class       dictionary;
     location    "system";
-    object      controlDict;
+    object      fvSchemes;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-application     RichardsFoam;
 
-startFrom       latestTime;
-startTime       0;
-stopAt          endTime;
+ddtSchemes
+{
+    default         Euler;
+}
 
-/*
-End time for low flow experiment is 
-548h × 3600s/h = 1972800s
-*/
+gradSchemes
+{
+    default 	    leastSquares;
+    grad(h)         cellLimited leastSquares 1.0;
+}
 
-//endTime	        360000;
-endTime	        3600;
-writeControl    runTime;
-writeInterval   60;
+divSchemes
+{
+    default         none;
+}
 
-deltaT          0.1;
-purgeWrite      0;
+laplacianSchemes
+{
+    default         Gauss linear corrected;
+}
 
-writeFormat     ascii;
-writePrecision  6;
-writeCompression off;
+interpolationSchemes
+{
+    default         linear;           
+}
 
-timeFormat      fixed;
-timePrecision   3;
-runTimeModifiable true;
-adjustTimeStep  yes;
-
-maxCo           1.0;
-debug           1;
-
-// To plot breakthrough curve
-
-functions
-    {
-      #includeFunc    probes
-    };
+snGradSchemes
+{
+    default         corrected;
+}
 
 
 // ************************************************************************* //
