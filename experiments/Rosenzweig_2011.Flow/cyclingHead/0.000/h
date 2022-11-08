@@ -40,9 +40,9 @@ boundaryField
         uniformValueCoeffs
             {
                 frequency   2.000E-03;
-                amplitude   3.250E-01;
+                amplitude   2.750E-01;
                 scale       1.0; 
-                level       -3.250E-01;  // offset
+                level       -4.250E-01;  // offset
                 t0          0;      // shift this for a Cosinus
             }
 
