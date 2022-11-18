@@ -15,7 +15,7 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-end_hours 0.75;
+end_hours 1.6;
 end_secs #calc "round($end_hours*3600.0)";
 
 write_mins 0.5;

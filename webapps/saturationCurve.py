@@ -8,13 +8,15 @@ import subprocess
 REPO_PATH = subprocess.check_output(['git', 'rev-parse', '--show-toplevel']).decode('utf-8').strip()
 plt.style.use(f'{REPO_PATH}/misc/edwin.mplstyle')
 
-# Add some styling with CSS selectors
-with open(f"{REPO_PATH}/.streamlit/style.css") as f:
-    st.markdown(f"""
-    <style>
-        {f.read()}
-    </style>
-    """, unsafe_allow_html=True)
+with st.sidebar:
+    if st.checkbox("Add CSS", True):
+        # Add some styling with CSS selectors
+        with open(f"{REPO_PATH}/.streamlit/style.css") as f:
+            st.markdown(f"""
+            <style>
+                {f.read()}
+            </style>
+            """, unsafe_allow_html=True)
 
 r"# Constitutive relations for unsaturated flow"
 

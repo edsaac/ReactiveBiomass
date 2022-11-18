@@ -22,7 +22,7 @@ License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
 Application
-    nutrientCycle
+    unsatNutrientCycle
 
 Description
     Microbial growth is substrate-limited and electron acceptor-limited via
@@ -113,7 +113,6 @@ int main(int argc, char *argv[])
         //Info << "\nUpdate clog space limitation" << endl;
         totalBiomass = XAR + XN + XDN + XI + EPS;
         clogLimiter = 1.0 - totalBiomass/XMAX;
-        // clogLimiter = 1.0;
 
         if (Foam::min(clogLimiter) < dimensionedScalar("zero",dimless,0.0))
         {

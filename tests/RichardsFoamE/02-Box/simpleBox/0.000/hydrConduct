@@ -11,30 +11,30 @@ FoamFile
     format      ascii;
     class       volScalarField;
     location    "0.000";
-    object      theta;
+    object      hydrConduct;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dimensions      [0 0 0 0 0 0 0];
+dimensions      [0 1 -1 0 0 0 0];
 
-internalField   uniform 0.0126054;
+internalField   uniform 2.0947e-12;
 
 boundaryField
 {
     top
     {
         type            calculated;
-        value           uniform 0.362975;
+        value           uniform 0.000162892;
     }
     left
     {
         type            calculated;
-        value           uniform 0.0126054;
+        value           uniform 2.0947e-12;
     }
     right
     {
         type            calculated;
-        value           uniform 0.0126054;
+        value           uniform 2.0947e-12;
     }
     front
     {
@@ -47,7 +47,7 @@ boundaryField
     bottom
     {
         type            calculated;
-        value           uniform 0.0126054;
+        value           uniform 2.0947e-12;
     }
 }
 
