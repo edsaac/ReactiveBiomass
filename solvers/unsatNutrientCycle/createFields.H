@@ -29,6 +29,20 @@ volScalarField n
     mesh
 );
 
+Foam::Info << "Reading field: water saturation (Sw) \n" << endl;
+volScalarField Sw
+(
+    IOobject
+    (
+        "Sw",
+        runTime.timeName(),
+        mesh,
+        IOobject::MUST_READ,
+        IOobject::AUTO_WRITE
+    ),
+    mesh
+);
+
 volScalarField perm
 (
     IOobject
