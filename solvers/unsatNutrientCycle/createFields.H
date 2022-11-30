@@ -1,5 +1,81 @@
-// Read the transport properties dictionary
-#include "readParameters.H"
+//- Unsaturated flow constants
+
+volScalarField Sw_s
+// Maximum water saturation
+(
+    IOobject
+    (
+        "Sw_s",
+        runTime.constantPath()/"soilParameters",
+        mesh,
+        IOobject::MUST_READ,
+        IOobject::NO_WRITE
+    ),
+    mesh
+);
+
+volScalarField Sw_r
+// Residual water saturation
+(
+    IOobject
+    (
+        "Sw_r",
+        runTime.constantPath()/"soilParameters",
+        mesh,
+        IOobject::MUST_READ,
+        IOobject::NO_WRITE
+    ),
+    mesh
+);
+
+volScalarField K_0
+// Clean & saturated hydraulic conductivity
+(
+    IOobject
+    (
+        "K_0",
+        runTime.constantPath()/"soilParameters",
+        mesh,
+        IOobject::MUST_READ,
+        IOobject::NO_WRITE
+    ),
+    mesh
+);
+
+volScalarField alpha
+// van Genuchten - Capillary head scale parameter 
+(
+    IOobject
+    (
+        "alpha",
+        runTime.constantPath()/"soilParameters",
+        mesh,
+        IOobject::MUST_READ,
+        IOobject::NO_WRITE
+    ),
+    mesh
+);
+
+volScalarField n
+// van Genuchten - fitting exponent n
+(
+    IOobject
+    (
+        "n",
+        runTime.constantPath()/"soilParameters",
+        mesh,
+        IOobject::MUST_READ,
+        IOobject::NO_WRITE
+    ),
+    mesh
+);
+
+volScalarField m
+// van Genuchten - fitting exponent m
+(
+    1.0 - 1.0/n
+);
+
 
 Foam::Info << "Reading field: Hydraulic head (h) \n" << endl;
 volScalarField h
@@ -15,12 +91,12 @@ volScalarField h
     mesh
 );
 
-Foam::Info << "Reading field: porosity (n) \n" << endl;
-volScalarField n
+Foam::Info << "Reading field: porosity \n" << endl;
+volScalarField porosity
 (
     IOobject
     (
-        "n",
+        "porosity",
         runTime.timeName(),
         mesh,
         IOobject::MUST_READ,
@@ -43,19 +119,37 @@ volScalarField Sw
     mesh
 );
 
-volScalarField perm
+Foam::Info << "Creating field: relative permeability by clogging \n" << endl;
+volScalarField perm_clog
 (
     IOobject
     (
-        "perm",
+        "perm_clog",
         runTime.timeName(),
         mesh,
-        IOobject::MUST_READ,
+        IOobject::NO_READ,
         IOobject::AUTO_WRITE
     ),
-    mesh
+    mesh,
+    dimensionedScalar("perm_clog0", dimless, 1.0)
 );
 
+Foam::Info << "Creating field: relative permeability by saturation \n" << endl;
+volScalarField perm_satu
+(
+    IOobject
+    (
+        "perm_satu",
+        runTime.timeName(),
+        mesh,
+        IOobject::NO_READ,
+        IOobject::AUTO_WRITE
+    ),
+    mesh,
+    dimensionedScalar("perm_satu0", dimless, 1.0)
+);
+
+Foam::Info << "Creating field: hydraulic conductivity [m/s] \n" << endl;
 volScalarField hydraulicCond
 (
     IOobject
@@ -70,11 +164,52 @@ volScalarField hydraulicCond
     dimensionedScalar("hydraulicCond0", dimVelocity, 1.0)
 );
 
-hydraulicCond = perm * rho * g / mu;
+//  For Picard loops
+volScalarField h_before
+(
+    IOobject
+    (
+        "h_before",
+        runTime.timeName(),
+        mesh,
+        IOobject::NO_READ,
+        IOobject::NO_WRITE
+    ),
+    mesh,
+    dimensionedScalar("h_before", dimLength, scalar(0.0))
+);
 
-// U in this code refers to the Darcy velocity (a.k.a q)
+volScalarField h_after = h;
+
+volScalarField err
+(
+    IOobject
+    (
+        "err",
+        runTime.timeName(),
+        mesh,
+        IOobject::NO_READ,
+        IOobject::NO_WRITE
+    ),
+    mesh,
+    dimensionedScalar("err", dimLength, scalar(0.0))
+);
+
+//- gradient fields for dK/dz 
+volVectorField grad_k
+(
+    fvc::grad(hydraulicCond)
+);
+
+volScalarField grad_kz
+( 
+    grad_k.component(vector::Z) 
+);
+
+Foam::Info << "Creating field: Darcy specific discharge [m/s] \n" << endl;
 volVectorField U
 (
+    // U refers to the Darcy velocity (a.k.a q), not to the pore water velocity
     IOobject
     (
         "U",
@@ -87,6 +222,10 @@ volVectorField U
     dimensionedVector("U", dimensionSet(0,1,-1,0,0,0,0) , vector(0.0, 0.0, 0.0))
 );
 
+//- Face fluxes [m³/s]
+#include "createPhi.H"
+
+//- Transport
 
 Foam::Info << "Reading field: Dissolved organic carbon (DOC) \n" << endl;
 volScalarField DOC
@@ -293,15 +432,39 @@ volScalarField POCr
 //Foam::Info << "D_diff: ("<< D_diffusion.value() <<")\n" << endl;
 ////////////////////
 
+
+UnsaturatedSoilParametersField soil
+// Instantiate soil
+(
+    &Sw_s,
+    &Sw_r,
+    &alpha,
+    &n,
+    &m,
+    &perm_satu // <-- It will modify this field
+);
+
 Foam::Info << "Switch for clogging?? (cloggingSwitch)\n" << endl;
 Foam::Switch cloggingSwitch(cloggingProperties.lookup("clog?"));
 
 autoPtr<cloggingModel> clogging
 (
-    cloggingModel::New("clog",cloggingProperties,n,&perm)
+    cloggingModel::New(
+        "clog",
+        cloggingProperties,
+        porosity,
+        &perm_clog // <-- It will modify this field
+        )
 );
 
 clogging->read(cloggingProperties);
+
+soil.mualemCalculator(h); // This will modify perm_satu
+if (cloggingSwitch) { clogging->calcPerm();} // This will modify perm_clog
+
+updateHydCond;
+U = - hydraulicCond * (fvc::grad(h) + fvc::grad(z));
+phi = fvc::flux(U);
 
 // Calculate deposited mass and clogLimiter
 dimensionedScalar XMAX ((clogging->nRef() - clogging->nMin()) * rho_X);

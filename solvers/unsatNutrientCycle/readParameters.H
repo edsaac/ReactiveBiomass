@@ -33,8 +33,9 @@ dimensionedTensor molDiff(transportProperties.lookup("molDiff"));
 Foam::Info << "Dispersion tensor\n" << endl;
 dimensionedTensor DispTensor(transportProperties.lookup("DispTensor"));
 
+//-----------
 
-////////////////////////////////////////////////////////////
+Foam::Info << "Reading cloggingProperties\n" << endl;
 
 IOdictionary cloggingProperties
 (
@@ -48,33 +49,10 @@ IOdictionary cloggingProperties
     )
 );
 
-////////////////////////////////////////////////////////////
+//-----------
 
-class Kinetics{
-    public:
-        dimensionedScalar qhat;
-        dimensionedScalar yield;
-        dimensionedScalar bDie;
-        dimensionedScalar Kdonor;
-        dimensionedScalar Kaccep;
+Foam::Info << "Reading <microbe>Properties\n" << endl;
 
-    Kinetics(IOdictionary& ParameterDict){
-        Foam::Info << "Maximum reaction rate qhat\n" << endl;
-        qhat.read(ParameterDict.lookup("qhat"));
-
-        Foam::Info << "Yield\n" << endl;
-        yield.read(ParameterDict.lookup("yield"));
-
-        Foam::Info << "Half-saturation e-donor Kdonor\n" << endl;
-        Kdonor.read(ParameterDict.lookup("Kdonor"));
-
-        Foam::Info << "Half-saturation e-acceptor Kaccep \n" << endl;
-        Kaccep.read(ParameterDict.lookup("Kaccep"));
-
-        Foam::Info << "Die-off rate bdie\n" << endl;
-        bDie.read(ParameterDict.lookup("bdie"));
-    }
-};
 
 IOdictionary aerobicHeterotrophKinetics
 (
@@ -117,7 +95,6 @@ Kinetics pXAR{aerobicHeterotrophKinetics};
 Kinetics pXN{nitrifierKinetics};
 Kinetics pXDN{denitrifierKinetics};
 
-
 IOdictionary biochemicalProperties
 (
     IOobject
@@ -157,4 +134,17 @@ dimensionedScalar gamma_N(biochemicalProperties.lookup("gamma_N"));
 Foam::Info << "Minimum viable biomass concentraton (X_min)\n" << endl;
 dimensionedScalar X_min(biochemicalProperties.lookup("X_min"));
 
+//----
 
+//  Time stepping properties 
+//  Currently it only supports and unique homogeneous material
+
+Foam::Info<< "Reading time stepping properties\n" << endl;
+dictionary timeProperties
+( 
+    mesh.solutionDict().subDict("timeStepping")
+);
+
+TimeStepper timeControl {timeProperties};
+
+bool adjustTimeStep = runTime.controlDict().lookupOrDefault("adjustTimeStep", true);

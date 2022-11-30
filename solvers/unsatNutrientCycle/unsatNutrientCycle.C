@@ -80,10 +80,14 @@ IGNORE
 ENDIGNORE
 \*---------------------------------------------------------------------------*/
 
+#define updateHydCond hydraulicCond = K_0 * perm_clog * perm_satu
+
 #include "fvCFD.H"
 #include "fvOptions.H"
 #include "simpleControl.H"
 
+#include "timeStepper.H"
+#include "declareClasses.H"
 #include "cloggingModel.H"
 #include "attachmentModel.H"
 
@@ -96,13 +100,30 @@ int main(int argc, char *argv[])
     #include "createMesh.H"
 
     simpleControl simple(mesh);
+    volScalarField z (mesh.C().component(2));
+    const label nbMesh = mesh.nCells();
+    Foam::Info << "nCells: " << nbMesh;
 
+    #include "readParameters.H"
     #include "createFields.H"
-    #include "createPhi.H"
     #include "CourantNo.H"
     #include "createFvOptions.H"
 
+    double convergeFlow = 1.0;
+    int nCycles = 0;
+
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+    //- Initialize derived fields
+    Sw = soil.waterSaturationCalculator(h);
+    Sw.write();
+    
+    if (cloggingSwitch) { clogging->calcPerm();}
+    soil.mualemCalculator(h);
+    updateHydCond;
+    hydraulicCond.write();
+    U = - hydraulicCond * (fvc::grad(h) + fvc::grad(z));  
+    U.write();
 
     Foam::Info << "\nCalculating...\n" << endl;
 
@@ -110,10 +131,11 @@ int main(int argc, char *argv[])
     {
         Foam::Info<< "Time = " << runTime.timeName() << nl << endl;
 
-        //Info << "\nUpdate clog space limitation" << endl;
+        //- Calculate total biomass and the clog limiter function
         totalBiomass = XAR + XN + XDN + XI + EPS;
         clogLimiter = 1.0 - totalBiomass/XMAX;
 
+        //- Check that the totalBiomass < XMAX everywhere
         if (Foam::min(clogLimiter) < dimensionedScalar("zero",dimless,0.0))
         {
             Foam::SeriousError<< "Total biomass greater that XMAX" << endl;            
@@ -121,35 +143,67 @@ int main(int argc, char *argv[])
             break;
         }
 
+        //- Update porosity field and update perm_clog
         n  = clogging->nRef() - totalBiomass/rho_X;
-
-        //Calculate hydraulic head using mass balance + Darcy's equation
         if (cloggingSwitch) { clogging->calcPerm();}
-        hydraulicCond = perm * g * rho / mu;
+        
+        //- Start Richards' solver block
+        nCycles = 0;
+        h_before = h;
+        h_after = h;
 
-        while (simple.correctNonOrthogonal())
+        while(true)
         {
-            fvScalarMatrix FlowEquation
+
+            //- Calculate grad(K(h)) and extract z-component
+            soil.mualemCalculator(h_before);
+            updateHydCond;
+
+            grad_k = fvc::grad(hydraulicCond);
+            grad_kz = grad_k.component(vector::Z);
+
+            //- Solve Richard's equation for undeformable porous media
+            //--  To do: Add ddt(porosity) term for deformable media
+            fvScalarMatrix richardsEquation
             (
-                fvm::laplacian(hydraulicCond, h)
+                fvm::ddt(soil.capillary(h_before), h_after)
+                ==
+                fvm::laplacian(hydraulicCond, h_after)
+                + grad_kz
             );
-            fvOptions.constrain(FlowEquation);
-            FlowEquation.solve();
-            fvOptions.correct(h);
+            fvOptions.constrain(richardsEquation);
+            richardsEquation.solve();
+            fvOptions.correct(h_after);
+
+            //- Check if solution converged
+            err = Foam::mag(h_after - h_before);
+            convergeFlow = Foam::gSumMag(err)/nbMesh;
+            Foam::Info << "nCycles: "    << nCycles      << "\t"
+                       << "Converger: " << convergeFlow << endl;
+
+            //- Adjust time step if possible
+            if (adjustTimeStep) {
+                #include "timeControl.H"
+            }
+            else { 
+                break; 
+            }
         }
 
+        //- Update perm_satu based on hydraulic head
+        soil.mualemCalculator(h);
+        updateHydCond;
+
         // Update flow field
-        Foam::Info << "\n Update porosity field (n):" << endl;
-        U   = - hydraulicCond * fvc::grad(h);
+        U = - hydraulicCond * (fvc::grad(h) + fvc::grad(z));
         phi = fvc::flux(U);
         #include "CourantNo.H"
 
-        // Calculate attach/detach rates
+        //- Calculate attach/detach rates
         attachment->calcAttachment();
         detachment->calcAttachment();
 
-        
-        // Transport equations
+        //- Transport equations
         while (simple.correctNonOrthogonal())
         {
             // Info << "\nRates of utilization (...) " << endl;
