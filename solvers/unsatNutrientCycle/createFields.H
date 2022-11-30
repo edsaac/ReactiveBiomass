@@ -56,12 +56,12 @@ volScalarField alpha
     mesh
 );
 
-volScalarField n
+volScalarField n_vangenucthen
 // van Genuchten - fitting exponent n
 (
     IOobject
     (
-        "n",
+        "n_vangenucthen",
         runTime.constantPath()/"soilParameters",
         mesh,
         IOobject::MUST_READ,
@@ -70,10 +70,10 @@ volScalarField n
     mesh
 );
 
-volScalarField m
+volScalarField m_vangenucthen
 // van Genuchten - fitting exponent m
 (
-    1.0 - 1.0/n
+    1.0 - 1.0/n_vangenucthen
 );
 
 
@@ -113,10 +113,11 @@ volScalarField Sw
         "Sw",
         runTime.timeName(),
         mesh,
-        IOobject::MUST_READ,
+        IOobject::NO_READ,
         IOobject::AUTO_WRITE
     ),
-    mesh
+    mesh,
+    dimensionedScalar("Sw", dimless, 1.0)
 );
 
 Foam::Info << "Creating field: relative permeability by clogging \n" << endl;
@@ -131,7 +132,7 @@ volScalarField perm_clog
         IOobject::AUTO_WRITE
     ),
     mesh,
-    dimensionedScalar("perm_clog0", dimless, 1.0)
+    dimensionedScalar("perm_clog", dimless, 1.0)
 );
 
 Foam::Info << "Creating field: relative permeability by saturation \n" << endl;
@@ -146,7 +147,7 @@ volScalarField perm_satu
         IOobject::AUTO_WRITE
     ),
     mesh,
-    dimensionedScalar("perm_satu0", dimless, 1.0)
+    dimensionedScalar("perm_satu", dimless, 1.0)
 );
 
 Foam::Info << "Creating field: hydraulic conductivity [m/s] \n" << endl;
@@ -439,8 +440,8 @@ UnsaturatedSoilParametersField soil
     &Sw_s,
     &Sw_r,
     &alpha,
-    &n,
-    &m,
+    &n_vangenucthen,
+    &m_vangenucthen,
     &perm_satu // <-- It will modify this field
 );
 
@@ -467,7 +468,11 @@ U = - hydraulicCond * (fvc::grad(h) + fvc::grad(z));
 phi = fvc::flux(U);
 
 // Calculate deposited mass and clogLimiter
-dimensionedScalar XMAX ((clogging->nRef() - clogging->nMin()) * rho_X);
+dimensionedScalar XMAX 
+(
+    (clogging->nRef() - clogging->nMin()) * rho_X
+);
+
 Foam::Info << "Calculate max possible deposited mass: " << XMAX << "\n";
 
 volScalarField totalBiomass (XAR + XN + XDN + XI + EPS);
@@ -586,7 +591,7 @@ autoPtr<attachmentModel> attachment
         mesh,
         runTime,
         U,
-        n)
+        porosity)
 );
 
 attachment->read(attachmentProperties);
@@ -629,7 +634,7 @@ autoPtr<attachmentModel> detachment
         mesh,
         runTime,
         U,
-        n)
+        porosity)
 );
 
 detachment->read(detachmentProperties);

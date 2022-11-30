@@ -9,33 +9,43 @@ FoamFile
 {
     version     2.0;
     format      ascii;
-    class       dictionary;
-    location    "constant";
-    object      transportProperties;
+    class       volScalarField;
+    location    "0";
+    object      porosity;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-// [kg m s K mol * *]
 
-// Clogging parameters
-clog?     true;
+dimensions      [0 0 0 0 0 0 0];
 
-nMin      nMin       [0 0 0 0 0 0 0]    0.10;     // Minimum porosity
-permMin   spermMin   [0 0 0 0 0 0 0]    1.0E-3;   // Minimum relative permeability
+internalField   uniform 0.358;
 
-nRef      nRef       [0 0 0 0 0 0 0]    0.358;     // Reference porosity
-permRef   permRef    [0 0 0 0 0 0 0]    1.0;       // Reference permeability
-
-cloggingModel powerLaw;
-
-powerLawCoeffs
+boundaryField
 {
-    nExponent dimless 3.0;
+    front
+    {
+        type            empty;
+    }
+    back
+    {
+        type            empty;
+    }
+    left
+    {
+        type            empty;
+    }
+    right
+    {
+        type            empty;
+    }
+    bottom
+    {
+        type            zeroGradient;
+    }
+    top
+    {
+        type            zeroGradient;
+    }
 }
 
-// kozenyCarmanCoeffs
-// {
-//     nExponent dimless 3.0;
-//     mExponent dimless 2.0;
-// }
 
 // ************************************************************************* //

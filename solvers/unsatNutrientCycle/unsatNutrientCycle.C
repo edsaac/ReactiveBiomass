@@ -80,7 +80,10 @@ IGNORE
 ENDIGNORE
 \*---------------------------------------------------------------------------*/
 
+#define DEBUG true
+
 #define updateHydCond hydraulicCond = K_0 * perm_clog * perm_satu
+#define debug(message) if(DEBUG){Foam::Info << message << endl;}
 
 #include "fvCFD.H"
 #include "fvOptions.H"
@@ -114,14 +117,21 @@ int main(int argc, char *argv[])
 
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-    //- Initialize derived fields
+    Foam::Info << "\nInitialize derived fields...\n" << endl;
+    
+    debug("Water saturation...\n");
     Sw = soil.waterSaturationCalculator(h);
     Sw.write();
     
+    debug("Clogging & porosity...\n");
     if (cloggingSwitch) { clogging->calcPerm();}
     soil.mualemCalculator(h);
+    
+    debug("Hydraulic conductivity...\n");
     updateHydCond;
     hydraulicCond.write();
+
+    debug("Flow velocity...\n");
     U = - hydraulicCond * (fvc::grad(h) + fvc::grad(z));  
     U.write();
 
@@ -144,7 +154,8 @@ int main(int argc, char *argv[])
         }
 
         //- Update porosity field and update perm_clog
-        n  = clogging->nRef() - totalBiomass/rho_X;
+        debug("Update porosity and calculate perm_clog");
+        porosity  = clogging->nRef() - totalBiomass/rho_X;
         if (cloggingSwitch) { clogging->calcPerm();}
         
         //- Start Richards' solver block
@@ -156,9 +167,13 @@ int main(int argc, char *argv[])
         {
 
             //- Calculate grad(K(h)) and extract z-component
+            debug("Calculate perm_satu");
             soil.mualemCalculator(h_before);
+
+            debug("Update K");
             updateHydCond;
 
+            debug("Calculate K gradients");
             grad_k = fvc::grad(hydraulicCond);
             grad_kz = grad_k.component(vector::Z);
 
@@ -171,17 +186,19 @@ int main(int argc, char *argv[])
                 fvm::laplacian(hydraulicCond, h_after)
                 + grad_kz
             );
+            debug("Solve Richards");
             fvOptions.constrain(richardsEquation);
             richardsEquation.solve();
             fvOptions.correct(h_after);
 
             //- Check if solution converged
+            debug("Check convergence");
             err = Foam::mag(h_after - h_before);
             convergeFlow = Foam::gSumMag(err)/nbMesh;
             Foam::Info << "nCycles: "    << nCycles      << "\t"
                        << "Converger: " << convergeFlow << endl;
 
-            //- Adjust time step if possible
+            debug("Adjust time step if possible");
             if (adjustTimeStep) {
                 #include "timeControl.H"
             }
@@ -235,7 +252,7 @@ int main(int argc, char *argv[])
                 pXAR.yield * rH * XAR                   //Growth
                 - pXAR.bDie * XAR                       //Decay XAR -> EPS + XI
                 - kdet * XAR                            //Detachment XAR -> XARp
-                + (Sw * n) * katt * clogLimiter * XARp         //Attachment XARp -> XAR
+                + (Sw * porosity) * katt * clogLimiter * XARp         //Attachment XARp -> XAR
             );
             ARGrowth.relax();
             fvOptions.constrain(ARGrowth);
@@ -245,15 +262,15 @@ int main(int argc, char *argv[])
             //Info << "\nMobile aerobic heterotrophs (XARp)" << endl;
             fvScalarMatrix ARGrowth_p
             (
-                n * Sw * fvm::ddt(XARp)
+                porosity * Sw * fvm::ddt(XARp)
                 // + XARp * fvc::ddt(Sw,n)
                 + fvm::div(phi, XARp)
-                - fvm::laplacian(Sw * n * (mag(U)*DispTensor + molDiff), XARp)
+                - fvm::laplacian(porosity * Sw * (mag(U)*DispTensor + molDiff), XARp)
                 ==
-                Sw * n * pXAR.yield * rH * XARp              //Growth
-                - Sw * n * pXAR.bDie * XARp                  //Decay XARp -> BAP + POCr
+                porosity * Sw * pXAR.yield * rH * XARp              //Growth
+                - porosity * Sw * pXAR.bDie * XARp                  //Decay XARp -> BAP + POCr
                 + kdet * XAR                                 //Detachment XAR -> XARp
-                - Sw* n * katt * clogLimiter * XARp          //Attachment XARp -> XAR
+                - porosity * Sw * katt * clogLimiter * XARp          //Attachment XARp -> XAR
             );
             ARGrowth_p.relax();
             fvOptions.constrain(ARGrowth_p);
@@ -268,7 +285,7 @@ int main(int argc, char *argv[])
                   pXN.yield * rN * XN                        //Growth
                 - pXN.bDie * XN                              //Decay XN -> EPS + XI
                 - kdet * XN                                  //Detachment XN -> XNp
-                + Sw * n * katt * clogLimiter * XNp          //Attachment XNp -> XN
+                + porosity * Sw * katt * clogLimiter * XNp          //Attachment XNp -> XN
             );
             NitrifiersGrowth.relax();
             fvOptions.constrain(NitrifiersGrowth);
@@ -278,15 +295,15 @@ int main(int argc, char *argv[])
             // Info << "\nMobile Nitrifiers (XN)" << endl;
             fvScalarMatrix NitrifiersGrowth_p
             (
-                n * Sw * fvm::ddt(XNp)
+                porosity * Sw * fvm::ddt(XNp)
                 // + XNp * fvc::ddt(Sw,n)
                 + fvm::div(phi, XNp)
-                - fvm::laplacian(Sw * n * (mag(U)*DispTensor + molDiff), XNp)
+                - fvm::laplacian(porosity * Sw * (mag(U)*DispTensor + molDiff), XNp)
                 ==
-                Sw * n * pXN.yield * rN * XNp                    //Growth
-                - Sw * n * pXN.bDie * XNp                        //Decay XNp -> BAP + POCr
+                porosity * Sw * pXN.yield * rN * XNp                    //Growth
+                - porosity * Sw * pXN.bDie * XNp                        //Decay XNp -> BAP + POCr
                 + kdet * XN                                      //Detachment XN -> XNp
-                - Sw * n * katt * clogLimiter * XNp              //Attachment XNp -> XN
+                - porosity * Sw * katt * clogLimiter * XNp              //Attachment XNp -> XN
             );
             NitrifiersGrowth_p.relax();
             fvOptions.constrain(NitrifiersGrowth_p);
@@ -301,7 +318,7 @@ int main(int argc, char *argv[])
                 pXDN.yield * rDN * XDN                       //Growth
                 - pXDN.bDie * XDN                            //Decay XDN -> EPS + XI
                 - kdet * XDN                                 //Detachment XDN -> XDNp
-                + Sw * n * katt * clogLimiter * XDNp         //Attachment XDNp -> XDN
+                + porosity * Sw * katt * clogLimiter * XDNp         //Attachment XDNp -> XDN
             );
             DenitrifiersGrowth.relax();
             fvOptions.constrain(DenitrifiersGrowth);
@@ -311,15 +328,15 @@ int main(int argc, char *argv[])
             // Info << "\nMobile Denitrifiers (XDN)" << endl;
             fvScalarMatrix DenitrifiersGrowth_p
             (
-                n * Sw * fvm::ddt(XDNp)
+                porosity * Sw * fvm::ddt(XDNp)
                 // + XDNp * fvc::ddt(Sw,n)
                 + fvm::div(phi, XDNp)
-                - fvm::laplacian(Sw * n*(mag(U)*DispTensor + molDiff), XDNp)
+                - fvm::laplacian(porosity * Sw*(mag(U)*DispTensor + molDiff), XDNp)
                 ==
-                Sw * n * pXDN.yield * rDN * XDNp                 //Growth
-                - Sw * n * pXDN.bDie * XDNp                      //Decay XDN -> BAP + POCr
+                porosity * Sw * pXDN.yield * rDN * XDNp                 //Growth
+                - porosity * Sw * pXDN.bDie * XDNp                      //Decay XDN -> BAP + POCr
                 + kdet * XDN                                     //Detachment XDN -> XDNp
-                - Sw * n * katt * clogLimiter * XDNp             //Attachment XDNp -> XDN
+                - porosity * Sw * katt * clogLimiter * XDNp             //Attachment XDNp -> XDN
             );
             DenitrifiersGrowth_p.relax();
             fvOptions.constrain(DenitrifiersGrowth_p);
@@ -340,7 +357,7 @@ int main(int argc, char *argv[])
                 + (kEPS*rN  + fd*pXN.bDie)  * XN        //Metabolism + decay XN
                 + (kEPS*rDN + fd*pXDN.bDie) * XDN       //Metabolism + decay XDN
                 - kdet * EPS                            //Detachment EPS -> BAP
-                + Sw * n * katt * clogLimiter * BAP     //Attachment BAP -> EPS
+                + porosity * Sw * katt * clogLimiter * BAP     //Attachment BAP -> EPS
                 - khyd_labil * EPS                      //Hydrolysis EPS -> DOC
             );
             EPSTransport.relax();
@@ -358,7 +375,7 @@ int main(int argc, char *argv[])
                     + pXN.bDie*XN                       //Decay XN
                     + pXDN.bDie*XDN )                   //Decay XDN
                 - kdet * XI                             //Detachment XI -> POCr
-                + Sw * n * katt * clogLimiter * POCr    //Attachment POCr -> XI
+                + porosity * Sw * katt * clogLimiter * POCr    //Attachment POCr -> XI
                 - khyd_recal * XI                       //Hydrolysis of XI -> DOC
             );
             InertGeneration.relax();
@@ -369,14 +386,14 @@ int main(int argc, char *argv[])
             //Info << "\nDissolved Organic Carbon DOC transport" << endl;
             fvScalarMatrix DissolvedCarbonTransport
             (
-                n * Sw * fvm::ddt(DOC)
+                porosity * Sw * fvm::ddt(DOC)
                 // + DOC * fvc::ddt(Sw,n)
                 + fvm::div(phi, DOC)
-                - fvm::laplacian(Sw * n*(mag(U)*DispTensor + molDiff), DOC)
+                - fvm::laplacian(porosity * Sw*(mag(U)*DispTensor + molDiff), DOC)
                 ==
                 - rH * XAR                              //Metabolism XAR
                 - rDN * XDN                             //Metabolism XDN
-                + Sw * n * (
+                + porosity * Sw * (
                     khyd_labil * BAP                    //Hydrolisis BAP -> DOC
                     + khyd_recal * POCr                 //Hydrolisis POCr -> DOC
                     + khyd_labil * EPS                  //Hydrolysis of EPS -> DOC
@@ -391,13 +408,13 @@ int main(int argc, char *argv[])
             //Info << "\nDissolved oxygen (O2)" << endl;
             fvScalarMatrix OxygenTransport
             (
-                Sw * n * fvm::ddt(O2)
+                porosity * Sw * fvm::ddt(O2)
                 // + O2 * fvc::ddt(Sw,n)
                 + fvm::div(phi, O2)
-                - fvm::laplacian(Sw * n*(mag(U)*DispTensor + molDiff), O2)
+                - fvm::laplacian(porosity * Sw*(mag(U)*DispTensor + molDiff), O2)
                 ==
-                - alpha_1 * rH * (XAR + Sw*n*XARp)   //Metabolism XAR
-                - alpha_N * rN * (XN + Sw*n*XNp)     //Metabolism XN
+                - alpha_1 * rH * (XAR + porosity * Sw*XARp)   //Metabolism XAR
+                - alpha_N * rN * (XN + porosity * Sw*XNp)     //Metabolism XN
             );
             OxygenTransport.relax();
             fvOptions.constrain(OxygenTransport);
@@ -407,10 +424,10 @@ int main(int argc, char *argv[])
             // Info << "\nNH4-N transport" << endl;
             fvScalarMatrix AmmoniumTransport
             (
-                n * Sw * fvm::ddt(NH4)
+                porosity * Sw * fvm::ddt(NH4)
                 // + NH4 * fvc::ddt(Sw,n)
                 + fvm::div(phi, NH4)
-                - fvm::laplacian(Sw*n*(mag(U)*DispTensor + molDiff), NH4)
+                - fvm::laplacian(porosity * Sw*(mag(U)*DispTensor + molDiff), NH4)
                 ==
                 - rN * XN                               //Metabolism XN
                 + gamma_N * fd * (
@@ -418,13 +435,13 @@ int main(int argc, char *argv[])
                     + pXN.bDie*XN                       //Decay XN
                     + pXDN.bDie*XDN                     //Decay XDN
                     )
-                + gamma_N * fd * Sw * n * (                      
+                + gamma_N * fd * porosity * Sw * (                      
                     pXAR.bDie*XARp                      //Decay XARp
                     + pXN.bDie*XNp                      //Decay XNp
                     + pXDN.bDie*XDNp                    //Decay XDNp
                     )                   
                 - gamma_N * pXAR.yield * rH * XAR            //Metabolism XAR
-                - Sw * n * gamma_N * pXAR.yield * rH * XARp  //Metabolism XARp
+                - porosity * Sw * gamma_N * pXAR.yield * rH * XARp  //Metabolism XARp
             );
             AmmoniumTransport.relax();
             fvOptions.constrain(AmmoniumTransport);
@@ -434,13 +451,13 @@ int main(int argc, char *argv[])
             // Info << "\nDissolved nitrate-nitrogen (NO3+N)" << endl;
             fvScalarMatrix NitrateTransport
             (
-                n * Sw * fvm::ddt(NO3)
+                porosity * Sw * fvm::ddt(NO3)
                 // + NO3 * fvc::ddt(Sw,n) 
                 + fvm::div(phi, NO3) 
-                - fvm::laplacian(Sw*n*(mag(U)*DispTensor + molDiff), NO3)
+                - fvm::laplacian(porosity * Sw*(mag(U)*DispTensor + molDiff), NO3)
                 ==
-                (1.0 - 0.31*pXN.yield - kEPS) * rN * (XN + Sw*n*XNp)   //Metabolism XN
-                - beta_1 * rDN * (XDN + Sw*n*XDNp)                     //Metabolism XDN
+                (1.0 - 0.31*pXN.yield - kEPS) * rN * (XN + porosity * Sw*XNp)   //Metabolism XN
+                - beta_1 * rDN * (XDN + porosity * Sw*XDNp)                     //Metabolism XDN
             );
             NitrateTransport.relax();
             fvOptions.constrain(NitrateTransport);
@@ -450,15 +467,15 @@ int main(int argc, char *argv[])
 	        //Info << "\nBiomass-associated products (BAP) transport" << endl;
             fvScalarMatrix BAPTransport
             (
-                n * Sw * fvm::ddt(BAP)
+                porosity * Sw * fvm::ddt(BAP)
                 // + BAP * fvc::ddt(Sw,n)
                 + fvm::div(phi, BAP)
-                - fvm::laplacian(Sw*n*(mag(U)*DispTensor + molDiff), BAP)
+                - fvm::laplacian(porosity * Sw*(mag(U)*DispTensor + molDiff), BAP)
                 ==
                 kdet * EPS                              //Detachment EPS -> BAP
-                - Sw * n * katt * clogLimiter * BAP     //Attachment BAP -> EPS
-                - Sw * n * khyd_labil * BAP             //Hydrolisis BAP -> DOC
-                + Sw * n * fd * (
+                - porosity * Sw * katt * clogLimiter * BAP     //Attachment BAP -> EPS
+                - porosity * Sw * khyd_labil * BAP             //Hydrolisis BAP -> DOC
+                + porosity * Sw * fd * (
                       pXAR.bDie * XARp                  //Decay XARp
                     + pXN.bDie  * XNp                   //Decay XNp
                     + pXDN.bDie * XDNp                  //Decay XDNp
@@ -472,17 +489,17 @@ int main(int argc, char *argv[])
             //Info << "\nInert biomass (XI)" << endl;
             fvScalarMatrix POCrGeneration
             (
-                n * Sw * fvm::ddt(POCr)
+                porosity * Sw * fvm::ddt(POCr)
                 // + POCr * fvc::ddt(Sw,n)
                 + fvm::div(phi, POCr)
-                - fvm::laplacian(Sw * n*(mag(U)*DispTensor + molDiff), POCr)
+                - fvm::laplacian(porosity * Sw*(mag(U)*DispTensor + molDiff), POCr)
                 ==
                 kdet * XI                       //Detachment XI -> POCr
-                - Sw * n * POCr * (
+                - porosity * Sw * POCr * (
                     katt * clogLimiter          //Attachment POCr -> XI
                     + khyd_recal                //Hydrolisis POCr -> DOC
                     )                 
-                + Sw * n * (1-fd) * (
+                + porosity * Sw * (1-fd) * (
                       pXAR.bDie * XARp          //Decay XARp
                     + pXN.bDie  * XNp           //Decay XNp
                     + pXDN.bDie * XDNp          //Decay XDNp

@@ -16,31 +16,31 @@ FoamFile
 
 convertToMeters 1.0;
 
-lenght     0.62;
-diameter   0.08;
+lenght   10.0;
+diameter 10.0;
 
-deltaLenght 0.005;
+deltaLenght 10.0;
+deltaDiam   10.0;
 
 LCells #calc "round($lenght/$deltaLenght)";
-WCells 1;
-DCells 1;
+TCells #calc "round($diameter/$deltaDiam)";
 
 vertices
 (
-    (0 0 0)                   //0
-    ($diameter 0 0)           //1
-    ($diameter $diameter 0)   //2
-    (0 $diameter 0)           //3
-    (0 0 $lenght)             //4
-    ($diameter 0 $lenght)             //5
-    ($diameter $diameter $lenght)     //6
-    (0 $diameter $lenght)             //7
+    (0 0 0)
+    (0 $diameter 0)
+    (0 $diameter $lenght)
+    (0 0 $lenght)
+    ($diameter 0 0)
+    ($diameter $diameter 0)
+    ($diameter $diameter $lenght)
+    ($diameter 0 $lenght)
 );
 
 
 blocks
 (
-    hex (0 1 2 3 4 5 6 7) ($WCells $DCells $LCells) simpleGrading (1 1 0.2)
+    hex (0 4 5 1 3 7 6 2) ($TCells $TCells $LCells) simpleGrading (1 1 1)
 );
 
 edges
@@ -54,7 +54,7 @@ boundary
         type patch;
         faces
         (
-            (4 5 6 7)
+            (3 7 6 2)
         );
     }
     left
@@ -79,7 +79,7 @@ boundary
         type empty;
         faces
         (
-            (2 3 7 6)
+            (4 5 6 7)
         );
     }
     back
@@ -87,7 +87,7 @@ boundary
         type empty;
         faces
         (
-            (0 1 5 4)
+            (0 3 2 1)
         );
     }
     bottom
@@ -95,7 +95,7 @@ boundary
         type patch;
         faces
         (
-            (0 3 2 1)
+            (0 1 5 4)
         );
     }
 
