@@ -8,6 +8,7 @@ class UnsaturatedSoilParametersField
         volScalarField* ptr_n = nullptr;
         volScalarField* ptr_m = nullptr;
         volScalarField* ptr_perm_satu = nullptr;
+        volScalarField* ptr_Sw = nullptr;
 
     // Constructors
     UnsaturatedSoilParametersField
@@ -17,7 +18,8 @@ class UnsaturatedSoilParametersField
         volScalarField* alpha,
         volScalarField* n,
         volScalarField* m,
-        volScalarField* perm_satu
+        volScalarField* perm_satu,
+        volScalarField* Sw
     )
         :
         ptr_Sw_s(Sw_s),
@@ -25,7 +27,8 @@ class UnsaturatedSoilParametersField
         ptr_alpha(alpha),
         ptr_n(n),
         ptr_m(m),
-        ptr_perm_satu(perm_satu)
+        ptr_perm_satu(perm_satu),
+        ptr_Sw(Sw)
     {   
     }
 
@@ -44,10 +47,10 @@ class UnsaturatedSoilParametersField
         return  Foam::pow( 1.0 + innerVanGenuchtenCalculator(h), -(*ptr_m));
     }
 
-    volScalarField waterSaturationCalculator(const volScalarField& h)
+    void waterSaturationCalculator(const volScalarField& h)
     {
         // theta
-        return vanGenuchtenCalculator(h) * ((*ptr_Sw_s) - (*ptr_Sw_r)) + (*ptr_Sw_r);
+        *(this->ptr_Sw) = vanGenuchtenCalculator(h) * ((*ptr_Sw_s) - (*ptr_Sw_r)) + (*ptr_Sw_r);
     }
 
     void mualemCalculator(const volScalarField& h)

@@ -28,12 +28,12 @@ Description
     Microbial growth is substrate-limited and electron acceptor-limited via
     dual Monod.
 
-    Generation and consumption of EPS, UAP and BAP are included.
+    Generation and consumption of EPS and BAP are included.
     Only advection of dissolved and particulate species is considered
 
-    Clogging is introduced some porosity-permeability relationship
+    Clogging is introduced by some porosity-permeability relationship
     
-    k/k0 = f(n/n0)
+    k(n)/k0 = f(n/n0)
 
     Solves eight species:
     - Aerobic heterotrophs (XAR) {X}
@@ -42,10 +42,10 @@ Description
     - Biomass-associated products (BAP) {B}
     - Substrate (DOC) {S}
     - Oxygen (O2) {O}
+    - Ammonium (NH4) and nitrate (NO3)
 
     Eqs:
 
-IGNORE
     d(nS)/dt  = - rH*X - rDN*Xdn
     d(nN)/dt  = - rN*Xn + gammaN*fd*(b*X + bN*Xn + bDN*Xdn) - gammaN*Y'*rH*X
 
@@ -83,7 +83,7 @@ ENDIGNORE
 #define DEBUG true
 
 #define updateHydCond hydraulicCond = K_0 * perm_clog * perm_satu
-#define debug(message) if(DEBUG){Foam::Info << message << endl;}
+#define debug(message) if(DEBUG){Foam::Info << message << nl << endl;}
 
 #include "fvCFD.H"
 #include "fvOptions.H"
@@ -119,19 +119,19 @@ int main(int argc, char *argv[])
 
     Foam::Info << "\nInitialize derived fields...\n" << endl;
     
-    debug("Water saturation...\n");
-    Sw = soil.waterSaturationCalculator(h);
+    debug("Water saturation...");
+    soil.waterSaturationCalculator(h);
     Sw.write();
     
-    debug("Clogging & porosity...\n");
+    debug("Clogging & porosity...");
     if (cloggingSwitch) { clogging->calcPerm();}
     soil.mualemCalculator(h);
     
-    debug("Hydraulic conductivity...\n");
+    debug("Hydraulic conductivity...");
     updateHydCond;
     hydraulicCond.write();
 
-    debug("Flow velocity...\n");
+    debug("Flow velocity...");
     U = - hydraulicCond * (fvc::grad(h) + fvc::grad(z));  
     U.write();
 
@@ -169,6 +169,7 @@ int main(int argc, char *argv[])
             //- Calculate grad(K(h)) and extract z-component
             debug("Calculate perm_satu");
             soil.mualemCalculator(h_before);
+            soil.waterSaturationCalculator(h_before);
 
             debug("Update K");
             updateHydCond;
@@ -182,6 +183,7 @@ int main(int argc, char *argv[])
             fvScalarMatrix richardsEquation
             (
                 fvm::ddt(soil.capillary(h_before), h_after)
+                + Sw * fvc::ddt(porosity)
                 ==
                 fvm::laplacian(hydraulicCond, h_after)
                 + grad_kz
@@ -207,7 +209,8 @@ int main(int argc, char *argv[])
             }
         }
 
-        //- Update perm_satu based on hydraulic head
+        //- Update Sw and perm_satu based on hydraulic head
+        soil.waterSaturationCalculator(h);
         soil.mualemCalculator(h);
         updateHydCond;
 
@@ -263,7 +266,7 @@ int main(int argc, char *argv[])
             fvScalarMatrix ARGrowth_p
             (
                 porosity * Sw * fvm::ddt(XARp)
-                // + XARp * fvc::ddt(Sw,n)
+                + XARp * fvc::ddt(Sw,porosity)
                 + fvm::div(phi, XARp)
                 - fvm::laplacian(porosity * Sw * (mag(U)*DispTensor + molDiff), XARp)
                 ==
@@ -296,7 +299,7 @@ int main(int argc, char *argv[])
             fvScalarMatrix NitrifiersGrowth_p
             (
                 porosity * Sw * fvm::ddt(XNp)
-                // + XNp * fvc::ddt(Sw,n)
+                + XNp * fvc::ddt(Sw,porosity)
                 + fvm::div(phi, XNp)
                 - fvm::laplacian(porosity * Sw * (mag(U)*DispTensor + molDiff), XNp)
                 ==
@@ -329,7 +332,7 @@ int main(int argc, char *argv[])
             fvScalarMatrix DenitrifiersGrowth_p
             (
                 porosity * Sw * fvm::ddt(XDNp)
-                // + XDNp * fvc::ddt(Sw,n)
+                + XDNp * fvc::ddt(Sw,porosity)
                 + fvm::div(phi, XDNp)
                 - fvm::laplacian(porosity * Sw*(mag(U)*DispTensor + molDiff), XDNp)
                 ==
@@ -387,7 +390,8 @@ int main(int argc, char *argv[])
             fvScalarMatrix DissolvedCarbonTransport
             (
                 porosity * Sw * fvm::ddt(DOC)
-                // + DOC * fvc::ddt(Sw,n)
+                + DOC * Sw * fvc::ddt(porosity)
+                + DOC * porosity * fvc::ddt(Sw)
                 + fvm::div(phi, DOC)
                 - fvm::laplacian(porosity * Sw*(mag(U)*DispTensor + molDiff), DOC)
                 ==
@@ -409,7 +413,7 @@ int main(int argc, char *argv[])
             fvScalarMatrix OxygenTransport
             (
                 porosity * Sw * fvm::ddt(O2)
-                // + O2 * fvc::ddt(Sw,n)
+                + O2 * fvc::ddt(Sw,porosity)
                 + fvm::div(phi, O2)
                 - fvm::laplacian(porosity * Sw*(mag(U)*DispTensor + molDiff), O2)
                 ==
@@ -425,7 +429,7 @@ int main(int argc, char *argv[])
             fvScalarMatrix AmmoniumTransport
             (
                 porosity * Sw * fvm::ddt(NH4)
-                // + NH4 * fvc::ddt(Sw,n)
+                + NH4 * fvc::ddt(Sw,porosity)
                 + fvm::div(phi, NH4)
                 - fvm::laplacian(porosity * Sw*(mag(U)*DispTensor + molDiff), NH4)
                 ==
@@ -452,7 +456,7 @@ int main(int argc, char *argv[])
             fvScalarMatrix NitrateTransport
             (
                 porosity * Sw * fvm::ddt(NO3)
-                // + NO3 * fvc::ddt(Sw,n) 
+                + NO3 * fvc::ddt(Sw,porosity) 
                 + fvm::div(phi, NO3) 
                 - fvm::laplacian(porosity * Sw*(mag(U)*DispTensor + molDiff), NO3)
                 ==
@@ -468,7 +472,7 @@ int main(int argc, char *argv[])
             fvScalarMatrix BAPTransport
             (
                 porosity * Sw * fvm::ddt(BAP)
-                // + BAP * fvc::ddt(Sw,n)
+                + BAP * fvc::ddt(Sw,porosity)
                 + fvm::div(phi, BAP)
                 - fvm::laplacian(porosity * Sw*(mag(U)*DispTensor + molDiff), BAP)
                 ==
@@ -490,7 +494,7 @@ int main(int argc, char *argv[])
             fvScalarMatrix POCrGeneration
             (
                 porosity * Sw * fvm::ddt(POCr)
-                // + POCr * fvc::ddt(Sw,n)
+                + POCr * fvc::ddt(Sw,porosity)
                 + fvm::div(phi, POCr)
                 - fvm::laplacian(porosity * Sw*(mag(U)*DispTensor + molDiff), POCr)
                 ==
@@ -509,6 +513,20 @@ int main(int argc, char *argv[])
             fvOptions.constrain(POCrGeneration);
             POCrGeneration.solve();
             fvOptions.correct(POCr);
+
+        //Info << "\nNonreactive tracer transport" << endl;
+            fvScalarMatrix NonReactiveTracer
+            (
+                porosity * Sw * fvm::ddt(tracer)
+                // + tracer * Sw * fvc::ddt(Sw, porosity)
+                + fvm::div(phi, tracer)
+                // - fvm::laplacian(porosity * Sw*(mag(U)*DispTensor + molDiff), tracer)
+            );
+            NonReactiveTracer.relax();
+            fvOptions.constrain(NonReactiveTracer);
+            NonReactiveTracer.solve();
+            fvOptions.correct(tracer);
+
         }
 
         //End bits

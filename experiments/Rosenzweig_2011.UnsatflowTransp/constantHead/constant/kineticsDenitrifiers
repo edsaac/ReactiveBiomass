@@ -9,45 +9,20 @@ FoamFile
 {
     version     2.0;
     format      ascii;
-    class       volScalarField;
-    location    "0.000";
-    object      Sw;
+    class       dictionary;
+    location    "constant";
+    object      kineticsDenitrifiers;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// [kg m s K mol * *]
 
-dimensions      [0 0 0 0 0 0 0];
-
-internalField   uniform 0.143196;
-
-boundaryField
-{
-    top
-    {
-        type            calculated;
-        value           uniform 0.384803;
-    }
-    left
-    {
-        type            empty;
-    }
-    right
-    {
-        type            empty;
-    }
-    front
-    {
-        type            empty;
-    }
-    back
-    {
-        type            empty;
-    }
-    bottom
-    {
-        type            calculated;
-        value           uniform 0.143196;
-    }
-}
+// Biochemical parameters
+//// Denitrifiers
+yield    yield    [0 0  0 0 0 0 0]     0.20;      //
+qhat     qhat     [0 0 -1 0 0 0 0]     1.3889E-4; //
+bdie     bdie     [0 0 -1 0 0 0 0]     5.7870E-7; //
+Kdonor   Kdonor   [1 -3 0 0 0 0 0]     1.0E-3;    //
+Kaccep   Kaccep   [1 -3 0 0 0 0 0]     0.5E-3;    //
 
 
 // ************************************************************************* //

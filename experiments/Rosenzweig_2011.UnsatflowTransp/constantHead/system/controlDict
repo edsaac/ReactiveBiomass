@@ -18,7 +18,7 @@ FoamFile
 end_days 10.0;
 end_secs #calc "round($end_days*86400.0)";
 
-write_days 0.5;
+write_days 0.1;
 write_secs #calc "round($write_days*86400.0)";
 
 application     unsatNutrientCycle;
@@ -31,7 +31,7 @@ endTime	        $end_secs;
 writeControl    runTime;
 writeInterval   $write_secs;
 
-deltaT          500;
+deltaT          30;
 purgeWrite      0;
 
 writeFormat     ascii;
@@ -49,17 +49,18 @@ runTimeModifiable true;
 adjustTimeStep  yes;
 
 maxCo           1.0;
+
 debug           1;
 
 // To plot breakthrough curve
 
-functions
-    {
-      #includeFunc    probes
-	    //#includeFunc    probeU
-	//#includeFunc  boundaryProbes
-        //#includeFunc  boundaryProbeTop
-    };
+// functions
+//     {
+//       #includeFunc    probes
+// 	    //#includeFunc    probeU
+// 	//#includeFunc  boundaryProbes
+//         //#includeFunc  boundaryProbeTop
+//     };
 
 
 // ************************************************************************* //

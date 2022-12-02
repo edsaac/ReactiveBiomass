@@ -228,6 +228,20 @@ volVectorField U
 
 //- Transport
 
+Foam::Info << "Reading field: Non-reactive tracer (tracer) \n" << endl;
+volScalarField tracer
+(
+    IOobject
+    (
+        "tracer",
+        runTime.timeName(),
+        mesh,
+        IOobject::MUST_READ,
+        IOobject::AUTO_WRITE
+    ),
+    mesh
+);
+
 Foam::Info << "Reading field: Dissolved organic carbon (DOC) \n" << endl;
 volScalarField DOC
 (
@@ -442,7 +456,8 @@ UnsaturatedSoilParametersField soil
     &alpha,
     &n_vangenucthen,
     &m_vangenucthen,
-    &perm_satu // <-- It will modify this field
+    &perm_satu, // <-- It will modify this field
+    &Sw // <-- It will modify this field
 );
 
 Foam::Info << "Switch for clogging?? (cloggingSwitch)\n" << endl;

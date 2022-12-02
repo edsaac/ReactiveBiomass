@@ -9,45 +9,32 @@ FoamFile
 {
     version     2.0;
     format      ascii;
-    class       volScalarField;
-    location    "0.000";
-    object      Sw;
+    class       dictionary;
+    location    "constant";
+    object      attachmentProperties;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// [kg m s K mol * *]
 
-dimensions      [0 0 0 0 0 0 0];
+attachmentModel colloidFiltrationTheory;
 
-internalField   uniform 0.143196;
-
-boundaryField
+colloidFiltrationTheoryCoeffs
 {
-    top
-    {
-        type            calculated;
-        value           uniform 0.384803;
-    }
-    left
-    {
-        type            empty;
-    }
-    right
-    {
-        type            empty;
-    }
-    front
-    {
-        type            empty;
-    }
-    back
-    {
-        type            empty;
-    }
-    bottom
-    {
-        type            calculated;
-        value           uniform 0.143196;
-    }
+    collectorSize   2.0E-3;
+    particleSize    10.0E-6;
+    fluidDensity    999.79;
+    particleDensity 1050.0;
+    fluidViscosity  0.0008891;
+    alphaEfficiency 0.01;
+    hamakerConst    5.0E-21;
+    refTemperature  283.0;
 }
 
+// attachmentModel constantRate;
+
+// constantRateCoeffs
+// {
+//     value   0.0;
+// }
 
 // ************************************************************************* //
