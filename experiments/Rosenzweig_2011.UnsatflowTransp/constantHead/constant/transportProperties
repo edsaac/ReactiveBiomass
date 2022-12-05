@@ -39,5 +39,6 @@ DispTensor DispTensor [0 1 0 0 0 0 0]
      $TransDisp $LongDisp $TransDisp 
      $TransDisp $TransDisp $LongDisp);
 
+diffusiveGrowth diffusiveGrowth [0 2 -1 0 0 0 0]  1.0E-10;
 
 // ************************************************************************* //

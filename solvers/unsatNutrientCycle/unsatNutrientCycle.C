@@ -251,6 +251,7 @@ int main(int argc, char *argv[])
             fvScalarMatrix ARGrowth
             (
                 fvm::ddt(XAR)
+                - fvm::laplacian(diffusiveGrowth, XAR)  //Pseudo-diffusion
                 ==
                 pXAR.yield * rH * XAR                   //Growth
                 - pXAR.bDie * XAR                       //Decay XAR -> EPS + XI
@@ -284,6 +285,7 @@ int main(int argc, char *argv[])
             fvScalarMatrix NitrifiersGrowth
             (
                 fvm::ddt(XN)
+                - fvm::laplacian(diffusiveGrowth, XN)  //Pseudo-diffusion
                 ==
                   pXN.yield * rN * XN                        //Growth
                 - pXN.bDie * XN                              //Decay XN -> EPS + XI
@@ -317,6 +319,7 @@ int main(int argc, char *argv[])
             fvScalarMatrix DenitrifiersGrowth
             (
                 fvm::ddt(XDN)
+                - fvm::laplacian(diffusiveGrowth, XDN)       //Pseudo-diffusion
                 ==
                 pXDN.yield * rDN * XDN                       //Growth
                 - pXDN.bDie * XDN                            //Decay XDN -> EPS + XI

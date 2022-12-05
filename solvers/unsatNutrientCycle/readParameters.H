@@ -33,6 +33,9 @@ dimensionedTensor molDiff(transportProperties.lookup("molDiff"));
 Foam::Info << "Dispersion tensor\n" << endl;
 dimensionedTensor DispTensor(transportProperties.lookup("DispTensor"));
 
+Foam::Info << "Diffusive growth\n" << endl;
+dimensionedScalar diffusiveGrowth(transportProperties.lookup("diffusiveGrowth"));
+
 //-----------
 
 Foam::Info << "Reading cloggingProperties\n" << endl;

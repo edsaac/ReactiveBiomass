@@ -25,13 +25,22 @@ solvers
         relTol          0;
     }
 
-    "(DOC|POC|O2|NO3|NH4|XAR|XN|XDN|XI|EPS|UAP|BAP|POCr|XARp|XNp|XDNp|tracer)"
+    "(DOC|POC|O2|NO3|NH4|XI|EPS|UAP|BAP|POCr|XARp|XNp|XDNp|tracer)"
     {
         solver          PBiCGStab;
         preconditioner  DILU;
         tolerance       1e-09;
         relTol          0;
     }
+
+    "(XAR|XN|XDN)"
+    {
+        solver          PBiCGStab;
+        preconditioner  DIC;
+        tolerance       1e-09;
+        relTol          0;
+    }
+
 }
 
 SIMPLE
