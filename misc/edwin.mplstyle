@@ -1,6 +1,7 @@
 figure.facecolor : white
 axes.labelsize : 14
 axes.labelweight : 10
+axes.titleweight : 10
 axes.labelpad : 5.0
 axes.facecolor : snow
 legend.fontsize : 14

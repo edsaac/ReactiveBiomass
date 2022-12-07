@@ -120,6 +120,21 @@ volScalarField Sw
     dimensionedScalar("Sw", dimless, 1.0)
 );
 
+Foam::Info << "Reading field: air saturation (Sa) \n" << endl;
+volScalarField Sa
+(
+    IOobject
+    (
+        "Sa",
+        runTime.timeName(),
+        mesh,
+        IOobject::NO_READ,
+        IOobject::AUTO_WRITE
+    ),
+    mesh,
+    dimensionedScalar("Sa", dimless, 0.0)
+);
+
 Foam::Info << "Creating field: relative permeability by clogging \n" << endl;
 volScalarField perm_clog
 (

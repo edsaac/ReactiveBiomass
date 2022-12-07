@@ -36,6 +36,13 @@ dimensionedTensor DispTensor(transportProperties.lookup("DispTensor"));
 Foam::Info << "Diffusive growth\n" << endl;
 dimensionedScalar diffusiveGrowth(transportProperties.lookup("diffusiveGrowth"));
 
+Foam::Info << "Henry's law for oxygen partition\n" << endl;
+dimensionedScalar Hacc(transportProperties.lookup("Hacc"));
+
+Foam::Info << "Oxygen saturation concentration\n" << endl;
+dimensionedScalar O2_saturation(transportProperties.lookup("O2_saturation"));
+
+
 //-----------
 
 Foam::Info << "Reading cloggingProperties\n" << endl;

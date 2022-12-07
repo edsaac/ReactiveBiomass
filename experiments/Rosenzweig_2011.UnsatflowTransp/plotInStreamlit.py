@@ -15,6 +15,26 @@ caseName   = "constantHead"
 PATH_TO_VTK = f"{caseName}/VTK"
 
 @st.experimental_memo
+def get_probe(field) -> np.float64:
+
+    point = np.array([[0.04, 0.04, 0.00]])
+
+    ## Extract VTK results (this should be done with a probe but meh)
+    all_vtk_paths = [os.path.join(PATH_TO_VTK, f) for f in getVTKList(PATH_TO_VTK)]
+    nTimes = len(all_vtk_paths)
+
+    ## Initialize array to store data
+    results = np.zeros([nTimes])
+
+    ## Extract field for each vtk field
+    for t,vtk in enumerate(all_vtk_paths):
+        mesh = pv.read(vtk)
+        probing = mesh.probe(point)
+        results[t] = probing[field][0]
+
+    return results 
+
+@st.experimental_memo
 def get_mean_velocity() -> np.float64:
 
     ## Extract VTK results (this should be done with a probe but meh)
@@ -138,6 +158,7 @@ ax.plot(scalar.t/86400, -velocity)
 ax.axhline(y=K_0, ls="dotted", c="gray", label="$K_0$")
 ax.set_xlabel("Time $t$ [d]")
 ax.set_ylabel("Specific discharge $q$ [m/s]")
+ax.set_ylim(bottom=0.0)
 ax.ticklabel_format(axis='y', scilimits=(0,0))
 ax.legend()
 ax.spines.right.set_visible(False)
@@ -146,16 +167,21 @@ st.pyplot(fig)
 
 st.header("Stacked total biomass")
 
+biomass_colors = ["tomato", "khaki", "darkkhaki"]
+biomass_labels = ["X_{\mathsf{AR}}","X_{\mathsf{EPS}}","X_{\mathsf{Inert}}"]
+
 fig, (rax,ax)  = plt.subplots(2,1, figsize=(8,7), gridspec_kw={"height_ratios":[1,5]}, sharex=True)
 fig.set_facecolor("#ffffff00")
 ax.stackplot(scalar.t/86400, *biomasses, baseline="sym",
-    labels = [ rf"$X_{{{i.replace('X','')}}}$" for i in biomass_labels ])
+    labels = [ rf"${{{i}}}$" for i in biomass_labels ],
+    colors = biomass_colors)
 
 ax.legend(loc="lower left")
 ax.set_xlabel("Time $t$ [d]")
 ax.set_ylabel("Total immobile biomass $X$ [g/L]")
 ax.spines.right.set_visible(False)
 ax.ticklabel_format(axis='y', scilimits=(0,0))
+ax.set_xlim(0,20)
 
 rax.plot(scalar.t/86400, np.gradient(np.sum(biomasses, axis=0), scalar.t/86400),
     label="Biomass generation \n rate $dX/dt$ [g/L/d]")
@@ -163,5 +189,27 @@ rax.spines.right.set_visible(False)
 rax.ticklabel_format(axis='y', scilimits=(0,0))
 rax.axhline(y=0, ls='dotted', c='gray', lw=0.8)
 rax.legend(fontsize=8)
-plt.show()
+rax.set_xlim(0,20)
+st.pyplot(fig, facecolor='#ffffff00')
+
+st.header("Nutrient transformations")
+
+labels = ["DOC","NO3","NH4","O2"]
+nutrient_colors = ["dimgray", "darkorchid", "darkturquoise", "red"]
+initConc = [10,2,1,9]
+probes = [get_probe(i) for i in labels]
+
+
+labels = ["DOC","NO_3^-","NH_4^+","O_2"]
+fig, ax = plt.subplots(figsize=(8,7))
+fig.set_facecolor("#ffffff00")
+for i, probe in enumerate(probes):
+    ax.plot(scalar.t/86400, probe/(initConc[i]*1.0E-3), 
+        label=rf"$C_{{\mathsf{{{labels[i]}}}}}$", color=nutrient_colors[i], lw=3)
+
+ax.set_xlabel("Time $t$ [d]")
+ax.set_ylabel("Nutrient tranformation \t $C_{\mathsf{out}}/C_{\mathsf{in}}$ [-]")
+ax.spines.right.set_visible(False)
+ax.legend(loc="lower left")
+ax.axhline(y=1.0, ls='dotted', c='gray', lw=0.8)
 st.pyplot(fig)

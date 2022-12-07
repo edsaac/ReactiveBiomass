@@ -213,6 +213,7 @@ int main(int argc, char *argv[])
         soil.waterSaturationCalculator(h);
         soil.mualemCalculator(h);
         updateHydCond;
+        Sa = 1.0 - Sw;
 
         // Update flow field
         U = - hydraulicCond * (fvc::grad(h) + fvc::grad(z));
@@ -416,7 +417,8 @@ int main(int argc, char *argv[])
             fvScalarMatrix OxygenTransport
             (
                 porosity * Sw * fvm::ddt(O2)
-                + O2 * fvc::ddt(Sw,porosity)
+                + O2 * fvc::ddt(Sw, porosity)                   // Oxygen in the aqueous phase
+                + O2_saturation/Hacc * fvc::ddt(porosity, Sa)   // Oxygen in the gaseous phase
                 + fvm::div(phi, O2)
                 - fvm::laplacian(porosity * Sw*(mag(U)*DispTensor + molDiff), O2)
                 ==
