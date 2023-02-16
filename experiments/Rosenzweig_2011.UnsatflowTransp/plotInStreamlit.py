@@ -11,10 +11,11 @@ import streamlit as st
 REPO_PATH = subprocess.check_output(['git', 'rev-parse', '--show-toplevel']).decode('utf-8').strip()
 plt.style.use(f'{REPO_PATH}/misc/edwin.mplstyle')
 
-caseName   = "constantHead"
+caseName = st.selectbox("Case:", ["constantHead","oxygenReplenish"], index=1)
+
 PATH_TO_VTK = f"{caseName}/VTK"
 
-@st.experimental_memo
+@st.cache_data
 def get_probe(field) -> np.float64:
 
     point = np.array([[0.04, 0.04, 0.00]])
@@ -34,7 +35,7 @@ def get_probe(field) -> np.float64:
 
     return results 
 
-@st.experimental_memo
+@st.cache_data
 def get_mean_velocity() -> np.float64:
 
     ## Extract VTK results (this should be done with a probe but meh)
@@ -54,7 +55,7 @@ def get_mean_velocity() -> np.float64:
 
     return results
 
-@st.experimental_memo
+@st.cache_data
 def get_total_biomass(field:str) -> np.float64:
 
     ## Extract VTK results (this should be done with a probe but meh)
@@ -73,7 +74,7 @@ def get_total_biomass(field:str) -> np.float64:
 
     return results
 
-@st.experimental_memo
+@st.cache_data
 def getAllMeshes(field:str):
     ## Extract VTK result (this should be done with a probe but meh)
     all_vtk_paths = [os.path.join(PATH_TO_VTK, f) for f in getVTKList(PATH_TO_VTK)]
@@ -168,7 +169,7 @@ st.pyplot(fig)
 st.header("Stacked total biomass")
 
 biomass_colors = ["tomato", "khaki", "darkkhaki"]
-biomass_labels = ["X_{\mathsf{AR}}","X_{\mathsf{EPS}}","X_{\mathsf{Inert}}"]
+biomass_labels = [r"X_{\mathsf{AR}}",r"X_{\mathsf{Inert, l}}",r"X_{\mathsf{Inert, r}}"]
 
 fig, (rax,ax)  = plt.subplots(2,1, figsize=(8,7), gridspec_kw={"height_ratios":[1,5]}, sharex=True)
 fig.set_facecolor("#ffffff00")
@@ -176,7 +177,16 @@ ax.stackplot(scalar.t/86400, *biomasses, baseline="sym",
     labels = [ rf"${{{i}}}$" for i in biomass_labels ],
     colors = biomass_colors)
 
-ax.legend(loc="lower left")
+ax.text(13.0, -4.5E-4, r"$X_{\mathsf{Active}}$", 
+    ha='center', va='center', fontsize=18, rotation=10)
+
+ax.text(12.5, 2.0E-4, r"$X_{\mathsf{Inert},\,\mathsf{labile}}$", 
+    ha='center', va='center', fontsize=18, rotation=-5)
+
+ax.text(15.0, 5.2E-4, r"$X_{\mathsf{Inert},\,\mathsf{recalcitrant}}$", 
+    ha='center', va='center', fontsize=18, rotation=-15)
+
+#ax.legend(loc="lower left")
 ax.set_xlabel("Time $t$ [d]")
 ax.set_ylabel("Total immobile biomass $X$ [g/L]")
 ax.spines.right.set_visible(False)
