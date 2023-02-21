@@ -1,0 +1,65 @@
+        # fig, ax = plt.subplots(figsize=[10,6])
+        # for probe, color in zip(probes, colors):
+        #     ax.plot(θ["Time (d)"], θ[probe], lw=0.5, alpha=0.6, c=color)
+        #     ax.plot(θ["Time (d)"], θ[probe].rolling(10).mean(), lw=3, label=f"{probe} @ {all_probes[probe]:.2f}m", marker="None", alpha=1, c=color)
+
+        # ax.legend(loc='upper right')
+        # ax.set_ylabel("Water content (θ)")
+        # ax.set_xlabel("Time (d)")
+        # ax.set_xlim(left=0)
+        # ax.set_ylim(θr,θs)
+        # fig.tight_layout()
+        # st.pyplot(fig)
+
+        fig,axs = plt.subplots(1,2, 
+            figsize=[10,5], 
+            gridspec_kw={
+                "width_ratios":[1.0,0.7],
+                "wspace":0.01}, 
+            sharey=True)
+
+        ax = axs[0]
+        img = ax.pcolormesh(t, z, θ.T, cmap="RdPu", vmin=θr, vmax=θs)
+        plt.colorbar(img, ax=ax, shrink=0.5, pad=0.01)
+        ax.set_ylabel("Depth [m]")
+        ax.set_xlabel("Time (d)")
+
+        ax = axs[1]
+        ## TDR readings at end-time
+        θ_tmean = np.average(θ[-10:], axis=0)  ## Last 50 hr
+        ax.scatter(θ_tmean, z, 
+            c="#4d0c69", marker="o", label="TDR")
+        
+        θ_dmean = np.average(θ_tmean)  ## Mean over depth
+        for i,j in zip(θ_tmean, z): ax.annotate(f"{i:.3f}",[i,j], [i+0.01,j+0.005], fontsize=8)
+        ax.axvline(x=θ_dmean, lw=1, alpha=0.5, ls="dotted", c="#4d0c69", 
+            label=rf"$\langle\bar{{\theta}}\rangle$={θ_dmean:.3f}")
+
+        ## Gravimetric measurement at the end of the experiment
+        ax.scatter("θ", "z (m)", data=θend, 
+            marker="X", label="Gravimetric", c="orange")
+        for i,j in zip(θend["θ"], θend["z (m)"]): 
+            ax.annotate(f"{i:.3f}",[i,j], [i+0.01,j+0.005], fontsize=8, c="orange")
+        θend_dmean = θend['θ'].mean()
+        ax.axvline(x=θend_dmean, lw=1, alpha=0.5, ls="dotted", c="orange",
+            label=rf"$\langle\bar{{\theta}}\rangle$={θend_dmean:.3f}")
+
+        ax.set_xlim(θr,θs)
+        ax.set_xlabel(r"Μean water content ($\bar{θ}$)")
+        ax.legend(fontsize=8)
+        st.pyplot(fig)
+
+        #
+####################
+            fig,ax = plt.subplots(figsize=[8,5])
+            for hcol in head.columns:
+                if "h_Avg" in hcol:
+                    head[hcol] = head[hcol].mask(head[hcol] > 0.0).mask(head[hcol] < -100.0)
+                    ax.plot("Time (d)", hcol, data=head)
+
+            ax.legend()
+            ax.set_ylabel("Matric head (cm)")
+            ax.set_xlabel("Time (d)")
+            ax.set_ylim(-50, 0.0)
+            fig.tight_layout()
+            st.pyplot(fig)

@@ -124,6 +124,8 @@ with cols[2]:
 
 scalar = getAllMeshes(scalarName)
 #fig, (ax,cax) = plt.subplots(1,2, figsize=[8,6], gridspec_kw={"width_ratios":[5,0.2]}, sharex=False)
+
+cols = st.columns([2,1])
 fig, (cax,ax) = plt.subplots(2,1, figsize=[5,7], gridspec_kw={"height_ratios":[0.2,5]}, sharex=False)
 fig.set_facecolor("#ffffff00")
 igt = 4  # Ignore the first timesteps for plor
@@ -143,15 +145,27 @@ ax.set_ylabel("Depth $z$ [m]")
 plt.colorbar(img, cax=cax, orientation="horizontal")
 cax.set_title(fr"${label}$ {units}")
 
-st.pyplot(fig)
+with cols[0]:
+    st.pyplot(fig)
 
+# Profile at the end of the experiment
+fig, ax = plt.subplots(figsize=[2.5,8.0])
+ax.plot(scalar[:,-1], scalar.z)
+ax.set_ylabel("Depth $z$ [m]")
+ax.set_xscale(("linear","log")[with_logscale])
+ax.set_xlabel(f"{label} [{units}]")
+with cols[1]:
+    st.pyplot(fig)
+
+
+######################################################
+st.header("Flow over time")
 
 K_0 = 2.067E-4
 biomass_labels = ["XAR","EPS","XI"]
 biomasses = np.array([get_total_biomass(i) for i in biomass_labels])
 velocity = get_mean_velocity()
 
-st.header("Flow over time")
 
 fig, ax  = plt.subplots(figsize=(5,7))
 fig.set_facecolor("#ffffff00")

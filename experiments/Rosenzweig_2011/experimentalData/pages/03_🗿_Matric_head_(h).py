@@ -3,43 +3,95 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import subprocess
 import streamlit as st
+import plotly.graph_objects as go
+
 
 REPO_PATH = subprocess.check_output(['git', 'rev-parse', '--show-toplevel']).decode('utf-8').strip()
 plt.style.use(f'{REPO_PATH}/misc/edwin.mplstyle')
 
-"# Matric head"
+colors = ['#e41a1c','#377eb8','#4daf4a','#984ea3','#ff7f00','#ffff33']
+z = np.array([0.57, 0.52, 0.47, 0.42, 0.37, 0.32])
+
+"# 🗿 Matric head"
 
 labels = ["Control", "Inoculated"]
 
-for tab, dataset in zip(st.tabs(labels), labels):
+for tab, dataset in zip(st.tabs([f"**{i}**" for i in labels]), labels):
 
     with tab:
         head = pd.read_excel(".hiddendata/matricHead.xlsx", sheet_name=dataset)
         head["Time (d)"] = head["Time (min)"]/(60*24)
-        st.dataframe(head, height=200)
+        
+        with st.expander("🗃️ **Dataframes**"):
+            st.dataframe(head, height=200)
 
-        "**Tensiometer data**"
-        fig,ax = plt.subplots(figsize=[8,5])
-        for hcol in head.columns:
-            if "h_Avg" in hcol:
+
+        with st.expander("📈 **TDR timeseries**"):
+            
+            fig = go.Figure()
+            
+            for color, zval, hcol in zip(colors, z, [k for k in head.columns if "h_Avg" in k]):
+
                 head[hcol] = head[hcol].mask(head[hcol] > 0.0).mask(head[hcol] < -100.0)
-                ax.plot("Time (d)", hcol, data=head)
 
-        ax.legend()
-        ax.set_ylabel("Matric head (cm)")
-        ax.set_xlabel("Time (d)")
-        ax.set_ylim(-50, 0.0)
-        fig.tight_layout()
-        st.pyplot(fig)
+                fig.add_trace(
+                    go.Scatter(
+                        x=head["Time (d)"],
+                        y=head[hcol],
+                        name=f"{hcol} @ {zval} m",
+                        line=dict(color=color, width=3),
+                    )
+                )
+            fig.update_yaxes(
+                title_text="Matric head [cm]", 
+                range=[-50,0.0], 
+                showgrid=False,
+                **st.session_state.axis_setup)
 
-        "**Matric head spatial distribution**"
-        t = head["Time (d)"].to_numpy()
-        z = np.array([0.57, 0.52, 0.47, 0.42, 0.37, 0.32])
-        h = head[[i for i in head.columns if "h_" in i]].to_numpy()/100.
+            fig.update_xaxes(
+                title_text="Time [d]", 
+                showgrid=False,
+                **st.session_state.axis_setup)
+            
+            st.plotly_chart(fig, use_container_width=True)
 
-        fig,ax = plt.subplots(figsize=[10,5])
-        img = ax.pcolormesh(t, z, h.T, cmap="winter_r", vmin=-0.4, vmax=-0.1)
-        plt.colorbar(img, ax=ax, shrink=0.5, pad=0.01, label=r"$h$ (m)")
-        ax.set_ylabel("Depth [m]")
-        ax.set_xlabel("Time (d)")
-        st.pyplot(fig)
+        with st.expander("🌽 **Matric head spatial distribution**", expanded=True):
+        
+            t = head["Time (d)"].to_numpy()
+            h = head[[i for i in head.columns if "h_" in i]].to_numpy()/100.
+
+            fig = go.Figure()
+
+            hovertemplate = """<b>h = %{z:.2f} m</b> <br> z = %{y:.2f} m <br> t = %{x:.1f} d"""
+
+            fig.add_trace(
+                go.Heatmap(
+                    x=t, y=z, z=h.T,
+                    zmin=-0.40, zmax=-0.10,
+                    hovertemplate=hovertemplate,
+                    name="h [m]",
+                    colorbar=dict(
+                        len=0.7,
+                        lenmode="fraction",
+                        thickness=0.02,
+                        thicknessmode="fraction",
+                        title_text="h [m]",
+                        titlefont_size=18,
+                        outlinewidth=0,
+                        y=0.50,
+                        x=1.04
+                    ))
+            )
+            
+            fig.update_xaxes(
+                title_text="Time [d]",
+                showgrid=False,
+                **st.session_state.axis_setup)
+
+            fig.update_yaxes(
+                title_text="Depth [m]", 
+                range=[0.28,0.61], 
+                showgrid=False,
+                **st.session_state.axis_setup)
+
+            st.plotly_chart(fig, use_container_width=True)
