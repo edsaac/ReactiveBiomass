@@ -1,8 +1,12 @@
-import os, pickle, shutil
 import numpy as np
+import xarray as xr
 import pandas as pd
-from natsort import natsorted
 import pyvista as pv
+
+import os, pickle, shutil
+from pathlib import Path
+from natsort import natsorted
+import subprocess
 
 def getVTKList(path:str) -> list[str]:
     '''
@@ -134,6 +138,40 @@ def integrateDataOverTime(path: str):
             pickle.dump(globalDataFrame,f)
 
     return globalDataFrame
+
+def vtk_to_xarray(field:str, casepath:Path):
+    
+    ## Extract VTK result (this should be done with a probe but meh)
+    vtkpath = casepath/"VTK"
+    all_vtk_paths = [vtkpath/f for f in getVTKList(vtkpath)]
+    nTimes = len(all_vtk_paths)
+    times = [float(t) for t in subprocess.check_output("foamListTimes", cwd=casepath.absolute()).decode("utf-8").splitlines() if t[0:2].isnumeric()]
+
+    ## Use dimensions from the first VTK
+    mesh = pv.read(all_vtk_paths[0])
+    line = pv.Line(
+        a:=[0, 0, mesh.bounds[5]],
+        b:=[0, 0, mesh.bounds[2]])
+    sample = mesh.sample_over_line(a,b)
+    nPoints = len(sample[field])
+
+    ## Initialize array to store data
+    results = np.zeros([nPoints, nTimes])
+
+    ## Extract field for each vtk field
+    for t,vtk in enumerate(all_vtk_paths):
+        mesh = pv.read(vtk)
+        sample = mesh.sample_over_line(a,b)
+        results[:,t] = sample[field]
+
+    data = xr.DataArray(
+        results, 
+        dims=("z","t"), 
+        coords={
+            "z": sample.points[:,2], 
+            "t": times})
+ 
+    return data
 
 def main():
     pass

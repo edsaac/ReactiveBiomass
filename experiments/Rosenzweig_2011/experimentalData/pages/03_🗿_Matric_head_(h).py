@@ -8,6 +8,7 @@ import plotly.graph_objects as go
 
 REPO_PATH = subprocess.check_output(['git', 'rev-parse', '--show-toplevel']).decode('utf-8').strip()
 plt.style.use(f'{REPO_PATH}/misc/edwin.mplstyle')
+st.markdown(st.session_state.css_style, unsafe_allow_html=True)
 
 colors = ['#e41a1c','#377eb8','#4daf4a','#984ea3','#ff7f00','#ffff33']
 z = np.array([0.57, 0.52, 0.47, 0.42, 0.37, 0.32])

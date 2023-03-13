@@ -19,7 +19,7 @@ convertToMeters 1.0;
 lenght     0.62;
 diameter   0.08;
 
-deltaLenght 0.005;
+deltaLenght 0.0015;
 
 LCells #calc "round($lenght/$deltaLenght)";
 WCells 1;
@@ -40,7 +40,7 @@ vertices
 
 blocks
 (
-    hex (0 1 2 3 4 5 6 7) ($WCells $DCells $LCells) simpleGrading (1 1 0.2)
+    hex (0 1 2 3 4 5 6 7) ($WCells $DCells $LCells) simpleGrading (1 1 0.25)
 );
 
 edges

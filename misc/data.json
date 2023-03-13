@@ -1,0 +1,204 @@
+{
+    "biomass":
+    {
+        "XAR": 
+        {
+            "long_name": "Aerobic respirators", 
+            "equation_repr": "X<sub>AR</sub>",
+            "units": "kg/m<sup>3</sup>"
+        }, 
+        "XN": 
+        {
+            "long_name": "Nitrifiers", 
+            "equation_repr": "X<sub>N</sub>",
+            "units": "kg/m<sup>3</sup>"
+        },
+        "XDN": 
+        {
+            "long_name": "Denitrifiers", 
+            "equation_repr": "X<sub>DN</sub>",
+            "units": "kg/m<sup>3</sup>"
+        },
+        "XI": 
+        {
+            "long_name": "Inert biomass", 
+            "equation_repr": "X<sub>I</sub>",
+            "units": "kg/m<sup>3</sup>"
+        },
+        "EPS": 
+        {
+            "long_name": "Extrapolymeric substances (EPS)", 
+            "equation_repr": "X<sub>EPS</sub>",
+            "units": "kg/m<sup>3</sup>"
+        }
+    },
+    "postprocessed_biomass":
+    {
+        "Xactive": 
+        {
+            "long_name": "Active biomass", 
+            "equation_repr": "X<sub><i>Active</i></sub>",
+            "units": "kg/m<sup>3</sup>",
+            "is_vtk": false
+        }, 
+        "Xinactive": 
+        {
+            "long_name": "Inactive biomass", 
+            "equation_repr": "X<sub><i>inactive</i></sub>",
+            "units": "kg/m<sup>3</sup>",
+            "is_vtk": false
+        },
+        "Xtotal": 
+        {
+            "long_name": "Total biomass", 
+            "equation_repr": "X<sub><i>Total</i></sub>",
+            "units": "kg/m<sup>3</sup>",
+            "is_vtk": false
+        }
+    },
+    "particulates":
+    {
+        "XARp": 
+        {
+            "long_name": "Mobile aerobic respirators", 
+            "equation_repr": "X<sub>AR,p</sub>",
+            "units": "kg/m<sup>3</sup>"
+        }, 
+        "XNp": 
+        {
+            "long_name": "Mobile nitrifiers", 
+            "equation_repr": "X<sub>N,p</sub>",
+            "units": "kg/m<sup>3</sup>"
+        },
+        "XDNp": 
+        {
+            "long_name": "Mobile denitrifiers", 
+            "equation_repr": "X<sub>DN,p</sub>",
+            "units": "kg/m<sup>3</sup>"
+        },
+        "POCr": 
+        {
+            "long_name": "Recalcitrant POC", 
+            "equation_repr": "POC<sub>r</sub>",
+            "units": "kg/m<sup>3</sup>"
+        },
+        "BAP": 
+        {
+            "long_name": "Labile POC", 
+            "equation_repr": "POC<sub>l</sub>",
+            "units": "kg/m<sup>3</sup>"
+        }
+    },
+    "hydraulics":
+    {
+        "h": 
+        {
+            "long_name": "Hydraulic head", 
+            "equation_repr": "h",
+            "units": "m",
+            "is_logscale": false,
+            "colormap": "blues"
+        }, 
+        "Sw": 
+        {
+            "long_name": "Vol. water saturation", 
+            "equation_repr": "S<sub><i>w</i></sub>",
+            "units": "-",
+            "is_logscale": false,
+            "colormap": "blues"
+        },
+        "hydraulicCond": 
+        {
+            "long_name": "Hydraulic conductivity", 
+            "equation_repr": "K",
+            "units": "m/s"
+        },
+        "porosity": 
+        {
+            "long_name": "Porosity", 
+            "equation_repr": "n",
+            "units": "-",
+            "is_logscale": false
+        },
+        "mag(U)":
+        {
+            "long_name": "Flow velocity",
+            "equation_repr": "|U|",
+            "units": "m/s",
+            "is_logscale": false
+        }
+    },
+    "postprocessed_hydraulics":
+    {
+        "Swb":
+        {
+            "long_name": "Water + biomass content", 
+            "equation_repr": "S<sub><i>w,b</i></sub>",
+            "units": "-",
+            "is_vtk": false,
+            "is_logscale": false
+        }
+    },
+    "chemical_species":
+    {
+        "O2": 
+        {
+            "long_name": "Dissolved oxygen", 
+            "equation_repr": "O<sub>2</sub>",
+            "units": "kg/m<sup>3</sup>",
+            "zmin": 2.0e-3,
+            "zmax": 9.0e-3,
+            "colormap": "Reds",
+            "is_logscale": false
+        }, 
+        "NO3": 
+        {
+            "long_name": "Nitrate", 
+            "equation_repr": "NO<sub>3</sub><sup>-</sup>",
+            "units": "kg/m<sup>3</sup>",
+            "colormap": "Greys",
+            "is_logscale": false
+        },
+        "NH4": 
+        {
+            "long_name": "Ammonium", 
+            "equation_repr": "NH<sub>4</sub><sup>+</sup>",
+            "units": "kg/m<sup>3</sup>",
+            "colormap": "Darkmint",
+            "is_logscale": false
+        },
+        "DOC": 
+        {
+            "long_name": "Dissolved organic carbon", 
+            "equation_repr": "DOC",
+            "units": "kg/m<sup>3</sup>",
+            "colormap": "turbid",
+            "is_logscale": false
+        },
+        "tracer": 
+        {
+            "long_name": "Conservative tracer", 
+            "equation_repr": "tr",
+            "units": "kg/m<sup>3</sup>",
+            "colormap": "RdBu",
+            "zmin": 0.9e-3,
+            "zmax": 1.1e-3,
+            "is_logscale": false
+        }
+    },
+    "rates":
+    {
+        "katt": 
+        {
+            "long_name": "Attachment rate", 
+            "equation_repr": "k<sub>att</sub>",
+            "units": "1/s"
+        }, 
+        "kdet": 
+        {
+            "long_name": "Detachment rate", 
+            "equation_repr": "k<sub>det</sub>",
+            "units": "1/s"
+        }
+    }
+}

@@ -50,15 +50,15 @@ SIMPLE
 
 timeStepping
 {
-    convergeThreshold   5.0E-06;
+    convergeThreshold   0.005;
     maxItersToConverge  10;  // Triggers dT down
 
     UpDeltaT_nIters     3;   // Triggers dT up
-    UpDeltaT_Factor     1.1;
+    UpDeltaT_Factor     1.02;
     maxDeltaT           30;
 
     DownDeltaT_Factor   0.5;
-    minDeltaT           0.0001;      
+    minDeltaT           0.0001;
 }
 
 // relaxationFactors

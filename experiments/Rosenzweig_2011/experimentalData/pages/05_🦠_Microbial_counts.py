@@ -8,6 +8,8 @@ from plotly.subplots import make_subplots
 
 REPO_PATH = subprocess.check_output(['git', 'rev-parse', '--show-toplevel']).decode('utf-8').strip()
 plt.style.use(f'{REPO_PATH}/misc/edwin.mplstyle')
+st.markdown(st.session_state.css_style, unsafe_allow_html=True)
+
 colors = ['#e41a1c','#377eb8']
 markers = ["octagon-open", "star-square-open-dot"]
 
@@ -23,9 +25,10 @@ for m, color, dataset in zip(markers, colors, labels):
     cfu = pd.read_excel(".hiddendata/Live-counts.xlsx", sheet_name=dataset)
 
     fig.add_trace(go.Scatter(
-        mode="markers",
+        mode="lines+markers",
         x=cfu["CFU/mL"], y=cfu["z (m)"],
         marker=dict(color=color, symbol=m, size=12, line_width=1),
+        line=dict(width=0.5),
         name=dataset,
         error_x=dict(
             type="data",

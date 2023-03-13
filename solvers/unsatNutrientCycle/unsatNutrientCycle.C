@@ -80,7 +80,7 @@ Description
 ENDIGNORE
 \*---------------------------------------------------------------------------*/
 
-#define DEBUG true
+#define DEBUG false
 
 #define updateHydCond hydraulicCond = K_0 * perm_clog * perm_satu
 #define debug(message) if(DEBUG){Foam::Info << message << nl << endl;}
@@ -179,7 +179,7 @@ int main(int argc, char *argv[])
             grad_kz = grad_k.component(vector::Z);
 
             //- Solve Richard's equation for undeformable porous media
-            //--  To do: Add ddt(porosity) term for deformable media
+            //--  To do: Add ddt(porosity) term for deformable media (done)
             fvScalarMatrix richardsEquation
             (
                 fvm::ddt(soil.capillary(h_before), h_after)
@@ -207,6 +207,8 @@ int main(int argc, char *argv[])
             else { 
                 break; 
             }
+            //- If h converged, the h field is updated with the one found 
+            //  from the iterations above and this loop is broken
         }
 
         //- Update Sw and perm_satu based on hydraulic head

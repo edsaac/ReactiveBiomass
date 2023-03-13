@@ -8,6 +8,8 @@ from plotly.subplots import make_subplots
 
 REPO_PATH = subprocess.check_output(['git', 'rev-parse', '--show-toplevel']).decode('utf-8').strip()
 plt.style.use(f'{REPO_PATH}/misc/edwin.mplstyle')
+st.markdown(st.session_state.css_style, unsafe_allow_html=True)
+
 
 "# 🌵 Water content (θ)"
 st.info("TDR: Time Domain Reflectometry -> dielectric sensors that measure the charge storing capacity of the soil")
@@ -36,7 +38,7 @@ for tab, dataset in zip(st.tabs([f"**{i}**" for i in labels]), labels):
         θ = pd.read_excel(".hiddendata/TDR-theta.xlsx", sheet_name=dataset)
         θend = pd.read_excel(".hiddendata/theta-endexperiment.xlsx", sheet_name=dataset)
         
-        θ["Time (d)"] = θ["Time(hr)"]/24.0
+        θ["Time (d)"] = θ["Time (hr)"]/24.0
         for i in range(1,7): 
             θ[f"θ{i}_roll"] = θ[f"θ{i}"].rolling(10, center=True).mean()
         
@@ -97,7 +99,7 @@ for tab, dataset in zip(st.tabs([f"**{i}**" for i in labels]), labels):
             fig.add_trace(
                 go.Heatmap(
                     x=t, y=z, z=θ.T,
-                    zmin=0.01, zmax=0.35,
+                    zmin=0.10, zmax=0.35,
                     hovertemplate=hovertemplate,
                     name="θ",
                     colorbar=dict(

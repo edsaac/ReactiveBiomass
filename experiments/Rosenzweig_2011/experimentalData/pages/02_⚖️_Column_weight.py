@@ -8,6 +8,7 @@ from plotly.subplots import make_subplots
 
 REPO_PATH = subprocess.check_output(['git', 'rev-parse', '--show-toplevel']).decode('utf-8').strip()
 plt.style.use(f'{REPO_PATH}/misc/edwin.mplstyle')
+st.markdown(st.session_state.css_style, unsafe_allow_html=True)
 
 colors = ['#e41a1c','#377eb8']
 

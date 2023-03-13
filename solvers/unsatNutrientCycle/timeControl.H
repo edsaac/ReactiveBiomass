@@ -60,21 +60,21 @@ else
     // Decrease timeStep and start all over
     if (nCycles >= timeControl.maxItersToConverge)
     {
+        // End simulation if deltaT is too small 
+        if (runTime.deltaTValue() < timeControl.minDeltaT)
+        {
+            Foam::Info << "\n deltaT is lower than minDeltaT"
+                       << runTime.deltaTValue() << "<" << timeControl.minDeltaT << nl
+                       << "\n Failed to converge :( " << nl << endl;
+            runTime.writeAndEnd();
+        }
+
         runTime.setDeltaT
         (
             timeControl.DownDeltaT_Factor * runTime.deltaTValue()
         );
 
-        // End simulation if deltaT is too small 
-        if (runTime.deltaTValue() < timeControl.minDeltaT)
-        {
-            Foam::Info << "\n deltaT going to be lower than minDeltaT"
-                       << runTime.deltaTValue() << nl
-                       << "\n Failed to converge :( " << endl;
-            runTime.writeAndEnd();
-        }
-
-        Foam::Info << nl << "deltaT going DOWN ↓↓↓"
+        Foam::Info << nl << "deltaT going DOWN ↓↓↓: "
                    << runTime.deltaTValue() << endl;
 
         h_after = h;
