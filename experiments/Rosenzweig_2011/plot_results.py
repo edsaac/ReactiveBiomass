@@ -14,7 +14,7 @@ import pyvista as pv
 REPO_PATH = subprocess.check_output(['git', 'rev-parse', '--show-toplevel']).decode('utf-8').strip()
 plt.style.use(f'{REPO_PATH}/misc/edwin.mplstyle')
 
-caseName = st.selectbox("Case:", ["constantHead","oxygenReplenish"], index=1)
+caseName = st.selectbox("Case:", ["constantHead","highFlowRate","oxygenReplenish"], index=1)
 
 PATH_TO_VTK = f"{caseName}/VTK"
 
