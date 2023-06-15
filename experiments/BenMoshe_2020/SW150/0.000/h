@@ -1,0 +1,73 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  7
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volScalarField;
+    object      h;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions      [0 1 0 0 0 0 0];
+
+internalField   uniform 0.0;
+
+boundaryField
+{
+    front
+    {
+        type            empty;
+    }
+
+    back
+    {
+        type            empty;
+    }
+
+    right
+    {
+  	type		empty;
+    }
+
+    left
+    {
+  	type		empty;
+    }
+
+    top
+    {
+        type            uniformInletOutlet;
+        phi             phi;
+        uniformInletValue	
+        {
+            type             csvFile;
+            nHeaderLine      1;              // number of header lines
+            refColumn        0;              // time column index
+            componentColumns (1);            // data column index
+            separator        ",";            // optional (defaults to ",")
+            mergeSeparators  no;             // merge multiple separators
+            file             "../h_dataTable.csv";
+            } 
+        value           $internalField;
+    }
+
+    bottom
+    {
+        // Set to 1.0 for a NO-FLOW condition
+        // Set to 0.0 for a unit gradient drain
+        type        fixedGradient;
+        gradient    uniform 0.00;   
+
+        // type    fixedValue;
+        // value   uniform 0.0;
+
+    }
+}
+
+// ************************************************************************* //

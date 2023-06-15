@@ -1,0 +1,171 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  7
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      blockMeshDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+convertToMeters 1.0;
+
+diameter   0.15;
+
+deltaLength 0.01;
+WCells 1;
+DCells 1;
+
+// Layers
+z_1     -1.53;
+// LCells_1 #calc "1.5 * abs(round($z_1/$deltaLength))";
+LCells_1 200;
+
+z_2     -2.58;
+LCells_2 #calc "abs(round(($z_2 - $z_1)/$deltaLength))";
+
+z_3     -3.52;
+LCells_3 #calc "abs(round(($z_3 - $z_2)/$deltaLength))";
+
+z_4     -4.62;
+LCells_4 #calc "abs(round(($z_4 - $z_3)/$deltaLength))";
+
+z_5     -4.80;
+LCells_5 #calc "abs(round(($z_5 - $z_4)/$deltaLength))";
+
+z_6     -6.00;
+LCells_6 #calc "abs(round(($z_6 - $z_5)/$deltaLength))";
+
+
+vertices
+(
+    (0 0 0)                   //0
+    ($diameter 0 0)           //1
+    ($diameter $diameter 0)   //2
+    (0 $diameter 0)           //3
+    (0 0 $z_1)                  //4
+    ($diameter 0 $z_1)          //5
+    ($diameter $diameter $z_1)  //6
+    (0 $diameter $z_1)  //7
+    (0 0 $z_2)                  //8
+    ($diameter 0 $z_2)          //9
+    ($diameter $diameter $z_2)  //10
+    (0 $diameter $z_2)  //11
+    (0 0 $z_3)                  //12
+    ($diameter 0 $z_3)          //13
+    ($diameter $diameter $z_3)  //14
+    (0 $diameter $z_3)  //15
+    (0 0 $z_4)                  //16
+    ($diameter 0 $z_4)          //17
+    ($diameter $diameter $z_4)  //18
+    (0 $diameter $z_4)  //19
+    (0 0 $z_5)                  //20
+    ($diameter 0 $z_5)          //21
+    ($diameter $diameter $z_5)  //22
+    (0 $diameter $z_5)  //23
+    (0 0 $z_6)                  //24
+    ($diameter 0 $z_6)          //25
+    ($diameter $diameter $z_6)  //26
+    (0 $diameter $z_6)  //27
+);
+
+
+blocks
+(
+    hex (4 5 6 7 0 1 2 3) layer_1 ($WCells $DCells $LCells_1) simpleGrading (1 1 0.5696)
+    hex (8 9 10 11 4 5 6 7) layer_2 ($WCells $DCells $LCells_2) simpleGrading (1 1 1)
+    hex (12 13 14 15 8 9 10 11) layer_3 ($WCells $DCells $LCells_3) simpleGrading (1 1 1)
+    hex (16 17 18 19 12 13 14 15) layer_4 ($WCells $DCells $LCells_4) simpleGrading (1 1 1)
+    hex (20 21 22 23 16 17 18 19) layer_5 ($WCells $DCells $LCells_5) simpleGrading (1 1 1)
+    hex (24 25 26 27 20 21 22 23) layer_6 ($WCells $DCells $LCells_6) simpleGrading (1 1 1)
+    );
+
+edges
+(
+);
+
+boundary
+(
+    top
+    {
+        type patch;
+        faces
+        (
+            (0 1 2 3)
+        );
+    }
+    left
+    {
+        type empty;
+        faces
+        (
+            (0 4 7 3)
+            (4 8 11 7)
+            (8 12 15 11)
+            (12 16 19 15)
+            (16 20 23 19)
+            (20 24 27 23)
+        );
+    }
+    right
+    {
+        type empty;
+        faces
+        (
+            (2 6 5 1)
+            (6 10 9 5)
+            (10 14 13 9)
+            (14 18 17 13)
+            (18 22 21 17)
+            (22 26 25 21)
+        );
+    }
+
+    front
+    {
+        type empty;
+        faces
+        (
+            (2 3 7 6)
+            (6 7 11 10)
+            (10 11 15 14)
+            (14 15 19 18)
+            (18 19 23 22)
+            (22 23 27 26)
+        );
+    }
+    back
+    {
+        type empty;
+        faces
+        (
+            (0 1 5 4)
+            (4 5 9 8)
+            (8 9 13 12)
+            (12 13 17 16)
+            (16 17 21 20)
+            (20 21 25 24)
+        );
+    }
+    bottom
+    {
+        type patch;
+        faces
+        (
+            (24 25 26 27)
+        );
+    }
+
+);
+
+mergePatchPairs
+(
+);
+
+// ************************************************************************* //
