@@ -45,20 +45,22 @@ solvers
 
 SIMPLE
 {
-    nNonOrthogonalCorrectors 1;
+    nNonOrthogonalCorrectors 0;
 }
 
 timeStepping
 {
-    convergeThreshold   5.0E-06;
-    maxItersToConverge  10;  // Triggers dT down
+    convergeThreshold   0.0002;
+    maxItersToConverge  20;  // Triggers dT down
 
     UpDeltaT_nIters     3;   // Triggers dT up
-    UpDeltaT_Factor     1.1;
-    maxDeltaT           30;
+    UpDeltaT_Factor     1.15;
+    maxDeltaT           120;
 
     DownDeltaT_Factor   0.5;
-    minDeltaT           0.0001;      
+    minDeltaT           0.00001; 
+    
+    hguess_coeff       0.975;
 }
 
 // relaxationFactors

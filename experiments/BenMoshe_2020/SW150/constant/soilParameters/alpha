@@ -15,18 +15,9 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-/*
-    See Table 4.1 from Rosenzweig thesis (2011)
-    For Caesarea sand without added xantan, van Genuchten parameters are:
-        thera_r = 0.012
-        theta_s = 0.385
-        n = 7.26
-        alpha = 0.0279 1/cm
-*/
-
 dimensions      [0 -1 0 0 0 0 0];
 
-internalField   uniform 2.79;
+internalField   uniform 0.912;
 
 boundaryField
 {

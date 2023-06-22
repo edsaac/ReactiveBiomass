@@ -69,7 +69,7 @@ boundaryField
         refGradient     uniform 0;
         valueFraction   uniform 0;          // If 0: fixedGradient, if 1: fixedValue
         name            DarcyInflux;        // name of generated BC
-    
+        
         code
         #{
             // Read the hydraulic conductivity field

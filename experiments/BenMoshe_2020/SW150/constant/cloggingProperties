@@ -17,7 +17,7 @@ FoamFile
 // [kg m s K mol * *]
 
 // Clogging parameters
-clog?     true;
+clog?     false;
 
 nMin      nMin       [0 0 0 0 0 0 0]    0.10;     // Minimum porosity
 permMin   spermMin   [0 0 0 0 0 0 0]    1.0E-3;   // Minimum relative permeability

@@ -9,9 +9,9 @@ FoamFile
 {
     version     2.0;
     format      ascii;
-    class       dictionary;
-    location    "system";
-    object      setFieldsDict;
+    class       volScalarField;
+    location    "0.000";
+    object      Sw_r;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -42,20 +42,49 @@ FoamFile
     |   5 |     -  |   - |    - |   - |   - |    - |
     |   6 |  0.42  | 0.4 | 86.4 | 5.4 | 7.6 | 0.05 |
 
+
+    · n = 0.48 (Porosity)
+    · n_vanGen = 2.3
+    · Ks = 1.7E-3 m/min = 2.83E-5 m/s
+    · α  = 0.912 1/m
+    · θs = 0.31
+    · Sw_s = θs/n = 0.646
+    · θr = 0.01
+    · Sw_r = θr/n = 0.021
+
 */
 
-defaultFieldValues
-(
-    volScalarFieldValue alpha    0.912
-    volScalarFieldValue K_0      2.83E-05
-    volScalarFieldValue n_vangenucthen     2.3
-    volScalarFieldValue Sw_r     0.021
-    volScalarFieldValue Sw_s     0.646            
-);
+dimensions      [0 0 0 0 0 0 0];
 
-regions
-(
-);
+internalField   uniform 0.021; 
+
+boundaryField
+{
+    top
+    {
+        type            zeroGradient;
+    }
+    left
+    {
+        type            empty;
+    }
+    right
+    {
+        type            empty;
+    }
+    front
+    {
+        type            empty;
+    }
+    back
+    {
+        type            empty;
+    }
+    bottom
+    {
+        type            zeroGradient;
+    }
+}
 
 
 // ************************************************************************* //

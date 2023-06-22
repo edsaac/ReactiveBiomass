@@ -1,0 +1,143 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  7
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      setFieldsDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+/*
+See Supplemental Material of Ben Moshe et al. (2020)
+DOI: 10.1002/vzj2.20095
+
+Table S2 - Soil hydraulic parameters for the six layers
+|Layer|$\theta_s$|$\theta_r$|$\alpha$ [1/m]|$n$|$K_s$ [m/min]|
+|:---:|:---:|:-----:|:-----:|:----:|:-------:|
+|Thin | 0.45| 0.070 | 10.4  | 1.08 | 8E-7    |
+| 1 | 0.31 | 0.010 | 0.912 | 2.3  | 1.7E-3  |
+| 2 | 0.27 | 0.045 | 3.28  | 2.25 | 3.8E-3  |
+| 3 | 0.22 | 0.043 | 3.28  | 2.7  | 2.37E-3 |
+| 4 | 0.28 | 0.045 | 3.28  | 5.2  | 3.8E-3  |
+| 5 | 0.28 | 0.045 | 3.28  | 3.9  | 2.8E-3  |
+| 6 | 0.29 | 0.043 | 4.88  | 2.0  | 2.25E-3 |
+
+Porosity values found on Ben Moshe et al. (2020)
+DOI: 10.5194/hess-24-417-2020
+
+|Layer|Porosity|Gravel (%)|Sand (&)|Silt (%)|Clay (%)|TOC (%)|
+|:---:|:------:|:----:|:-----:|:----:|:----:|:-----:|
+|   1 |  0.48  | 0.7 | 93.9 | 2.4 | 3.0 | 0.25 |
+|   2 |  0.48  | 0.6 | 94.4 | 2.1 | 2.9 | 0.10 |
+|   3 |  0.47  | 0.0 | 99.2 | 0.1 | 0.7 | 0.01 |
+|   4 |  0.42  | 0.0 | 97.4 | 0.6 | 2.0 | 0.02 |
+|   5 |     -  |   - |    - |   - |   - |    - |
+|   6 |  0.42  | 0.4 | 86.4 | 5.4 | 7.6 | 0.05 |
+
+
+These parameters ar in constant/soilParameters
+so you will need to move them temporarily to the 0/ folder
+in order for setFields to be able to find them. After edited,
+they have to be moved back to constant/soilParameters
+
+*/
+
+defaultFieldValues
+(
+    volScalarFieldValue alpha           1.0
+    volScalarFieldValue K_0             1.0
+    volScalarFieldValue n_vangenucthen  1.0
+    volScalarFieldValue Sw_r            1.0
+    volScalarFieldValue Sw_s            1.0
+
+
+);
+
+regions
+(
+    zoneToCell
+    {
+        name "layer_1";
+        fieldValues
+        (
+            volScalarFieldValue alpha    0.912
+            volScalarFieldValue K_0      2.83E-05
+            volScalarFieldValue n_vangenucthen     2.3
+            volScalarFieldValue Sw_r     0.021
+            volScalarFieldValue Sw_s     0.646            
+        );
+    }
+
+    zoneToCell
+    {
+        name "layer_2";
+        fieldValues
+        (
+            volScalarFieldValue alpha     3.28
+            volScalarFieldValue K_0     6.33E-05
+            volScalarFieldValue n_vangenucthen     2.25
+            volScalarFieldValue Sw_r     0.094
+            volScalarFieldValue Sw_s     0.563
+            
+        );
+    }
+    zoneToCell
+    {
+        name "layer_3";
+        fieldValues
+        (
+            volScalarFieldValue alpha     3.28
+            volScalarFieldValue K_0     3.95E-05
+            volScalarFieldValue n_vangenucthen     2.7
+            volScalarFieldValue Sw_r     0.091
+            volScalarFieldValue Sw_s     0.468            
+        );
+    }
+    zoneToCell
+    {
+        name "layer_4";
+        fieldValues
+        (
+            volScalarFieldValue alpha     3.28
+            volScalarFieldValue K_0     6.33E-05
+            volScalarFieldValue n_vangenucthen     5.2
+            volScalarFieldValue Sw_r     0.107
+            volScalarFieldValue Sw_s     0.667            
+            );
+    }
+    zoneToCell
+    {
+        name "layer_5";
+        fieldValues
+        (
+            volScalarFieldValue alpha     3.28
+            volScalarFieldValue K_0     4.67E-05
+            volScalarFieldValue n_vangenucthen     3.9
+            volScalarFieldValue Sw_r     0.107
+            volScalarFieldValue Sw_s     0.667            
+        );
+    }
+    zoneToCell
+    {
+        name "layer_6";
+        fieldValues
+        (
+            volScalarFieldValue alpha     4.88
+            volScalarFieldValue K_0     3.75E-05
+            volScalarFieldValue n_vangenucthen     2
+            volScalarFieldValue Sw_r     0.102
+            volScalarFieldValue Sw_s     0.690            
+        );
+    }
+);
+
+
+// ************************************************************************* //

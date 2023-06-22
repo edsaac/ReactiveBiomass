@@ -411,7 +411,7 @@ volScalarField XDN
     mesh
 );
 
-Foam::Info << "Reading field: Biomass Denitrifiers (XDN) \n" << endl;
+Foam::Info << "Reading field: Biomass Denitrifiers (XDNp) \n" << endl;
 volScalarField XDNp
 (
     IOobject
@@ -493,9 +493,9 @@ clogging->read(cloggingProperties);
 soil.mualemCalculator(h); // This will modify perm_satu
 if (cloggingSwitch) { clogging->calcPerm();} // This will modify perm_clog
 
-updateHydCond;
-U = - hydraulicCond * (fvc::grad(h) + fvc::grad(z));
-phi = fvc::flux(U);
+// updateHydCond;
+// U = - hydraulicCond * (fvc::grad(h) + fvc::grad(z));
+// phi = fvc::flux(U);
 
 // Calculate deposited mass and clogLimiter
 dimensionedScalar XMAX 

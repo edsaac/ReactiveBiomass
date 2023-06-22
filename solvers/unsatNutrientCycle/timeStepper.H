@@ -11,6 +11,8 @@ class TimeStepper
 
         scalar DownDeltaT_Factor;
         scalar minDeltaT;
+
+        scalar hguess_coeff;
     
     //  Constructor
     TimeStepper(dictionary& ParameterDict)
@@ -36,5 +38,9 @@ class TimeStepper
         Foam::Info << "minDeltaT [s] \n" << endl;
         minDeltaT = ParameterDict.lookupOrDefault<scalar>("minDeltaT", 0.01);   
 
+        Foam::Info << "hguess_coeff [-] \n" << endl;
+        hguess_coeff = ParameterDict.lookupOrDefault<scalar>("hguess_coeff", 0.30);
+
+        
     }
 };

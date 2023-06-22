@@ -52,7 +52,7 @@ if (convergeFlow < timeControl.convergeThreshold)
 // The non-linerity was not solved, iterate over h.
 else 
 {
-    h_before = h_after;
+    h_before = (timeControl.hguess_coeff * h_after) + ((1.0 - timeControl.hguess_coeff) * h_before);
     h_after = h;
     nCycles++;
 
@@ -63,10 +63,13 @@ else
         // End simulation if deltaT is too small 
         if (runTime.deltaTValue() < timeControl.minDeltaT)
         {
-            Foam::Info << "\n deltaT is lower than minDeltaT"
-                       << runTime.deltaTValue() << "<" << timeControl.minDeltaT << nl
+            Foam::Info << "\n deltaT is lower than minDeltaT: "
+                       << runTime.deltaTValue() << " < " << timeControl.minDeltaT << nl
                        << "\n Failed to converge :( " << nl << endl;
+            
+            Foam::Info << "\n Final time: " << runTime.timeName()<< endl;
             runTime.writeAndEnd();
+            break;
         }
 
         runTime.setDeltaT

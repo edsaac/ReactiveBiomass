@@ -16,7 +16,7 @@ FoamFile
 
 dimensions      [0 1 0 0 0 0 0];
 
-internalField   uniform 0.0;
+internalField   uniform -6.0;
 
 boundaryField
 {
@@ -42,30 +42,121 @@ boundaryField
 
     top
     {
-        type            uniformInletOutlet;
-        phi             phi;
-        uniformInletValue	
-        {
-            type             csvFile;
-            nHeaderLine      1;              // number of header lines
-            refColumn        0;              // time column index
-            componentColumns (1);            // data column index
-            separator        ",";            // optional (defaults to ",")
-            mergeSeparators  no;             // merge multiple separators
-            file             "../h_dataTable.csv";
-            } 
-        value           $internalField;
+        /*
+        Ben Moshe HESS (2020)
+        ------------
+        For the SW150 experiment:
+            Flooding period: 60min
+            Drying period: 150min
+                Decreasing head: 80min
+                Totally dry: 70min
+        
+        As boundary condition:
+        */
+
+        type    fixedValue;
+        value   uniform 0.25;
+
+        // type    uniformFixedValue;
+        // value   $internalField;
+        // uniformValue 
+        // {
+        //     type             csvFile;
+        //     nHeaderLine      1;              // number of header lines
+        //     refColumn        0;              // time column index
+        //     componentColumns (1);            // data column index
+        //     separator        ",";            // optional (defaults to ",")
+        //     mergeSeparators  no;             // merge multiple separators
+        //     file             "../h_dataTable.csv";
+        // }
     }
+
+    // type            uniformInletOutlet;
+    //     phi             phi;
+    //     uniformInletValue	
+	// {
+    //       type             csvFile;
+    //       nHeaderLine      1;              // number of header lines
+    //       refColumn        0;              // time column index
+    //       componentColumns (1);            // data column index
+    //       separator        ",";            // optional (defaults to ",")
+    //       mergeSeparators  no;             // merge multiple separators
+    //       file             "Cw_dataTable.csv";
+    //  	} 
+    //     value           $internalField;
+    // {
+        /*
+        Ben Moshe HESS (2020)
+        ------------
+        For the SW150 experiment:
+            Flooding period: 60min
+            Drying period: 150min
+                Decreasing head: 80min
+                Totally dry: 70min
+        
+        As boundary condition:
+        
+        t = time % (60 + 150)
+            if t < 60:
+                dirichlet with constant h
+            elif t < 60 + 80:
+                dirichlet with decreasing h
+            elif t < 60 + 150:
+                neumann with zeroGradient  */
+    //     type            codedMixed;
+    //     refValue        uniform 10.0;
+    //     refGradient     uniform 0;
+    //     valueFraction   uniform 1;          // If 0: fixedGradient, if 1: fixedValue
+    //     name            DarcyInflux;        // name of generated BC
+    
+    //     code
+    //     #{
+    //         // Access the current value of time
+    //         const scalar t = this->db().time().value(); 
+    //         // const fvMesh& mesh = this->patch().boundaryMesh().mesh();
+
+    //         // const fvPatch& boundaryPatch = patch();
+    //         // const vectorField& Cf = boundaryPatch.Cf();  <- Gives you the coorfinates
+    //         // scalarField& field = *this;
+    //         // field = patchInternalField();
+            
+    //         // Is it flooding or drying
+    //         // scalar time_cycle = t.value() ;  //60min flood, 150min dry
+    //         if (t < 60*60)
+    //         {
+    //             // Foam::Info << this->patch().name() << " and "<< this->internalField().name() << endl;
+    //             // this->valueFraction() = scalar(1);  // Set as Dirichlet BC
+    //             // this->refValue() = scalar(0.10);    //dimensionedScalar("flooding_h", dimLength, 0.20);
+
+    //             // // this->refValue() = scalar(0.2);
+    //             forAll(this->patch(), faceI)
+    //             { 
+    //                 Info << this->refValue() << endl;
+    //                 this->valueFraction()[faceI] = 1.0;  // Set as Dirichlet BC
+    //                 this->refValue()[faceI] = 0.10;    //dimensionedScalar("flooding_h", dimLength, 0.20);
+    //                 this->updated() = True; 
+    //                 Foam::Info << "UPDATED " << this->updated();
+    //             }
+    //         }
+    //         else
+    //         {
+    //             // Set as Neumann BC
+    //             this->valueFraction() = scalar(0);
+    //             this->refGrad() = scalar(0.0);
+    //             Info << this->refValue() << endl;
+    //         }
+    //     #};       
+    // }
 
     bottom
     {
         // Set to 1.0 for a NO-FLOW condition
         // Set to 0.0 for a unit gradient drain
-        type        fixedGradient;
-        gradient    uniform 0.00;   
+        // type        fixedGradient;
+        // gradient    uniform 0.00;   
 
-        // type    fixedValue;
-        // value   uniform 0.0;
+        type    fixedValue;
+        value   uniform 0.0;
 
     }
 }

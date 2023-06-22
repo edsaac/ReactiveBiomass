@@ -16,39 +16,49 @@ FoamFile
 
 convertToMeters 1.0;
 
-diameter   0.15;
+diameter   1.0;
 
-deltaLength 0.01;
+deltaLength 0.02;
 WCells 1;
 DCells 1;
 
 // Layers
-z_1     -1.53;
-// LCells_1 #calc "1.5 * abs(round($z_1/$deltaLength))";
-LCells_1 200;
 
-z_2     -2.58;
+z_0      6.00;
+
+// z_1     -1.53;
+z_1      4.47;
+// LCells_1 #calc "1.5 * abs(round($z_1/$deltaLength))";
+LCells_1 #calc "abs(round(($z_1 - $z_0)/$deltaLength))";
+// LCells_1 400;
+
+// z_2     -2.58;
+z_2      3.42;
 LCells_2 #calc "abs(round(($z_2 - $z_1)/$deltaLength))";
 
-z_3     -3.52;
+// z_3     -3.52;
+z_3      2.48;
 LCells_3 #calc "abs(round(($z_3 - $z_2)/$deltaLength))";
 
-z_4     -4.62;
+// z_4     -4.62;
+z_4      1.38;
 LCells_4 #calc "abs(round(($z_4 - $z_3)/$deltaLength))";
 
-z_5     -4.80;
+// z_5     -4.80;
+z_5      1.2;
 LCells_5 #calc "abs(round(($z_5 - $z_4)/$deltaLength))";
 
-z_6     -6.00;
+// z_6     -6.00;
+z_6      0;
 LCells_6 #calc "abs(round(($z_6 - $z_5)/$deltaLength))";
 
 
 vertices
 (
-    (0 0 0)                   //0
-    ($diameter 0 0)           //1
-    ($diameter $diameter 0)   //2
-    (0 $diameter 0)           //3
+    (0 0 $z_0)                   //0
+    ($diameter 0 $z_0)           //1
+    ($diameter $diameter $z_0)   //2
+    (0 $diameter $z_0)           //3
     (0 0 $z_1)                  //4
     ($diameter 0 $z_1)          //5
     ($diameter $diameter $z_1)  //6
@@ -75,10 +85,15 @@ vertices
     (0 $diameter $z_6)  //27
 );
 
+/*
+Calculating the grading ratio for blocks 
+https://openfoamwiki.net/index.php/Scripts/blockMesh_grading_calculation
+*/
 
 blocks
 (
-    hex (4 5 6 7 0 1 2 3) layer_1 ($WCells $DCells $LCells_1) simpleGrading (1 1 0.5696)
+    // hex (4 5 6 7 0 1 2 3) layer_1 ($WCells $DCells $LCells_1) simpleGrading (1 1 0.5696)
+    hex (4 5 6 7 0 1 2 3) layer_1 ($WCells $DCells $LCells_1) simpleGrading (1 1 1)
     hex (8 9 10 11 4 5 6 7) layer_2 ($WCells $DCells $LCells_2) simpleGrading (1 1 1)
     hex (12 13 14 15 8 9 10 11) layer_3 ($WCells $DCells $LCells_3) simpleGrading (1 1 1)
     hex (16 17 18 19 12 13 14 15) layer_4 ($WCells $DCells $LCells_4) simpleGrading (1 1 1)
