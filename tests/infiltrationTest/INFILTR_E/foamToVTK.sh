@@ -1,0 +1,2 @@
+# foamToVTK -fields "(XAR XN XDN XI XARp XNp XDNp DOC NH4 NO3 O2 tracer BAP POCr Sw h porosity hydraulicCond U)"
+foamToVTK -fields "(theta h porosity hydraulicCond U capillarity)" -noZero

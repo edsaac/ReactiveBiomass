@@ -168,11 +168,11 @@ int main(int argc, char *argv[])
 
             //- Calculate grad(K(h)) and extract z-component
             debug("Calculate perm_satu");
-            soil.mualemCalculator(h_before);
-            soil.waterSaturationCalculator(h_before);
+            soil.waterSaturationCalculator(h_before); // <- Updates Sw(h)
+            soil.mualemCalculator(h_before); // <- Updates ksat(h)
 
             debug("Update K");
-            updateHydCond;
+            updateHydCond; // <- Updates hydraulicCond 
 
             debug("Calculate K gradients");
             grad_k = fvc::grad(hydraulicCond);
@@ -182,7 +182,8 @@ int main(int argc, char *argv[])
             //--  To do: Add ddt(porosity) term for deformable media (done)
             fvScalarMatrix richardsEquation
             (
-                porosity * fvm::ddt(soil.capillary(h_before), h_after)
+                porosity * soil.capillary(h_before) * fvm::ddt(h_after)
+                // fvm::ddt(soil.capillary(h_before), h_after)
                 + Sw * fvc::ddt(porosity)
                 ==
                 fvm::laplacian(hydraulicCond, h_after)
@@ -217,6 +218,8 @@ int main(int argc, char *argv[])
         updateHydCond;
         Sa = 1.0 - Sw;
 
+        capillarity = soil.capillary(h);
+        
         // Update flow field
         U = - hydraulicCond * (fvc::grad(h) + fvc::grad(z));
         phi = fvc::flux(U);

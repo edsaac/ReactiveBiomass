@@ -15,11 +15,11 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-end_minutes 500.0;
+end_minutes 600.0;
 end_secs #calc "round($end_minutes*60.0)";
 // end_secs 10;
 
-write_minutes 20.0;
+write_minutes 5.0;
 write_secs #calc "round($write_minutes*60.0)";
 
 application     unsatNutrientCycle;
@@ -32,7 +32,7 @@ endTime	        $end_secs;
 writeControl    runTime;
 writeInterval   $write_secs;
 
-deltaT          2;
+deltaT          30;
 purgeWrite      0;
 
 writeFormat     ascii;

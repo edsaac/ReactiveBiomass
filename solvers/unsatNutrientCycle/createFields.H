@@ -222,6 +222,21 @@ volScalarField grad_kz
     grad_k.component(vector::Z) 
 );
 
+Foam::Info << "Creating field: hydraulic capacity \n" << endl;
+volScalarField capillarity
+(
+    IOobject
+    (
+        "capillarity",
+        runTime.timeName(),
+        mesh,
+        IOobject::NO_READ,
+        IOobject::AUTO_WRITE
+    ),
+    mesh,
+    dimensionedScalar("capillarity", dimensionSet(0,-1,0,0,0,0,0), 1.0)
+);
+
 Foam::Info << "Creating field: Darcy specific discharge [m/s] \n" << endl;
 volVectorField U
 (

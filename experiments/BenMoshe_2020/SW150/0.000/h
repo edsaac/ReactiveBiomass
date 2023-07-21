@@ -16,7 +16,7 @@ FoamFile
 
 dimensions      [0 1 0 0 0 0 0];
 
-internalField   uniform -6.0;
+internalField   uniform -8.0;
 
 boundaryField
 {
@@ -152,11 +152,11 @@ boundaryField
     {
         // Set to 1.0 for a NO-FLOW condition
         // Set to 0.0 for a unit gradient drain
-        // type        fixedGradient;
-        // gradient    uniform 0.00;   
+        type        fixedGradient;
+        gradient    uniform 0.00;   
 
-        type    fixedValue;
-        value   uniform 0.0;
+        // type    fixedValue;
+        // value   uniform 0.0;
 
     }
 }
