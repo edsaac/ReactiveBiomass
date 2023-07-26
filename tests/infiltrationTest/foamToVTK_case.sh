@@ -1,6 +1,9 @@
 #!/bin/bash
-# Usage
-## ./foamToVTK_case.sh <path-to-OpenFOAM-case-folder>
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Usage:
+#   > ./foamToVTK_case.sh <path-to-OpenFOAM-case-folder>
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 cd $1
 # Get soil parameters for plotting
