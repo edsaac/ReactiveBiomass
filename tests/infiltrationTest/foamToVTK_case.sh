@@ -6,9 +6,12 @@
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 cd $1
+
+rm -r VTK VTK_soilProperties
+
 # Get soil parameters for plotting
 cp ./constant/soilParameters/* ./0.000/
-foamToVTK -fields "(alpha K_0 n_vangenucthen Sw_r Sw_s h)" -time "0"
+foamToVTK -fields "(h alpha K_0 n_vangenucthen Sw_r Sw_s)" -time "0"
 mv VTK VTK_soilProperties
 cd ./0.000
 rm alpha K_0 n_vangenucthen Sw_r Sw_s

@@ -1,30 +1,34 @@
+from collections import namedtuple
+from subprocess import check_output
+import subprocess
+
 import streamlit as st
 
 import matplotlib.pyplot as plt
-from collections import namedtuple
-
-from subprocess import check_output
 import matplotlib as mpl
+
 import numpy as np
+import pandas as pd
+
 import pyvista as pv
+from stpyvista import stpyvista
+
 from myusefultools import parser
 from phydrus.read import read_nod_inf
-import pandas as pd
-from stpyvista import stpyvista
-import subprocess
 
 import plotly.graph_objects as go
 
-## Check if xvfb is already running on the machine
-is_xvfb_running = subprocess.run(["pgrep", "Xvfb"], capture_output=True)
+if "first_run" not in st.session_state:
+    st.session_state.first_run = True
 
-if is_xvfb_running.returncode == 1:
-    with st.sidebar:
-        st.warning("Xvfb was not running...")
-    pv.start_xvfb()
-else:
-    with st.sidebar:
-        st.info(f"Xvfb is running! \n\n`PID: {is_xvfb_running.stdout.decode('utf-8')}`")
+    ## Check if xvfb is already running on the machine
+    is_xvfb_running = subprocess.run(["pgrep", "Xvfb"], capture_output=True)
+
+    if is_xvfb_running.returncode == 1:
+        st.toast("[red](Xvfb was not running...)")
+        pv.start_xvfb()
+    else:
+        st.toast(f"Xvfb is running! \n\n`PID: {is_xvfb_running.stdout.decode('utf-8')}`")
 
 
 REPO_PATH = (
@@ -113,9 +117,9 @@ with st.expander("VTK <-> Hydrus time step comparisons"):
             vtk, time_s, time_hr
 
 if len(hydrus_profiles) == len(of_selected_vtk_files) == len(colors):
-    st.success("1:1")
+    st.toast("1:1 times found!")
 else:
-    st.error("Something went wrong")
+    st.toast("[red](**Something went wrong**)")
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Plot using matplotlib
