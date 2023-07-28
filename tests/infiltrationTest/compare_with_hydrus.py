@@ -38,8 +38,8 @@ plt.style.use(f"{REPO_PATH}/misc/edwin.mplstyle")
 
 "# Tests for unsaturated flow solver"
 
-OPTIONS = ["LOAMYSAND", "THREELAYERS", "TOPCLOG"]
-COLUMN_LENGTH_DICT = {k: v for k, v in zip(OPTIONS, [6, 6, 5])}  # m
+OPTIONS = ["LOAMYSAND", "THREELAYERS", "TOPCLOG", "HANGCOL"]
+COLUMN_LENGTH_DICT = {k: v for k, v in zip(OPTIONS, [6, 6, 5, 1])}  # m
 CASE = st.selectbox("Select test case", options=OPTIONS)
 COLUMN_LENGTH = COLUMN_LENGTH_DICT[CASE]
 
@@ -59,7 +59,7 @@ hydrus_times_hours = [t / 3600 for t in hydrus_profiles.keys()]
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Sample colors for plotting
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-cmap = mpl.cm.tab20c
+cmap = mpl.cm.Dark2
 colors = cmap(np.linspace(0, 1, len(hydrus_times_hours)))
 
 
@@ -83,12 +83,12 @@ with st.sidebar:
     mesh = pv.read(f"{OPENFOAM_FOLDER}/VTK_soilProperties/{of_vtk_soil_properties[0]}")
     soil_property = st.selectbox("Soil property", list(set(mesh.array_names)), index=3)
     plotter.add_mesh(mesh, scalars=soil_property, cmap="bwr")
-    plotter.background_color = "#bbbbbb"
+    plotter.background_color = "#f0f2f6"
     plotter.camera.zoom("tight")
     plotter.view_xz()
     plotter.camera.azimuth = 45
     plotter.camera.elevation = 25
-    plotter.window_size = [200, 500]
+    plotter.window_size = [240, 450]
     stpyvista(plotter, horizontal_align="center")
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -211,6 +211,7 @@ elif PLOT_ENGINE == "plotly":
     ):
         color = np.round(color * 255)
         color_rgb = f"rgb({color[0]}, {color[1]}, {color[2]})"
+        color_rgba = f"rgba({color[0]}, {color[1]}, {color[2]}, 0.5)"
 
         mesh = pv.read(f"{OPENFOAM_FOLDER}/VTK/" + of_vtk)
         line = pv.Line(a := [0, 0, mesh.bounds[5]], b := [0, 0, mesh.bounds[2]])
@@ -227,6 +228,7 @@ elif PLOT_ENGINE == "plotly":
             elif var == "K(h)":
                 xdata_of = sample["hydraulicCond"]
                 xdata_hy = hydrus_profile["K"]
+                fig.update_xaxes(type="log")
             elif var == "C(h)":
                 xdata_of = sample["capillarity"] * sample["porosity"]
                 xdata_hy = hydrus_profile["C"]
@@ -240,7 +242,7 @@ elif PLOT_ENGINE == "plotly":
                     name="OpenFOAM",
                     legendgroup=f"{time_of:.2f} h",
                     legendgrouptitle_text=f"{time_of:.2f} h",
-                    line=dict(color=color_rgb, width=8),
+                    line=dict(color=color_rgba, width=10),
                 )
             )
             ##  Hydrus1D results
@@ -250,7 +252,7 @@ elif PLOT_ENGINE == "plotly":
                     y=COLUMN_LENGTH + hydrus_profile["Depth"],
                     name="Hydrus-1D",
                     legendgroup=f"{time_of:.2f} h",
-                    line=dict(color=color_rgb, width=2, dash="dash"),
+                    line=dict(color=color_rgb, width=3, dash="dash"),
                 )
             )
 
