@@ -38,7 +38,7 @@ st.session_state["axis_setup"] = dict(
     color="#bbb",
     showline=True)
 
-casesList = ["highFlowRate", "oxygenReplenish"]
+casesList = ["highFlowRate", "oxygenReplenish", "steadyInflow"]
 casename = st.radio("Select simulation:", casesList)
 st.session_state.casepath = Path(".", casename)
 
