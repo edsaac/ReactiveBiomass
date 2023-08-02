@@ -17,6 +17,7 @@ plt.style.use(f'{REPO_PATH}/misc/edwin.mplstyle')
 caseName = st.selectbox("Case:", ["constantHead","highFlowRate","oxygenReplenish"], index=1)
 
 PATH_TO_VTK = f"{caseName}/VTK"
+LIST_OF_VTK = getVTKList(PATH_TO_VTK)
 
 @st.cache_data
 def get_probe(field) -> np.float64:
@@ -123,7 +124,7 @@ with cols[0]:
     scalarName = st.selectbox("Select field", options=scalarList, index=0)
 
     plotter = pv.Plotter(window_size=[150,400])
-    reader = pv.get_reader(PATH_TO_VTK+"/oxygenReplenish_57600.vtk")
+    reader = pv.get_reader(f"{PATH_TO_VTK}/{LIST_OF_VTK[0]}")
     mesh = reader.read()
     plotter.add_mesh(mesh, scalars=scalarName, cmap='bwr')
     plotter.view_isometric()

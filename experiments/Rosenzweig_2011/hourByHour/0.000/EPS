@@ -10,53 +10,46 @@ FoamFile
     version     2.0;
     format      ascii;
     class       volScalarField;
-    object      h;
+    object      EPS;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dimensions      [0 1 0 0 0 0 0];
+dimensions      [1 -3 0 0 0 0 0];
 
-internalField   uniform -1e-10;
+internalField   uniform 0.000;
 
 boundaryField
 {
     front
     {
-        type         empty;
+        type    empty;
     }
 
     back
     {
-        type         empty;
+        type    empty;
     }
 
     right
     {
-  	    type		 empty;
+        type    empty;
     }
 
     left
     {
-  	    type		 empty;
+        type    empty;
     }
 
     top
     {
-        type        fixedGradient;
-        gradient    uniform -1;
+        type   zeroGradient;
     }
 
     bottom
     {
-        // Set to -1.0 for a NO-FLOW condition
-        // Set to 0.0 for a unit gradient drain
-        type        fixedGradient;
-        gradient    uniform 0;   
-
-        // type    fixedValue;
-        // value   uniform 0.0;
-
+        type   zeroGradient;
     }
+
 }
 
 // ************************************************************************* //

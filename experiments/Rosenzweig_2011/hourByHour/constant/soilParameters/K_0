@@ -10,53 +10,54 @@ FoamFile
     version     2.0;
     format      ascii;
     class       volScalarField;
-    object      h;
+    location    "0.000";
+    object      K_0;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dimensions      [0 1 0 0 0 0 0];
+/*
+    See Table 4.1 from Rosenzweig thesis (2011)
+    For Caesarea sand without added xantan, van Genuchten parameters are:
+        thera_r = 0.012
+        theta_s = 0.385
+        n = 7.26
+        alpha = 0.0279 1/cm
+    
+    From Ch.8 (p. 132)
+        Ks = 1.24 cm/min
+*/
 
-internalField   uniform -1e-10;
+dimensions      [0 1 -1 0 0 0 0];
+
+internalField   uniform 2.067E-4; 
 
 boundaryField
 {
-    front
-    {
-        type         empty;
-    }
-
-    back
-    {
-        type         empty;
-    }
-
-    right
-    {
-  	    type		 empty;
-    }
-
-    left
-    {
-  	    type		 empty;
-    }
-
     top
     {
-        type        fixedGradient;
-        gradient    uniform -1;
+        type            zeroGradient;
     }
-
+    left
+    {
+        type            empty;
+    }
+    right
+    {
+        type            empty;
+    }
+    front
+    {
+        type            empty;
+    }
+    back
+    {
+        type            empty;
+    }
     bottom
     {
-        // Set to -1.0 for a NO-FLOW condition
-        // Set to 0.0 for a unit gradient drain
-        type        fixedGradient;
-        gradient    uniform 0;   
-
-        // type    fixedValue;
-        // value   uniform 0.0;
-
+        type            zeroGradient;
     }
 }
+
 
 // ************************************************************************* //

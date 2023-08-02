@@ -1,0 +1,105 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  7
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      fvSolution;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+solvers
+{
+    h
+    {
+        solver          PCG;
+        preconditioner  DIC;
+        tolerance       1e-10;
+        relTol          0;
+    }
+
+    "(DOC|POC|O2|NO3|NH4|XI|EPS|UAP|BAP|POCr|XARp|XNp|XDNp|tracer)"
+    {
+        solver          PBiCGStab;
+        preconditioner  DILU;
+        tolerance       1e-09;
+        relTol          0;
+    }
+
+    "(XAR|XN|XDN)"
+    {
+        solver          PBiCGStab;
+        preconditioner  DIC;
+        tolerance       1e-09;
+        relTol          0;
+    }
+
+}
+
+SIMPLE
+{
+    nNonOrthogonalCorrectors 1;
+}
+
+timeStepping
+{
+    convergeThreshold   0.0005;
+    maxItersToConverge  20;  // Triggers dT down
+
+    UpDeltaT_nIters     3;   // Triggers dT up
+    UpDeltaT_Factor     1.10;
+    maxDeltaT           30;
+
+    DownDeltaT_Factor   0.5;
+    minDeltaT           1e-5;
+    hguues_coeff        0.45;
+}
+
+// relaxationFactors
+// {
+//     equations
+//     {
+//         DissolvedCarbonTransport        $relaxFactor;
+//         AmmoniumTransport               $relaxFactor;
+//         EPSTransport                    $relaxFactor;
+//         UAPTransport                    $relaxFactor;
+//         BAPTransport                    $relaxFactor;
+//         ARGrowth                        $relaxFactor;
+//         NitrifiersGrowth                $relaxFactor;
+//         DenitrifiersGrowth              $relaxFactor;
+//         InertGeneration                 $relaxFactor;
+//         OxygenTransport                 $relaxFactor;
+//         NitrateTransport                $relaxFactor;
+//     }
+// }
+
+/*
+relaxFactor 0.8;
+
+relaxationFactors
+{
+    equations
+    {
+        DOC        $relaxFactor;
+        NH4        $relaxFactor;
+        EPS        $relaxFactor;
+        UAP        $relaxFactor;
+        BAP        $relaxFactor;
+        XAR        $relaxFactor;
+        XN         $relaxFactor;
+        XDN        $relaxFactor;
+        XIN        $relaxFactor;
+        O2         $relaxFactor;
+        NO3        $relaxFactor;
+        POCr       $relaxFactor;
+    }
+}*/
+
+// ************************************************************************* //
