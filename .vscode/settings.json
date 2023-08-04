@@ -32,6 +32,6 @@
     },
 
     // Controls whether entries in .gitignore should be parsed and excluded from the explorer. Similar to `files.exclude`.
-    "explorer.excludeGitIgnore": true,
+    "explorer.excludeGitIgnore": false,
     "editor.stickyScroll.enabled": true,
 }
