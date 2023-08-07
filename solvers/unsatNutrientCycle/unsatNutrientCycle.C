@@ -98,6 +98,8 @@ ENDIGNORE
 
 int main(int argc, char *argv[])
 {
+    unsigned short int RETURNCODE = 0;
+
     #include "setRootCaseLists.H"
     #include "createTime.H"
     #include "createMesh.H"
@@ -549,7 +551,7 @@ int main(int argc, char *argv[])
 
     Foam::Info<< "End\n" << endl;
 
-    return 0;
+    return RETURNCODE;
 }
 
 

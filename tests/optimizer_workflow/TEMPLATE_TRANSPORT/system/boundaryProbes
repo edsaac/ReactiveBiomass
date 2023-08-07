@@ -32,11 +32,8 @@ patches     ("bottom" "top");
 #includeEtc "caseDicts/postProcessing/probes/boundaryProbes.cfg"
 
 executeControl  timeStep;
-// writeControl	timeStep;
-// writeInterval	1;
-
-writeControl	runTime;
-writeInterval	60;
+writeControl	timeStep;
+writeInterval	1;
 
 
 // ************************************************************************* //

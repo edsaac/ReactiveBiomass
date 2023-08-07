@@ -14,12 +14,12 @@ import pyvista as pv
 REPO_PATH = subprocess.check_output(['git', 'rev-parse', '--show-toplevel']).decode('utf-8').strip()
 plt.style.use(f'{REPO_PATH}/misc/edwin.mplstyle')
 
-caseName = st.selectbox("Case:", ["constantHead","highFlowRate","oxygenReplenish"], index=1)
+caseName = st.selectbox("Case:", ["constantHead","highFlowRate","oxygenReplenish", "hourByHour"], index=3)
 
 PATH_TO_VTK = f"{caseName}/VTK"
 LIST_OF_VTK = getVTKList(PATH_TO_VTK)
 
-@st.cache_data
+# @st.cache_data
 def get_probe(field) -> np.float64:
 
     point = np.array([[0.04, 0.04, 0.00]])
@@ -39,7 +39,7 @@ def get_probe(field) -> np.float64:
 
     return results 
 
-@st.cache_data
+# @st.cache_data
 def get_mean_velocity() -> np.float64:
 
     ## Extract VTK results (this should be done with a probe but meh)
@@ -59,7 +59,7 @@ def get_mean_velocity() -> np.float64:
 
     return results
 
-@st.cache_data
+# @st.cache_data
 def get_total_biomass(field:str) -> np.float64:
 
     ## Extract VTK results (this should be done with a probe but meh)
@@ -78,13 +78,14 @@ def get_total_biomass(field:str) -> np.float64:
 
     return results
 
-@st.cache_data
+# @st.cache_data
 def getAllMeshes(field:str):
     ## Extract VTK result (this should be done with a probe but meh)
     all_vtk_paths = [os.path.join(PATH_TO_VTK, f) for f in getVTKList(PATH_TO_VTK)]
+    
     nTimes = len(all_vtk_paths)
     times = [float(t) for t in subprocess.check_output("foamListTimes", cwd=f"./{caseName}").decode("utf-8").splitlines() if t[0:2].isnumeric()]
-
+    print(len(times))
     ## Use dimensions from the first VTK
     mesh = pv.read(all_vtk_paths[0])
     line = pv.Line(
@@ -95,6 +96,7 @@ def getAllMeshes(field:str):
 
     ## Initialize array to store data
     results = np.zeros([nPoints, nTimes])
+    print(f"{len(all_vtk_paths)}")
 
     ## Extract field for each vtk field
     for t,vtk in enumerate(all_vtk_paths):
@@ -135,7 +137,9 @@ with cols[1]:
 
 with cols[2]: 
     label = st.text_input("Label", value=scalarName, max_chars=50)
-    units = st.text_input("Units", value="mg/L", max_chars=15)
+    units = st.text_input("Units", value="mg/L", max_chars=15) 
+    vmin = st.number_input("vmin", 0.0, 1.0, 0.0, 0.001, format="%.5f")
+    vmax = st.number_input("vmax", vmin, 1.0, vmin+0.005, 0.001, format="%.5f")
 
 scalar = getAllMeshes(scalarName)
 #fig, (ax,cax) = plt.subplots(1,2, figsize=[8,6], gridspec_kw={"width_ratios":[5,0.2]}, sharex=False)
@@ -146,18 +150,18 @@ fig.set_facecolor("#ffffff00")
 igt = 4  # Ignore the first timesteps for plor
 if with_logscale:
     img = ax.pcolormesh(scalar.t[igt:]/86400, scalar.z, scalar[:,igt:], cmap="copper",
-                        norm=colors.LogNorm(vmin=max(scalar.min(),1.0E-8), vmax=scalar.max())
+                        norm=colors.LogNorm(vmin=max(scalar.min(),1.0E-8), vmax=vmax)
                         #norm=colors.LogNorm(vmin=scalar.min(), vmax=2.067E-4)
                         #vmin=0.000, vmax=scalar.max()
                         )
 else:
-    img = ax.pcolormesh(scalar.t[igt:]/86400, scalar.z, scalar[:,igt:], cmap="copper")
+    img = ax.pcolormesh(scalar.t[igt:]/86400, scalar.z, scalar[:,igt:], cmap="copper", vmin=vmin, vmax=vmax)
 
 ax.spines.right.set_visible(False)
 ax.set_xlabel("Time $t$ [d]")
 ax.set_ylabel("Depth $z$ [m]")
 #plt.colorbar(img, cax=cax, label=f"{scalarName} {units}")
-plt.colorbar(img, cax=cax, orientation="horizontal")
+cbar = plt.colorbar(img, cax=cax, orientation="horizontal")
 cax.set_title(fr"${label}$ {units}")
 
 with cols[0]:

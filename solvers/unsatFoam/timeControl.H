@@ -63,6 +63,8 @@ else
         // End simulation if deltaT is too small 
         if (runTime.deltaTValue() < timeControl.minDeltaT)
         {
+            RETURNCODE = 1;
+            
             Foam::Info << "\n deltaT is lower than minDeltaT: "
                        << runTime.deltaTValue() << " < " << timeControl.minDeltaT << nl
                        << "\n Failed to converge :( " << nl << endl;

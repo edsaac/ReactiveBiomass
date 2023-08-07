@@ -267,7 +267,7 @@ internalField   nonuniform List<vector>
 (-1.83586e-21 -1.83586e-21 -0.0002067)
 (-3.67173e-21 3.67173e-21 -0.0002067)
 (1.83586e-21 1.83586e-21 -0.0002067)
-(1.22391e-21 -0 -6.89e-05)
+(1.01585e-19 -0 -0.0057187)
 )
 ;
 
@@ -276,7 +276,7 @@ boundaryField
     top
     {
         type            calculated;
-        value           uniform (1.22391e-21 -0 -0);
+        value           uniform (1.01585e-19 -0 -0.0084747);
     }
     left
     {

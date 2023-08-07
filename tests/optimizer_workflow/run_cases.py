@@ -6,6 +6,10 @@ import sys
 import multiprocessing as mp
 import argparse
 
+from pprint import PrettyPrinter
+
+pp = PrettyPrinter(indent=1, sort_dicts=True, underscore_numbers=True)
+
 
 def read_list_cases_to_run(file: str | Path):
     if isinstance(file, str):
@@ -13,7 +17,11 @@ def read_list_cases_to_run(file: str | Path):
 
     with open(file) as f:
         cases = json.load(f)
-    print(type(cases), cases)
+
+    print("Found in json file:")
+    pp.pprint(cases)
+    print("=" * 80)
+
     return cases
 
 
@@ -30,6 +38,7 @@ def main_postprocess():
 def main(args):
     RUN_OPTIONS = args
     json_file = RUN_OPTIONS["json"]
+    template_folder = RUN_OPTIONS["template"]
 
     ## Read cases
     cases_json = read_list_cases_to_run(json_file)
@@ -40,13 +49,17 @@ def main(args):
         cases_json["dry_times"], cases_json["flood_times"]
     ):
         schedule = OperationSchedule(
-            dry_minutes=dry, flood_minutes=flood, end_minutes=500
+            dry_minutes=dry, flood_minutes=flood, end_minutes=11_520
         )
         identifier = f"./CASES/dry_{dry}__flood_{flood}"
-        of = OpenFOAM(identifier, schedule=schedule)
+        of = OpenFOAM(
+            path_case=identifier, schedule=schedule, path_template=template_folder
+        )
         cases_objs[identifier] = of
 
-    print(cases_objs)
+    print("OpenFOAM cases:")
+    pp.pprint(cases_objs)
+    print("=" * 80)
 
     if RUN_OPTIONS["run"]:
         ## Pool for parallelizable tasks
@@ -68,7 +81,7 @@ def main(args):
         with mp.Pool() as pool:
             pool.starmap(
                 OpenFOAM.plot_field_over_time,
-                [(of, field, rf"${field}$", "[Units]") for of in cases_objs.values()],
+                [(of, field, field, "[Units]") for of in cases_objs.values()],
             )
 
     if RUN_OPTIONS["timeseries_probes"]:
@@ -95,7 +108,16 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
-        "--run", action="store_true", help="Run the cases specified in the json file."
+        "--template",
+        action="store",
+        help="Folder with the OpenFOAM template case.",
+        required=True,
+    )
+
+    parser.add_argument(
+        "--run",
+        action="store_true",
+        help="Run the cases specified in the json file using a valid solver.",
     )
 
     parser.add_argument(
@@ -122,7 +144,10 @@ if __name__ == "__main__":
         help="Plot the xarray boundaryProbe",
     )
 
-    print(vars(parser.parse_args()))
+    print("HELLO!", "=" * 80, sep="\n")
+    print("Options passed:")
+    pp.pprint(vars(parser.parse_args()))
+    print("=" * 80)
 
     if len(sys.argv) <= 1:
         print("Get help:", "\n  $ python run_cases.py --help")
