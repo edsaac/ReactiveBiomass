@@ -6,34 +6,16 @@
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 Description
-    Writes out values of fields at a specified list of points, interpolated to
-    specified boundary patches.
+    Writes out values of fields from cells nearest to specified locations.
 
 \*---------------------------------------------------------------------------*/
 
-fields ("Sw" "h" "U");
+#includeEtc "caseDicts/postProcessing/probes/probes.cfg"
 
-points
+fields (h Sw);
+probeLocations
 (
-(0.1 0.1 0.0)
-(0.1 0.1 2.0)
+    (0 0 0)
 );
-
-maxDistance 0.01;
-
-// Sampling and I/O settings
-#includeEtc "caseDicts/postProcessing/graphs/sampleDict.cfg"
-
-interpolationScheme cell;
-setFormat raw;
-
-patches     ("bottom" "top");
-
-#includeEtc "caseDicts/postProcessing/probes/boundaryProbes.cfg"
-
-executeControl  timeStep;
-writeControl	runTime;
-writeInterval	60;
-
 
 // ************************************************************************* //
