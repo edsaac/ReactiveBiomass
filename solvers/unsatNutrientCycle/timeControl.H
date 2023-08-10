@@ -76,7 +76,10 @@ else
                        << "\n Failed to converge :( " << nl << endl;
             
             Foam::Info << "\n Final time: " << runTime.timeName()<< endl;
-            runTime.writeAndEnd();
+            Info << "Exiting with code 101..." << endl;
+            exit(101);
+
+            // runTime.writeAndEnd();
             break;
         }
 

@@ -49,7 +49,7 @@ def main(args):
         cases_json["dry_times"], cases_json["flood_times"]
     ):
         schedule = OperationSchedule(
-            dry_minutes=dry, flood_minutes=flood, end_minutes=3_840
+            dry_minutes=dry, flood_minutes=flood, end_minutes=14_400
         )
         identifier = f"./CASES/dry_{dry}__flood_{flood}"
         of = OpenFOAM(
@@ -127,15 +127,15 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
-        "--process_probes",
-        action="store_true",
-        help="Process the data from a probe into easily importable files.",
-    )
-
-    parser.add_argument(
         "--heatmap",
         action="store",
         help="Make a heatmap plot of depth and time of the specified field.",
+    )
+
+    parser.add_argument(
+        "--process_probes",
+        action="store_true",
+        help="Process the data from a probe into easily importable files.",
     )
 
     parser.add_argument(

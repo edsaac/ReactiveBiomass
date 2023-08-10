@@ -150,9 +150,11 @@ int main(int argc, char *argv[])
         //- Check that the totalBiomass < XMAX everywhere
         if (Foam::min(clogLimiter) < dimensionedScalar("zero",dimless,0.0))
         {
-            Foam::SeriousError<< "Total biomass greater that XMAX" << endl;            
-            runTime.write();
-            break;
+            Foam::SeriousError<< "Total biomass greater that XMAX" << endl;
+            Info << "Exiting with code 102..." << endl;
+            exit(102);
+            // runTime.write();
+            // break;
         }
 
         //- Update porosity field and update perm_clog

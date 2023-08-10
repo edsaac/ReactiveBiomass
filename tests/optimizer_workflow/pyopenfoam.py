@@ -1,5 +1,7 @@
 import subprocess
 from pathlib import Path
+import shutil
+
 from myusefultools.parser import getVTKList
 import pyvista as pv
 import numpy as np
@@ -7,7 +9,9 @@ import xarray as xr
 import matplotlib.pyplot as plt
 from dataclasses import dataclass
 from fractions import Fraction
+from math import isclose
 
+from io import StringIO
 
 @dataclass(slots=True, frozen=True)
 class probePoint:
@@ -104,6 +108,7 @@ class OperationSchedule:
     dry_minutes: int
     flood_minutes: int
     end_minutes: int
+    in_sync: bool = True
 
     def __post_init__(self):
         self.current_time = 0.0
@@ -115,7 +120,6 @@ class OperationSchedule:
 
     def __bool__(self):
         return self.current_time < self.end_minutes
-
 
 @dataclass
 class OpenFOAM:
@@ -138,6 +142,9 @@ class OpenFOAM:
 
         self.get_solver()
 
+        self.log = StringIO("🪵 Welcome to the log 🪵")
+        self.log.write("OpenFOAM has been created")
+        
     def get_solver(self):
         solver = subprocess.run(
             "foamDictionary system/controlDict -entry application".split(),
@@ -270,7 +277,7 @@ class OpenFOAM:
         if value <= 0:
             raise ValueError("convergeThreshold must be positive")
 
-        subprocess.run(
+        foamDictionary = subprocess.run(
             [
                 "foamDictionary",
                 "system/fvSolution",
@@ -281,6 +288,9 @@ class OpenFOAM:
             ],
             cwd=self.path_case
         )
+
+        if foamDictionary.returncode > 0:
+            print("Could not set convergeThreshold")
 
     def set_boundary_fixedValue(
         self, value: float = -1e-6, patch: str = "top", field: str = "h"
@@ -422,8 +432,11 @@ class OpenFOAM:
         for f in path_latest_time.glob("ddt*"):
             f.unlink()
 
+        for f in path_latest_time.glob("*_0"):
+            f.unlink()
+
         if (path_latest_time / "uniform/time").exists():
-            (path_latest_time / "uniform/time").unlink()
+            shutil.rmtree(path_latest_time/"uniform")
 
     def cleanup_all_timesteps(self):
         """
@@ -433,8 +446,11 @@ class OpenFOAM:
         for f in self.path_case.glob("**/ddt*"):
             f.unlink()
 
-        for f in self.path_case.glob("**/uniform/time"):
+        for f in self.path_case.glob("**/*_0"):
             f.unlink()
+
+        for f in self.path_case.glob("**/uniform"):
+            shutil.rmtree(f)
 
     def run_solver(self):
         """
@@ -455,15 +471,44 @@ class OpenFOAM:
             openfoam_run = subprocess.run(
                 [self.solver], stdout=subprocess.DEVNULL, cwd=self.path_case
             )
+        
+        return openfoam_run.returncode
 
-        if openfoam_run.returncode > 0:
-            ## Should raise an error?
-            print("Something went wrong!!")
+    def check_schedule_and_runner(self):
 
-            ## Break the simulation loop
-            self.schedule.current_time = float("infinity")
+        schedule_current_time_min = self.schedule.current_time
+        schedule_current_time_sec = schedule_current_time_min * 60
 
-    def run_case_by_schedule(self, verbose=False):
+        schedule_next_time_min = self.schedule.next_time_minutes
+        schedule_next_time_sec = schedule_next_time_min * 60
+
+        case_latest_time_sec = self.latest_time
+        case_latest_time_min = round(float(case_latest_time_sec)/60, 3)
+
+        self.schedule.in_sync = isclose(schedule_current_time_min, case_latest_time_min, abs_tol=0.5)
+        in_sync = "✔️" if self.schedule.in_sync else "🚫"
+
+        print(
+            "📅 Schedule:".ljust(20),
+            f"{schedule_current_time_min} min".rjust(15), 
+            f"[{schedule_current_time_sec} s]".rjust(15)
+        )
+
+        print(
+            "💧 OpenFOAM case:".ljust(20),
+            f"{case_latest_time_min} min".rjust(15),
+            f"[{case_latest_time_sec} s]".rjust(15),
+            in_sync
+        )
+
+        print(
+            "🕓 Run until:".ljust(20),
+            f"{schedule_next_time_min} min".rjust(15),
+            f"[{schedule_next_time_sec} s]".rjust(15)
+        )
+
+
+    def run_case_by_schedule(self, verbose=True):
         """
         Executes the solver following the schedule instructions of dry
         and flooding periods
@@ -477,64 +522,95 @@ class OpenFOAM:
         None
         """
 
-        write_time_minutes = 38
+        write_time_minutes = 144
+        
+        print("\nSIMULATION RUNS")
 
         while self.schedule:
-            if verbose:
-                print("\nSIMULATION BEGINS")
-                print("\n🌧️ \t Flood period", f"{self.schedule.current_time = }")
-                print(f"{self.latest_time = }")
-
+            
+            ## Flood
             self.schedule.next_time_minutes += self.schedule.flood_minutes
-
+            
             if verbose:
-                print("Run until", f"{self.schedule.next_time_minutes = }")
+                print("\n🌊 ====== Flood period ======")
+                self.check_schedule_and_runner()
+
+            if not self.schedule.in_sync:
+                break
 
             self.set_boundary_fixedValue()  ##Flood
             self.set_endtime(self.schedule.next_time_minutes)
-            self.set_convergeThreshold(0.0001)
+            self.set_convergeThreshold(0.05)
             self.set_writeInterval(write_time_minutes)
             self.cleanup_last_timestep()
-            self.run_solver()
+            return_code = self.run_solver()
+
+            if return_code > 0:
+                ## Should raise an error or just print warning and end?
+                print(f"{self.solver} ended with error")
+                break
+
+            self.schedule.current_time = self.schedule.next_time_minutes
 
             if verbose:
                 print("Flood period ended")
             
-            self.schedule.current_time = self.schedule.next_time_minutes
+            if not self.schedule: break
 
-            if not self.schedule:
-                break
+            ## Warm
+            self.schedule.next_time_minutes += 10
 
             if verbose:
-                print("\n☀️ \t Dry period", f"{self.schedule.current_time = }")
-                print(f"{self.latest_time = }")
+                print("\n🍜 ======= Warm period ======")
+                self.check_schedule_and_runner()
 
-            # Start-ups the drying period
-            self.schedule.next_time_minutes += 1
+            if not self.schedule.in_sync:
+                break
+
             self.set_boundary_fixedGradient()  ## Dry
-            
-            self.set_convergeThreshold(0.01)
-            self.set_writeInterval(1)
             self.set_endtime(self.schedule.next_time_minutes)
+            self.set_convergeThreshold(0.1)
+            self.set_writeInterval(2)
             self.cleanup_last_timestep()
-            self.run_solver()
+            return_code = self.run_solver()
 
-            # Now it does run the thing
+            if return_code > 0:
+                ## Should raise an error or just print warning and end?
+                print(f"{self.solver} ended with error")
+                break
+            
+            self.schedule.current_time = self.schedule.next_time_minutes
+            
+            if verbose:
+                print("Warm period ended")
+            
+            if not self.schedule: break
+
+            ## Dry
             self.schedule.next_time_minutes += self.schedule.dry_minutes
 
             if verbose:
-                print("Run until", f"{self.schedule.next_time_minutes = }")
+                print("\n🔥 ======= Dry period ======")
+                self.check_schedule_and_runner()
 
-            self.set_convergeThreshold(0.0001)
-            self.set_writeInterval(write_time_minutes)
+            if not self.schedule.in_sync:
+                break
+            
             self.set_endtime(self.schedule.next_time_minutes)
+            self.set_convergeThreshold(0.05)
+            self.set_writeInterval(write_time_minutes)
             self.cleanup_last_timestep()
-            self.run_solver()
+            return_code = self.run_solver()
 
+            if return_code > 0:
+                ## Should raise an error or just print warning and end?
+                print(f"{self.solver} ended with error")
+                break
+            
+            self.schedule.current_time = self.schedule.next_time_minutes
+            
             if verbose:
                 print("Dry period ended")
-
-            self.schedule.current_time = self.schedule.next_time_minutes
 
     def foam_to_vtk(self):
         """

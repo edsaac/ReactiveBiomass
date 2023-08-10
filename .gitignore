@@ -144,7 +144,7 @@ dmypy.json
 **/VTK*
 **/log*
 *tar.gz
-
+**/PNGs/*
 # Pflotran snapshot
 **/*.h5
 
