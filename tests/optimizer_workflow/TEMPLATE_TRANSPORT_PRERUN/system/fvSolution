@@ -7,28 +7,22 @@
 \*---------------------------------------------------------------------------*/
 FoamFile
 {
-    version     2.0;
-    format      ascii;
-    class       dictionary;
-    location    "system";
-    object      fvSolution;
+    version         2;
+    format          ascii;
+    class           dictionary;
+    location        "system";
+    object          fvSolution;
 }
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 solvers
 {
     h
     {
-        // solver      smoothSolver;
-        // smoother    DIC;
-        // tolerance   1e-9;
-        // relTol      0;
-        solver          PCG; //PBiCG; 
-        preconditioner  FDIC; //DILU;
+        solver          PCG;
+        preconditioner  FDIC;
         tolerance       1e-14;
         relTol          0;
     }
-
     "(DOC|POC|O2|NO3|NH4|XI|EPS|UAP|BAP|POCr|XARp|XNp|XDNp|tracer)"
     {
         solver          PBiCGStab;
@@ -36,7 +30,6 @@ solvers
         tolerance       1e-09;
         relTol          0;
     }
-
     "(XAR|XN|XDN)"
     {
         solver          PBiCGStab;
@@ -44,7 +37,6 @@ solvers
         tolerance       1e-09;
         relTol          0;
     }
-    
 }
 
 SIMPLE
@@ -54,18 +46,15 @@ SIMPLE
 
 timeStepping
 {
-    convergeThreshold   0.0001; // 
-    maxItersToConverge  30;  // Triggers dT down
-
-    UpDeltaT_nIters     3;   // Triggers dT up
-    UpDeltaT_Factor     1.15;
-    maxDeltaT           10;
-
-    DownDeltaT_Factor   0.5;
-    minDeltaT           1e-6;
-    hguess_coeff        0.55;
+    convergeThreshold 0.09;
+    maxItersToConverge 100;
+    UpDeltaT_nIters 3;
+    UpDeltaT_Factor 1.15;
+    maxDeltaT       10;
+    DownDeltaT_Factor 0.5;
+    minDeltaT       1e-09;
+    hguess_coeff    0.9;
 }
-
 
 
 // ************************************************************************* //

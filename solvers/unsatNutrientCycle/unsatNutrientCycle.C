@@ -549,6 +549,8 @@ int main(int argc, char *argv[])
                 << nl << endl;
     }
 
+    runTime.writeNow();
+
     Foam::Info<< "End\n" << endl;
 
     return RETURNCODE;

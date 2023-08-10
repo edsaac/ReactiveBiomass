@@ -18,7 +18,7 @@ OUTPUT_DIR=./organizedData
 
 # Create a time file
 TIME_FILE=$OUTPUT_DIR/time.txt
-rm $TIME_FILE
+rm -f $TIME_FILE
 
 TIMES=$(ls -v $INPUT_DIR)
 LEN_TIMES=${#TIMES[@]}
@@ -28,7 +28,7 @@ sed -i "s/ /\n/g" $TIME_FILE
 
 # Create a coordinates file
 COORD_FILE=$OUTPUT_DIR/xyz.txt
-rm $COORD_FILE
+rm -f $COORD_FILE
 
 ## Pick some random time to get the coordinates
 RAND_FOLDER=$INPUT_DIR/$(ls -v $INPUT_DIR | shuf -n 1)
@@ -48,7 +48,7 @@ for FIELD in $FIELDS
   do
 
   OUT_FIELD_FILE=$OUTPUT_DIR/$FIELD
-  rm $OUT_FIELD_FILE
+  rm -f $OUT_FIELD_FILE
   
   for T in $TIMES
   do

@@ -54,7 +54,7 @@ timeStepping
     maxDeltaT           10;
 
     DownDeltaT_Factor   0.5;
-    minDeltaT           1e-6;
+    minDeltaT           1e-9;
     hguess_coeff        0.55;
 }
 

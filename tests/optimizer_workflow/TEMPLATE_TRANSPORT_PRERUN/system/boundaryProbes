@@ -33,7 +33,7 @@ patches     ("bottom" "top");
 
 executeControl  timeStep;
 writeControl	runTime;
-writeInterval	60;
+writeInterval	300;
 
 
 // ************************************************************************* //

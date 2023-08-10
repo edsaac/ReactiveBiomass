@@ -232,6 +232,56 @@ class OpenFOAM:
             cwd=self.path_case,
         )
 
+    def set_writeInterval(self, time_minutes: int) -> None:
+        """
+        Run `foamDictionary` to set the writeInterval of the simulation
+
+        Parameters
+        ----------
+        time_minutes: int
+            End time in minutes
+
+        Returns
+        -------
+        None
+
+        """
+
+        # OpenFOAM expects values in seconds
+        time_sec = str(int(time_minutes * 60))
+
+        subprocess.run(
+            [
+                "foamDictionary",
+                "system/controlDict",
+                "-entry",
+                "writeInterval",
+                "-set",
+                time_sec,
+            ],
+            cwd=self.path_case,
+        )
+
+    def set_convergeThreshold(self, value:float):
+        """
+        foamDictionary system/fvSolution -entry timeStepping.convergeThreshold -set 0.09;
+        
+        """
+        if value <= 0:
+            raise ValueError("convergeThreshold must be positive")
+
+        subprocess.run(
+            [
+                "foamDictionary",
+                "system/fvSolution",
+                "-entry",
+                "timeStepping.convergeThreshold",
+                "-set",
+                f"{value:.6f}"
+            ],
+            cwd=self.path_case
+        )
+
     def set_boundary_fixedValue(
         self, value: float = -1e-6, patch: str = "top", field: str = "h"
     ):
@@ -427,8 +477,11 @@ class OpenFOAM:
         None
         """
 
+        write_time_minutes = 38
+
         while self.schedule:
             if verbose:
+                print("\nSIMULATION BEGINS")
                 print("\n🌧️ \t Flood period", f"{self.schedule.current_time = }")
                 print(f"{self.latest_time = }")
 
@@ -439,27 +492,41 @@ class OpenFOAM:
 
             self.set_boundary_fixedValue()  ##Flood
             self.set_endtime(self.schedule.next_time_minutes)
+            self.set_convergeThreshold(0.0001)
+            self.set_writeInterval(write_time_minutes)
             self.cleanup_last_timestep()
             self.run_solver()
 
             if verbose:
                 print("Flood period ended")
+            
             self.schedule.current_time = self.schedule.next_time_minutes
 
             if not self.schedule:
                 break
 
             if verbose:
-                print("\nSIMULATION BEGINS")
                 print("\n☀️ \t Dry period", f"{self.schedule.current_time = }")
                 print(f"{self.latest_time = }")
 
+            # Start-ups the drying period
+            self.schedule.next_time_minutes += 1
+            self.set_boundary_fixedGradient()  ## Dry
+            
+            self.set_convergeThreshold(0.01)
+            self.set_writeInterval(1)
+            self.set_endtime(self.schedule.next_time_minutes)
+            self.cleanup_last_timestep()
+            self.run_solver()
+
+            # Now it does run the thing
             self.schedule.next_time_minutes += self.schedule.dry_minutes
 
             if verbose:
                 print("Run until", f"{self.schedule.next_time_minutes = }")
 
-            self.set_boundary_fixedGradient()  ## Dry
+            self.set_convergeThreshold(0.0001)
+            self.set_writeInterval(write_time_minutes)
             self.set_endtime(self.schedule.next_time_minutes)
             self.cleanup_last_timestep()
             self.run_solver()
@@ -590,13 +657,14 @@ class OpenFOAM:
     def plot_xarray(self):
         for bp in self.boundaryProbes:
             for k, v in bp.array_data.items():
-                fig, ax = plt.subplots()
-                v.plot.line(x="time", ax=ax)
+                fig, ax = plt.subplots(figsize=[6,5])
+                v.plot.line(x="time", ax=ax, lw=1)
 
                 plt.savefig(
                     self.path_case
                     / "organizedData/heatmaps"
-                    / f"{self.path_case.name}_xarray_{k}.png"
+                    / f"{self.path_case.name}_xarray_{k}.png",
+                    dpi=300
                 )
 
     def read_field_all_times(self, field: str):
@@ -681,5 +749,6 @@ class OpenFOAM:
         plt.savefig(
             self.path_case
             / "organizedData/heatmaps"
-            / f"{self.path_case.name}_{field}.png"
+            / f"{self.path_case.name}_{field}.png",
+            dpi=300
         )

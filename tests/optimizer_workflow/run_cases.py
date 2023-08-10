@@ -49,7 +49,7 @@ def main(args):
         cases_json["dry_times"], cases_json["flood_times"]
     ):
         schedule = OperationSchedule(
-            dry_minutes=dry, flood_minutes=flood, end_minutes=11_520
+            dry_minutes=dry, flood_minutes=flood, end_minutes=3_840
         )
         identifier = f"./CASES/dry_{dry}__flood_{flood}"
         of = OpenFOAM(

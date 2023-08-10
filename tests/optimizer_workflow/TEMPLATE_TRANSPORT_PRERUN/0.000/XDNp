@@ -10,7 +10,7 @@ FoamFile
     version     2.0;
     format      ascii;
     class       volScalarField;
-    location    "863997.597";
+    location    "0.00000";
     object      XDNp;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -229,7 +229,7 @@ boundaryField
     {
         type            uniformInletOutlet;
         uniformInletValue constant 0;
-        value           uniform 0;
+        value           uniform 1.78985e-10;
     }
     left
     {

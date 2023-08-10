@@ -34,17 +34,23 @@ if (convergeFlow < timeControl.convergeThreshold)
     // Can we increase the timestep?
     if (nCycles <= timeControl.UpDeltaT_nIters)
     {
-        runTime.setDeltaT
-        (
-            min
+        if (runTime.deltaTValue() < timeControl.maxDeltaT)
+        {
+            runTime.setDeltaT
             (
-                timeControl.UpDeltaT_Factor * runTime.deltaTValue(),
-                timeControl.maxDeltaT
-            )
-        );
+                min
+                (
+                    timeControl.UpDeltaT_Factor * runTime.deltaTValue(),
+                    timeControl.maxDeltaT
+                )
+            );
 
-        Foam::Info << nl << "deltaT going UP ↑↑↑ = "
-                   << runTime.deltaTValue() << endl;
+            Info << nl << "deltaT going UP ↑↑↑ = " << runTime.deltaTValue() << endl;
+        }
+        else
+        {
+            Info << nl << "deltaT is already at its max" << endl;
+        }
     }
     break;
 }
