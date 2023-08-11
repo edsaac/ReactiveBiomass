@@ -5,9 +5,9 @@ import json
 import sys
 import multiprocessing as mp
 import argparse
+import logging
 
 from pprint import PrettyPrinter
-
 pp = PrettyPrinter(indent=1, sort_dicts=True, underscore_numbers=True)
 
 
@@ -25,16 +25,6 @@ def read_list_cases_to_run(file: str | Path):
     return cases
 
 
-def main_postprocess():
-    cases = read_list_cases_to_run("list_cases_to_run.json")
-
-    for dry, flood in itertools.product(cases["dry_times"], cases["flood_times"]):
-        print(dry, flood)
-        of = OpenFOAM(f"./CASES/dry_{dry}__flood_{flood}")
-        of.foam_to_vtk()
-        of.plot_field_over_time(of.read_field_all_times("Sw"), label="Sw", units="-")
-
-
 def main(args):
     RUN_OPTIONS = args
     json_file = RUN_OPTIONS["json"]
@@ -49,9 +39,10 @@ def main(args):
         cases_json["dry_times"], cases_json["flood_times"]
     ):
         schedule = OperationSchedule(
+            # dry_minutes=dry, flood_minutes=flood, end_minutes=14_400
             dry_minutes=dry, flood_minutes=flood, end_minutes=14_400
         )
-        identifier = f"./CASES/dry_{dry}__flood_{flood}"
+        identifier = f"CASES/dry_{dry}__flood_{flood}"
         of = OpenFOAM(
             path_case=identifier, schedule=schedule, path_template=template_folder
         )
@@ -144,7 +135,7 @@ if __name__ == "__main__":
         help="Plot the xarray boundaryProbe",
     )
 
-    print("HELLO!", "=" * 80, sep="\n")
+    print("☁︎ 💀 ☁︎ 💀 ☁︎ ".center(80, "="))
     print("Options passed:")
     pp.pprint(vars(parser.parse_args()))
     print("=" * 80)

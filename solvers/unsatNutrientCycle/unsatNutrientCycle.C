@@ -143,24 +143,42 @@ int main(int argc, char *argv[])
     {
         Foam::Info<< "Time = " << runTime.timeName() << nl << endl;
 
-        //- Calculate total biomass and the clog limiter function
+        
+        /*
+        - Calculate the total immobile biomass, the growth rate limiting function
+          and check that the total biomass has not exceeded XMAX anywhere
+
+          clogLimiter
+            ^
+            |
+          1 -
+            | *
+            |    *
+            |       *
+          0 -----------|------> totalBiomass
+                      XMAX
+        */
+
         totalBiomass = XAR + XN + XDN + XI + EPS;
         clogLimiter = 1.0 - totalBiomass/XMAX;
 
-        //- Check that the totalBiomass < XMAX everywhere
         if (Foam::min(clogLimiter) < dimensionedScalar("zero",dimless,0.0))
         {
             Foam::SeriousError<< "Total biomass greater that XMAX" << endl;
             Info << "Exiting with code 102..." << endl;
             exit(102);
-            // runTime.write();
-            // break;
         }
 
-        //- Update porosity field and update perm_clog
-        debug("Update porosity and calculate perm_clog");
+        /*
+        - Update the porosity field based on the void space filled with biomass
+          and update the permeability perm_clog multiplier
+        */
         porosity  = clogging->nRef() - totalBiomass/rho_X;
-        if (cloggingSwitch) { clogging->calcPerm();}
+        
+        if (cloggingSwitch) 
+        { 
+            clogging->calcPerm();
+        }
         
         //- Start Richards' solver block
         nCycles = 0;
@@ -206,6 +224,7 @@ int main(int argc, char *argv[])
                        << "Converger: " << convergeFlow << endl;
 
             debug("Adjust time step if possible");
+            
             if (adjustTimeStep) {
                 #include "timeControl.H"
             }

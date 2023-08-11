@@ -12,6 +12,7 @@ from fractions import Fraction
 from math import isclose
 
 from io import StringIO
+from datetime import datetime
 
 @dataclass(slots=True, frozen=True)
 class probePoint:
@@ -126,7 +127,7 @@ class OpenFOAM:
     path_case: str | Path
     path_template: str | Path
     schedule: OperationSchedule
-
+    
     def __post_init__(self) -> None:
         if isinstance(self.path_case, str):
             self.path_case = Path(self.path_case)
@@ -142,9 +143,10 @@ class OpenFOAM:
 
         self.get_solver()
 
-        self.log = StringIO("🪵 Welcome to the log 🪵")
-        self.log.write("OpenFOAM has been created")
-        
+        ## Logging but poorly done
+        self._log_buffer = StringIO()
+        self.logger(f"This is the beggining of the log. {datetime.now()}".center(80, "="))
+
     def get_solver(self):
         solver = subprocess.run(
             "foamDictionary system/controlDict -entry application".split(),
@@ -159,9 +161,6 @@ class OpenFOAM:
 
         else:
             raise ValueError("returnCode in finding solver was not zero")
-
-    def print_path_to_case(self):
-        print(self.path_case)
 
     def spawn_from_template(self):
         # print(self.path_template)
@@ -440,14 +439,15 @@ class OpenFOAM:
 
     def cleanup_all_timesteps(self):
         """
-        Remove ddt and _0 files from all timesteps.
+        Remove ddt and _0 files from all folders.
         This is done so foamToVTK does not freak out.
         """
         for f in self.path_case.glob("**/ddt*"):
             f.unlink()
 
         for f in self.path_case.glob("**/*_0"):
-            f.unlink()
+            if f.name != "K_0":  #Exception for the clean saturated hydraulic conductivity
+                f.unlink()
 
         for f in self.path_case.glob("**/uniform"):
             shutil.rmtree(f)
@@ -488,20 +488,20 @@ class OpenFOAM:
         self.schedule.in_sync = isclose(schedule_current_time_min, case_latest_time_min, abs_tol=0.5)
         in_sync = "✔️" if self.schedule.in_sync else "🚫"
 
-        print(
+        self.logger(
             "📅 Schedule:".ljust(20),
             f"{schedule_current_time_min} min".rjust(15), 
             f"[{schedule_current_time_sec} s]".rjust(15)
         )
 
-        print(
+        self.logger(
             "💧 OpenFOAM case:".ljust(20),
             f"{case_latest_time_min} min".rjust(15),
             f"[{case_latest_time_sec} s]".rjust(15),
             in_sync
         )
 
-        print(
+        self.logger(
             "🕓 Run until:".ljust(20),
             f"{schedule_next_time_min} min".rjust(15),
             f"[{schedule_next_time_sec} s]".rjust(15)
@@ -524,7 +524,7 @@ class OpenFOAM:
 
         write_time_minutes = 144
         
-        print("\nSIMULATION RUNS")
+        self.logger("\n SIMULATION RUNS")
 
         while self.schedule:
             
@@ -532,7 +532,7 @@ class OpenFOAM:
             self.schedule.next_time_minutes += self.schedule.flood_minutes
             
             if verbose:
-                print("\n🌊 ====== Flood period ======")
+                self.logger("\n🌊 ====== Flood period ======")
                 self.check_schedule_and_runner()
 
             if not self.schedule.in_sync:
@@ -547,13 +547,13 @@ class OpenFOAM:
 
             if return_code > 0:
                 ## Should raise an error or just print warning and end?
-                print(f"{self.solver} ended with error")
+                self.logger(f"☠️ {self.solver} ended with error {return_code}.".rjust(80))
                 break
 
             self.schedule.current_time = self.schedule.next_time_minutes
 
             if verbose:
-                print("Flood period ended")
+                self.logger("~ Flood period ended ~")
             
             if not self.schedule: break
 
@@ -561,7 +561,7 @@ class OpenFOAM:
             self.schedule.next_time_minutes += 10
 
             if verbose:
-                print("\n🍜 ======= Warm period ======")
+                self.logger("\n🍜 ======= Warm period ======")
                 self.check_schedule_and_runner()
 
             if not self.schedule.in_sync:
@@ -569,20 +569,20 @@ class OpenFOAM:
 
             self.set_boundary_fixedGradient()  ## Dry
             self.set_endtime(self.schedule.next_time_minutes)
-            self.set_convergeThreshold(0.1)
+            self.set_convergeThreshold(0.10)
             self.set_writeInterval(2)
             self.cleanup_last_timestep()
             return_code = self.run_solver()
 
             if return_code > 0:
                 ## Should raise an error or just print warning and end?
-                print(f"{self.solver} ended with error")
+                self.logger(f"☠️ {self.solver} ended with error {return_code}.".rjust(80))
                 break
             
             self.schedule.current_time = self.schedule.next_time_minutes
             
             if verbose:
-                print("Warm period ended")
+                self.logger("~ Warm period ended ~")
             
             if not self.schedule: break
 
@@ -590,27 +590,27 @@ class OpenFOAM:
             self.schedule.next_time_minutes += self.schedule.dry_minutes
 
             if verbose:
-                print("\n🔥 ======= Dry period ======")
+                self.logger("\n🔥 ======= Dry period ======")
                 self.check_schedule_and_runner()
 
             if not self.schedule.in_sync:
                 break
-            
+
             self.set_endtime(self.schedule.next_time_minutes)
-            self.set_convergeThreshold(0.05)
+            self.set_convergeThreshold(0.10)
             self.set_writeInterval(write_time_minutes)
             self.cleanup_last_timestep()
             return_code = self.run_solver()
 
             if return_code > 0:
                 ## Should raise an error or just print warning and end?
-                print(f"{self.solver} ended with error")
+                self.logger(f"☠️ {self.solver} ended with error {return_code}.".rjust(80))
                 break
             
             self.schedule.current_time = self.schedule.next_time_minutes
             
             if verbose:
-                print("Dry period ended")
+                self.logger("~ Dry period ended ~")
 
     def foam_to_vtk(self):
         """
@@ -828,3 +828,14 @@ class OpenFOAM:
             / f"{self.path_case.name}_{field}.png",
             dpi=300
         )
+    
+    def logger(self, *msgs:str):
+        
+        for msg in msgs:
+            self._log_buffer.write(msg)
+
+        with open(self.path_case/f"{self.path_case.name}.log", "a") as f:
+            f.write(self._log_buffer.getvalue())
+            f.write("\n")
+        
+        self._log_buffer = StringIO()
