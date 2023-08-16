@@ -21,7 +21,7 @@ FoamFile
 yield    yield    [0 0  0 0 0 0 0]     0.49;     //
 qhat     qhat     [0 0 -1 0 0 0 0]     8.102E-5; //
 bdie     bdie     [0 0 -1 0 0 0 0]     3.472E-6; //
-Kdonor   Kdonor   [1 -3 0 0 0 0 0]     0.010;    //
-Kaccep   Kaccep   [1 -3 0 0 0 0 0]     0.0005;   //
+Kdonor   Kdonor   [1 -3 0 0 0 0 0]     10.0E-3;  // 40mg/L Berlin2014
+Kaccep   Kaccep   [1 -3 0 0 0 0 0]     0.5E-3;   // 0.77mg/L Berlin2013
 
 // ************************************************************************* //

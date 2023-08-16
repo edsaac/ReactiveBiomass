@@ -295,8 +295,7 @@ int main(int argc, char *argv[])
             //Info << "\nMobile aerobic heterotrophs (XARp)" << endl;
             fvScalarMatrix ARGrowth_p
             (
-                porosity * Sw * fvm::ddt(XARp)
-                + XARp * fvc::ddt(Sw,porosity)
+                fvm::ddt(porosity, Sw, XARp)
                 + fvm::div(phi, XARp)
                 - fvm::laplacian(porosity * Sw * (mag(U)*DispTensor + molDiff), XARp)
                 ==
@@ -329,8 +328,7 @@ int main(int argc, char *argv[])
             // Info << "\nMobile Nitrifiers (XN)" << endl;
             fvScalarMatrix NitrifiersGrowth_p
             (
-                porosity * Sw * fvm::ddt(XNp)
-                + XNp * fvc::ddt(Sw,porosity)
+                fvm::ddt(porosity, Sw, XNp)
                 + fvm::div(phi, XNp)
                 - fvm::laplacian(porosity * Sw * (mag(U)*DispTensor + molDiff), XNp)
                 ==
@@ -363,8 +361,7 @@ int main(int argc, char *argv[])
             // Info << "\nMobile Denitrifiers (XDN)" << endl;
             fvScalarMatrix DenitrifiersGrowth_p
             (
-                porosity * Sw * fvm::ddt(XDNp)
-                + XDNp * fvc::ddt(Sw,porosity)
+                porosity * Sw * fvm::ddt(porosity, Sw, XDNp)
                 + fvm::div(phi, XDNp)
                 - fvm::laplacian(porosity * Sw*(mag(U)*DispTensor + molDiff), XDNp)
                 ==
@@ -421,9 +418,7 @@ int main(int argc, char *argv[])
             //Info << "\nDissolved Organic Carbon DOC transport" << endl;
             fvScalarMatrix DissolvedCarbonTransport
             (
-                porosity * Sw * fvm::ddt(DOC)
-                + DOC * Sw * fvc::ddt(porosity)
-                + DOC * porosity * fvc::ddt(Sw)
+                fvm::ddt(porosity, Sw, DOC)
                 + fvm::div(phi, DOC)
                 - fvm::laplacian(porosity * Sw*(mag(U)*DispTensor + molDiff), DOC)
                 ==
@@ -444,25 +439,47 @@ int main(int argc, char *argv[])
             //Info << "\nDissolved oxygen (O2)" << endl;
             fvScalarMatrix OxygenTransport
             (
-                porosity * Sw * fvm::ddt(O2)
-                + O2 * fvc::ddt(Sw, porosity)                   // Oxygen in the aqueous phase
-                + O2_saturation/Hacc * fvc::ddt(porosity, Sa)   // Oxygen in the gaseous phase
+                fvm::ddt(porosity, Sw, O2)
                 + fvm::div(phi, O2)
-                - fvm::laplacian(porosity * Sw*(mag(U)*DispTensor + molDiff), O2)
+                // - fvm::laplacian(porosity * Sw*(mag(U)*DispTensor + molDiff), O2)
                 ==
-                - alpha_1 * rH * (XAR + porosity * Sw*XARp)   //Metabolism XAR
-                - alpha_N * rN * (XN + porosity * Sw*XNp)     //Metabolism XN
+                - alpha_1 * rH * (XAR + (porosity * Sw * XARp))   //Metabolism XAR
+                - alpha_N * rN * (XN + (porosity * Sw * XNp))     //Metabolism XN
+                // - oxygen_mass_transfer * porosity * ((Sw * O2) - (Sa * Hacc * O2gas)) //Replenish to saturation if Sa?
+                // + oxygen_mass_transfer * porosity * (Sa * Hacc * O2gas) //Replenish to saturation if Sa?
+
             );
             OxygenTransport.relax();
             fvOptions.constrain(OxygenTransport);
             OxygenTransport.solve();
             fvOptions.correct(O2);
 
+            //Info << "\Gaseous oxygen (O2gas)" << endl;
+            // fvScalarMatrix OxygenGasTransport
+            // (
+            //     porosity * Sa * fvm::ddt(O2gas)
+            //     + O2gas * fvc::ddt(Sa, porosity)                   // Oxygen in the gaseous phase
+            //     - fvm::laplacian(porosity * Sa * molDiff_air, O2gas)
+            //     ==
+            //     // oxygen_mass_transfer * porosity * ((Sw * O2) - (Sa * Hacc * O2gas)) 
+            //     // - oxygen_mass_transfer * porosity * (Sa * Hacc * O2gas)
+            // );
+            // OxygenGasTransport.relax();
+            // fvOptions.constrain(OxygenGasTransport);
+            // OxygenGasTransport.solve();
+            // fvOptions.correct(O2gas);
+
+            if (Foam::max(O2) > O2_saturation)
+            {
+                Foam::SeriousError<< "Oxygen in the aqueous phase is getting over saturated" << endl;
+                Info << "Exiting with code 103..." << endl;
+                exit(103);
+            }
+
             // Info << "\nNH4-N transport" << endl;
             fvScalarMatrix AmmoniumTransport
             (
-                porosity * Sw * fvm::ddt(NH4)
-                + NH4 * fvc::ddt(Sw,porosity)
+                fvm::ddt(porosity, Sw, NH4)
                 + fvm::div(phi, NH4)
                 - fvm::laplacian(porosity * Sw*(mag(U)*DispTensor + molDiff), NH4)
                 ==
@@ -488,8 +505,7 @@ int main(int argc, char *argv[])
             // Info << "\nDissolved nitrate-nitrogen (NO3+N)" << endl;
             fvScalarMatrix NitrateTransport
             (
-                porosity * Sw * fvm::ddt(NO3)
-                + NO3 * fvc::ddt(Sw,porosity) 
+                fvm::ddt(porosity, Sw, NO3)
                 + fvm::div(phi, NO3) 
                 - fvm::laplacian(porosity * Sw*(mag(U)*DispTensor + molDiff), NO3)
                 ==
@@ -504,8 +520,7 @@ int main(int argc, char *argv[])
 	        //Info << "\nBiomass-associated products (BAP) transport" << endl;
             fvScalarMatrix BAPTransport
             (
-                porosity * Sw * fvm::ddt(BAP)
-                + BAP * fvc::ddt(Sw,porosity)
+                fvm::ddt(porosity, Sw, BAP)
                 + fvm::div(phi, BAP)
                 - fvm::laplacian(porosity * Sw*(mag(U)*DispTensor + molDiff), BAP)
                 ==
@@ -526,8 +541,7 @@ int main(int argc, char *argv[])
             //Info << "\nInert biomass (XI)" << endl;
             fvScalarMatrix POCrGeneration
             (
-                porosity * Sw * fvm::ddt(POCr)
-                + POCr * fvc::ddt(Sw,porosity)
+                fvm::ddt(porosity, Sw, POCr)
                 + fvm::div(phi, POCr)
                 - fvm::laplacian(porosity * Sw*(mag(U)*DispTensor + molDiff), POCr)
                 ==
@@ -550,8 +564,7 @@ int main(int argc, char *argv[])
         //Info << "\nNonreactive tracer transport" << endl;
             fvScalarMatrix NonReactiveTracer
             (
-                porosity * Sw * fvm::ddt(tracer)
-                // + tracer * Sw * fvc::ddt(Sw, porosity)
+                fvm::ddt(porosity, Sw, tracer)
                 + fvm::div(phi, tracer)
                 // - fvm::laplacian(porosity * Sw*(mag(U)*DispTensor + molDiff), tracer)
             );

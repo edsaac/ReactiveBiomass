@@ -1,11 +1,10 @@
 from pathlib import Path
-from pyopenfoam import OpenFOAM, OperationSchedule
+from myusefultools.pyopenfoam import ScheduledOpenFOAM, OperationSchedule
 import itertools
 import json
 import sys
 import multiprocessing as mp
 import argparse
-import logging
 
 from pprint import PrettyPrinter
 pp = PrettyPrinter(indent=1, sort_dicts=True, underscore_numbers=True)
@@ -40,10 +39,10 @@ def main(args):
     ):
         schedule = OperationSchedule(
             # dry_minutes=dry, flood_minutes=flood, end_minutes=14_400
-            dry_minutes=dry, flood_minutes=flood, end_minutes=14_400
+            dry_minutes=dry, flood_minutes=flood, end_minutes=5_400
         )
         identifier = f"CASES/dry_{dry}__flood_{flood}"
-        of = OpenFOAM(
+        of = ScheduledOpenFOAM(
             path_case=identifier, schedule=schedule, path_template=template_folder
         )
         cases_objs[identifier] = of
@@ -55,23 +54,23 @@ def main(args):
     if RUN_OPTIONS["run"]:
         ## Pool for parallelizable tasks
         with mp.Pool(processes=16) as pool:
-            pool.map(OpenFOAM.run_case_by_schedule, cases_objs.values())
+            pool.map(ScheduledOpenFOAM.run_case_by_schedule, cases_objs.values())
 
     if RUN_OPTIONS["convert_vtk"]:
         ## Export result to VTK
         with mp.Pool() as pool:
-            pool.map(OpenFOAM.foam_to_vtk, cases_objs.values())
+            pool.map(ScheduledOpenFOAM.foam_to_vtk, cases_objs.values())
 
     if RUN_OPTIONS["process_probes"]:
         with mp.Pool() as pool:
-            pool.map(OpenFOAM.boundaryProbes_to_txt, cases_objs.values())
+            pool.map(ScheduledOpenFOAM.boundaryProbes_to_txt, cases_objs.values())
 
     if RUN_OPTIONS["heatmap"]:
         field = RUN_OPTIONS["heatmap"]
 
         with mp.Pool() as pool:
             pool.starmap(
-                OpenFOAM.plot_field_over_time,
+                ScheduledOpenFOAM.plot_field_over_time,
                 [(of, field, field, "[Units]") for of in cases_objs.values()],
             )
 
@@ -84,7 +83,7 @@ def main(args):
         # ..TODO: Expand for vector probes
 
         with mp.Pool() as pool:
-            pool.map(OpenFOAM.plot_xarray, cases_objs.values())
+            pool.map(ScheduledOpenFOAM.plot_xarray, cases_objs.values())
 
     # scalar = of.read_field_all_times(field="Sw")
 

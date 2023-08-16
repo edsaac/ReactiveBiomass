@@ -33,6 +33,14 @@ solvers
         relTol          0;
     }
 
+   O2gas
+   {
+	solver 		PCG;
+	preconditioner  DIC;
+	tolerance       1e-10;
+        relTol          0;
+   }
+
     "(XAR|XN|XDN)"
     {
         solver          PBiCGStab;
@@ -50,15 +58,15 @@ SIMPLE
 
 timeStepping
 {
-    convergeThreshold   5.0E-06;
+    convergeThreshold   0.1;
     maxItersToConverge  10;  // Triggers dT down
 
     UpDeltaT_nIters     3;   // Triggers dT up
-    UpDeltaT_Factor     1.1;
-    maxDeltaT           30;
+    UpDeltaT_Factor     1.02;
+    maxDeltaT           20;  // Check Courant number
 
     DownDeltaT_Factor   0.5;
-    minDeltaT           0.0001;      
+    minDeltaT           0.0001;
 }
 
 // relaxationFactors

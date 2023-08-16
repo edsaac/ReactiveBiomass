@@ -30,6 +30,9 @@ dimensionedScalar mu(transportProperties.lookup("mu"));
 Foam::Info << "Molecular diffusion\n" << endl;
 dimensionedTensor molDiff(transportProperties.lookup("molDiff"));
 
+Foam::Info << "Molecular diffusion of O2 in air\n" << endl;
+dimensionedTensor molDiff_air(transportProperties.lookup("molDiff_air"));
+
 Foam::Info << "Dispersion tensor\n" << endl;
 dimensionedTensor DispTensor(transportProperties.lookup("DispTensor"));
 
@@ -38,6 +41,9 @@ dimensionedScalar diffusiveGrowth(transportProperties.lookup("diffusiveGrowth"))
 
 Foam::Info << "Henry's law for oxygen partition\n" << endl;
 dimensionedScalar Hacc(transportProperties.lookup("Hacc"));
+
+Foam::Info << "Oxygen mass transfer coefficient (first order)\n" << endl;
+dimensionedScalar oxygen_mass_transfer(transportProperties.lookup("oxygen_mass_transfer"));
 
 Foam::Info << "Oxygen saturation concentration\n" << endl;
 dimensionedScalar O2_saturation(transportProperties.lookup("O2_saturation"));

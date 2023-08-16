@@ -342,6 +342,20 @@ volScalarField O2
     mesh
 );
 
+Foam::Info << "Reading field: Oxygen gas (O2gas) \n" << endl;
+volScalarField O2gas
+(
+    IOobject
+    (
+        "O2gas",
+        runTime.timeName(),
+        mesh,
+        IOobject::MUST_READ,
+        IOobject::AUTO_WRITE
+    ),
+    mesh
+);
+
 Foam::Info << "Reading field: Nitrate (NO3) \n" << endl;
 volScalarField NO3
 (

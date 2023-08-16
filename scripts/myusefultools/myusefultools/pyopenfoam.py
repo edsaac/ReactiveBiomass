@@ -14,6 +14,7 @@ from math import isclose
 from io import StringIO
 from datetime import datetime
 
+
 @dataclass(slots=True, frozen=True)
 class probePoint:
     x: float
@@ -122,47 +123,85 @@ class OperationSchedule:
     def __bool__(self):
         return self.current_time < self.end_minutes
 
+
 @dataclass
 class OpenFOAM:
     path_case: str | Path
     path_template: str | Path
-    schedule: OperationSchedule
-    
+
     def __post_init__(self) -> None:
-        if isinstance(self.path_case, str):
-            self.path_case = Path(self.path_case)
-
-        if isinstance(self.path_template, str):
-            self.path_template = Path(self.path_template)
-
+        self.path_case = Path(self.path_case)
+        self.path_template = Path(self.path_template)
         self.path_vtk = self.path_case / "VTK"
-
-        if not self.path_case.exists():
-            if self.path_template.is_dir():
-                self.spawn_from_template()
-
-        self.get_solver()
 
         ## Logging but poorly done
         self._log_buffer = StringIO()
-        self.logger(f"This is the beggining of the log. {datetime.now()}".center(80, "="))
 
-    def get_solver(self):
-        solver = subprocess.run(
-            "foamDictionary system/controlDict -entry application".split(),
+        ## Check if case need to be cloned or already exists
+        if not self.path_case.exists():
+            if self.path_template.is_dir():
+                self.clone_from_template()
+                self.logger(f".. LOG START .. {datetime.now()}".center(80, "="))
+                self.logger("🐣 Case spawned from template.")
+            else:
+                raise ValueError("`path_template` not a directory.")
+        else:
+            self.logger("💇🏻‍♂️ Case exists! No need to clone template.")
+
+    def get_value_from_foamDictionary(self, location: str, entry: str):
+        command = ["foamDictionary", location, "-entry", entry, "-value"]
+
+        value = subprocess.run(
+            command,
             cwd=self.path_case,
             capture_output=True,
             text=True,
             encoding="utf-8",
         )
 
-        if solver.returncode == 0:
-            self.solver = solver.stdout.split()[-1].replace(";", "")
+        if value.returncode == 0:
+            return value.stdout.split()[-1].replace(";", "")
 
         else:
-            raise ValueError("returnCode in finding solver was not zero")
+            raise ValueError(" ".join(command) + " get returned with error")
 
-    def spawn_from_template(self):
+    def set_value_in_foamDictionary(
+        self, location: str, entry: str, value: float | str
+    ):
+        command = ["foamDictionary", location, "-entry", entry, "-set", value]
+
+        completed_process = subprocess.run(
+            command,
+            cwd=self.path_case,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+        )
+
+        if completed_process.returncode > 0:
+            raise ValueError(" ".join(command) + " set returned with error")
+
+    def remove_entry_in_foamDictionary(self, location: str, entry: str):
+        command = ["foamDictionary", location, "-entry", entry, "-remove"]
+
+        completed_process = subprocess.run(
+            command,
+            cwd=self.path_case,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+        )
+
+        if completed_process.returncode > 0:
+            raise ValueError(" ".join(command) + " remove returned with error")
+
+    @property
+    def solver(self):
+        return self.get_value_from_foamDictionary(
+            "system/controlDict", entry="application"
+        )
+
+    def clone_from_template(self):
         # print(self.path_template)
         subprocess.run(["mkdir", self.path_case])
         subprocess.run(
@@ -182,7 +221,7 @@ class OpenFOAM:
     @property
     def latest_time(self) -> str:
         """
-        Run `foamListTimes` to get the latest time in the simulation
+        Run `foamListTimes` to get the latest time in the simulation.
 
         Returns
         -------
@@ -191,8 +230,10 @@ class OpenFOAM:
 
         """
 
+        command = ["foamListTimes", "-latestTime"]
+
         foamListTimes = subprocess.run(
-            ["foamListTimes", "-latestTime"],
+            command,
             cwd=self.path_case,
             capture_output=True,
             text=True,
@@ -206,90 +247,32 @@ class OpenFOAM:
                 return foamListTimes.stdout.replace("\n", "")
 
         else:
-            print("returnCode was not zero")
+            self.logger(" ".join(command) + " returned with error")
 
     def set_endtime(self, time_minutes: int) -> None:
-        """
-        Run `foamDictionary` to set the endTime of the simulation
+        time_sec = str(int(time_minutes * 60))  # OpenFOAM expects seconds
 
-        Parameters
-        ----------
-        time_minutes: int
-            End time in minutes
-
-        Returns
-        -------
-        None
-
-        """
-
-        # OpenFOAM expects values in seconds
-        time_sec = str(int(time_minutes * 60))
-
-        subprocess.run(
-            [
-                "foamDictionary",
-                "system/controlDict",
-                "-entry",
-                "endTime",
-                "-set",
-                time_sec,
-            ],
-            cwd=self.path_case,
-        )
+        self.set_value_in_foamDictionary("system/controlDict", "endTime", time_sec)
 
     def set_writeInterval(self, time_minutes: int) -> None:
-        """
-        Run `foamDictionary` to set the writeInterval of the simulation
-
-        Parameters
-        ----------
-        time_minutes: int
-            End time in minutes
-
-        Returns
-        -------
-        None
-
-        """
-
         # OpenFOAM expects values in seconds
-        time_sec = str(int(time_minutes * 60))
+        time_sec = str(int(time_minutes * 60))  # OpenFOAM expects seconds
 
-        subprocess.run(
-            [
-                "foamDictionary",
-                "system/controlDict",
-                "-entry",
-                "writeInterval",
-                "-set",
-                time_sec,
-            ],
-            cwd=self.path_case,
+        self.set_value_in_foamDictionary(
+            "system/controlDict", "writeInterval", time_sec
         )
 
-    def set_convergeThreshold(self, value:float):
+    def set_convergeThreshold(self, value: float):
         """
-        foamDictionary system/fvSolution -entry timeStepping.convergeThreshold -set 0.09;
-        
+        Refers to the converge threshold used in the Picard iterations of the Richards'
+        solver.
         """
         if value <= 0:
             raise ValueError("convergeThreshold must be positive")
 
-        foamDictionary = subprocess.run(
-            [
-                "foamDictionary",
-                "system/fvSolution",
-                "-entry",
-                "timeStepping.convergeThreshold",
-                "-set",
-                f"{value:.6f}"
-            ],
-            cwd=self.path_case
+        self.set_value_in_foamDictionary(
+            "system/fvSolution", "timeStepping.convergeThreshold", f"{value:.6f}"
         )
-
-        if foamDictionary.returncode > 0:
-            print("Could not set convergeThreshold")
 
     def set_boundary_fixedValue(
         self, value: float = -1e-6, patch: str = "top", field: str = "h"
@@ -312,49 +295,29 @@ class OpenFOAM:
         Returns
         -------
         None
+
+        Notes
+        ------
+        This is the code run:
+        ```
+        $ foamDictionary $LATEST_TIME/h -entry boundaryField.top.type \
+            -set "fixedValue"
+        $ foamDictionary $LATEST_TIME/h -entry boundaryField.top.value \
+            -set "uniform 0.06"
+        $ foamDictionary $LATEST_TIME/h -entry boundaryField.top.gradient \
+            -remove
+        ```
         """
 
-        # This is the code run:
-        # > foamDictionary $LATEST_TIME/h -entry boundaryField.top.type -set "fixedValue"
-        # > foamDictionary $LATEST_TIME/h -entry boundaryField.top.value -set "uniform 0.06"
-        # > foamDictionary $LATEST_TIME/h -entry boundaryField.top.gradient -remove
+        t = self.latest_time
+        dict_loc = f"{t}/{field}"
+        boundary = f"boundaryField.{patch}"
 
-        latest_time = self.latest_time
-
-        subprocess.run(
-            [
-                "foamDictionary",
-                f"{latest_time}/{field}",
-                "-entry",
-                f"boundaryField.{patch}.type",
-                "-set",
-                """fixedValue""",
-            ],
-            cwd=self.path_case,
+        self.set_value_in_foamDictionary(dict_loc, f"{boundary}.type", "fixedValue")
+        self.set_value_in_foamDictionary(
+            dict_loc, f"{boundary}.value", f"uniform {value:.4E}"
         )
-
-        subprocess.run(
-            [
-                "foamDictionary",
-                f"{latest_time}/{field}",
-                "-entry",
-                f"boundaryField.{patch}.value",
-                "-set",
-                f"""uniform {value:.4E}""",
-            ],
-            cwd=self.path_case,
-        )
-
-        subprocess.run(
-            [
-                "foamDictionary",
-                f"{latest_time}/{field}",
-                "-entry",
-                f"boundaryField.{patch}.gradient",
-                "-remove",
-            ],
-            cwd=self.path_case,
-        )
+        self.remove_entry_in_foamDictionary(dict_loc, f"{boundary}.gradient")
 
     def set_boundary_fixedGradient(
         self, value: float = -1.0, patch: str = "top", field: str = "h"
@@ -377,48 +340,28 @@ class OpenFOAM:
         Returns
         -------
         None
+
+        Notes
+        -----
+        ```
+        $ foamDictionary $LATEST_TIME/h -entry boundaryField.top.type \
+            -set "fixedGradient"
+        $ foamDictionary $LATEST_TIME/h -entry boundaryField.top.gradient \
+            -set "uniform -1"
+        $ foamDictionary $LATEST_TIME/h -entry boundaryField.top.value \
+            -remove
+        ```
         """
 
-        # > foamDictionary $LATEST_TIME/h -entry boundaryField.top.type -set "fixedGradient"
-        # > foamDictionary $LATEST_TIME/h -entry boundaryField.top.gradient -set "uniform -1"
-        # > foamDictionary $LATEST_TIME/h -entry boundaryField.top.value -remove
+        t = self.latest_time
+        dict_loc = f"{t}/{field}"
+        boundary = f"boundaryField.{patch}"
 
-        latest_time = self.latest_time
-
-        subprocess.run(
-            [
-                "foamDictionary",
-                f"{latest_time}/{field}",
-                "-entry",
-                f"boundaryField.{patch}.type",
-                "-set",
-                """fixedGradient""",
-            ],
-            cwd=self.path_case,
+        self.set_value_in_foamDictionary(dict_loc, f"{boundary}.type", "fixedGradient")
+        self.set_value_in_foamDictionary(
+            dict_loc, f"{boundary}.gradient", f"uniform {value}"
         )
-
-        subprocess.run(
-            [
-                "foamDictionary",
-                f"{latest_time}/{field}",
-                "-entry",
-                f"boundaryField.{patch}.gradient",
-                "-set",
-                f"""uniform {value}""",
-            ],
-            cwd=self.path_case,
-        )
-
-        subprocess.run(
-            [
-                "foamDictionary",
-                f"{latest_time}/{field}",
-                "-entry",
-                f"boundaryField.{patch}.value",
-                "-remove",
-            ],
-            cwd=self.path_case,
-        )
+        self.remove_entry_in_foamDictionary(dict_loc, f"{boundary}.value")
 
     def cleanup_last_timestep(self):
         """
@@ -435,7 +378,7 @@ class OpenFOAM:
             f.unlink()
 
         if (path_latest_time / "uniform/time").exists():
-            shutil.rmtree(path_latest_time/"uniform")
+            shutil.rmtree(path_latest_time / "uniform")
 
     def cleanup_all_timesteps(self):
         """
@@ -446,7 +389,9 @@ class OpenFOAM:
             f.unlink()
 
         for f in self.path_case.glob("**/*_0"):
-            if f.name != "K_0":  #Exception for the clean saturated hydraulic conductivity
+            if (
+                f.name != "K_0"
+            ):  # Exception for the clean saturated hydraulic conductivity
                 f.unlink()
 
         for f in self.path_case.glob("**/uniform"):
@@ -471,146 +416,8 @@ class OpenFOAM:
             openfoam_run = subprocess.run(
                 [self.solver], stdout=subprocess.DEVNULL, cwd=self.path_case
             )
-        
+
         return openfoam_run.returncode
-
-    def check_schedule_and_runner(self):
-
-        schedule_current_time_min = self.schedule.current_time
-        schedule_current_time_sec = schedule_current_time_min * 60
-
-        schedule_next_time_min = self.schedule.next_time_minutes
-        schedule_next_time_sec = schedule_next_time_min * 60
-
-        case_latest_time_sec = self.latest_time
-        case_latest_time_min = round(float(case_latest_time_sec)/60, 3)
-
-        self.schedule.in_sync = isclose(schedule_current_time_min, case_latest_time_min, abs_tol=0.5)
-        in_sync = "✔️" if self.schedule.in_sync else "🚫"
-
-        self.logger(
-            "📅 Schedule:".ljust(20),
-            f"{schedule_current_time_min} min".rjust(15), 
-            f"[{schedule_current_time_sec} s]".rjust(15)
-        )
-
-        self.logger(
-            "💧 OpenFOAM case:".ljust(20),
-            f"{case_latest_time_min} min".rjust(15),
-            f"[{case_latest_time_sec} s]".rjust(15),
-            in_sync
-        )
-
-        self.logger(
-            "🕓 Run until:".ljust(20),
-            f"{schedule_next_time_min} min".rjust(15),
-            f"[{schedule_next_time_sec} s]".rjust(15)
-        )
-
-
-    def run_case_by_schedule(self, verbose=True):
-        """
-        Executes the solver following the schedule instructions of dry
-        and flooding periods
-
-        Parameters
-        ----------
-        None
-
-        Returns
-        -------
-        None
-        """
-
-        write_time_minutes = 144
-        
-        self.logger("\n SIMULATION RUNS")
-
-        while self.schedule:
-            
-            ## Flood
-            self.schedule.next_time_minutes += self.schedule.flood_minutes
-            
-            if verbose:
-                self.logger("\n🌊 ====== Flood period ======")
-                self.check_schedule_and_runner()
-
-            if not self.schedule.in_sync:
-                break
-
-            self.set_boundary_fixedValue()  ##Flood
-            self.set_endtime(self.schedule.next_time_minutes)
-            self.set_convergeThreshold(0.05)
-            self.set_writeInterval(write_time_minutes)
-            self.cleanup_last_timestep()
-            return_code = self.run_solver()
-
-            if return_code > 0:
-                ## Should raise an error or just print warning and end?
-                self.logger(f"☠️ {self.solver} ended with error {return_code}.".rjust(80))
-                break
-
-            self.schedule.current_time = self.schedule.next_time_minutes
-
-            if verbose:
-                self.logger("~ Flood period ended ~")
-            
-            if not self.schedule: break
-
-            ## Warm
-            self.schedule.next_time_minutes += 10
-
-            if verbose:
-                self.logger("\n🍜 ======= Warm period ======")
-                self.check_schedule_and_runner()
-
-            if not self.schedule.in_sync:
-                break
-
-            self.set_boundary_fixedGradient()  ## Dry
-            self.set_endtime(self.schedule.next_time_minutes)
-            self.set_convergeThreshold(0.10)
-            self.set_writeInterval(2)
-            self.cleanup_last_timestep()
-            return_code = self.run_solver()
-
-            if return_code > 0:
-                ## Should raise an error or just print warning and end?
-                self.logger(f"☠️ {self.solver} ended with error {return_code}.".rjust(80))
-                break
-            
-            self.schedule.current_time = self.schedule.next_time_minutes
-            
-            if verbose:
-                self.logger("~ Warm period ended ~")
-            
-            if not self.schedule: break
-
-            ## Dry
-            self.schedule.next_time_minutes += self.schedule.dry_minutes
-
-            if verbose:
-                self.logger("\n🔥 ======= Dry period ======")
-                self.check_schedule_and_runner()
-
-            if not self.schedule.in_sync:
-                break
-
-            self.set_endtime(self.schedule.next_time_minutes)
-            self.set_convergeThreshold(0.10)
-            self.set_writeInterval(write_time_minutes)
-            self.cleanup_last_timestep()
-            return_code = self.run_solver()
-
-            if return_code > 0:
-                ## Should raise an error or just print warning and end?
-                self.logger(f"☠️ {self.solver} ended with error {return_code}.".rjust(80))
-                break
-            
-            self.schedule.current_time = self.schedule.next_time_minutes
-            
-            if verbose:
-                self.logger("~ Dry period ended ~")
 
     def foam_to_vtk(self):
         """
@@ -673,32 +480,38 @@ class OpenFOAM:
         )
 
         # Export relevant fields to VTK for test comparison
-        # foamToVTK -fields "(XAR XN XDN XI XARp XNp XDNp DOC NH4 NO3 O2 tracer BAP POCr Sw h porosity hydraulicCond U)"
+        # foamToVTK -fields "(XAR XN XDN XI XARp XNp XDNp DOC NH4 NO3 O2 tracer \
+        #    BAP POCr Sw h porosity hydraulicCond U)"
+        fields = ["Sw", "h", "porosity", "hydraulicCond", "U", "capillarity"]
 
-        export_fieds = "Sw h porosity hydraulicCond U capillarity "  ## End this line with a space :S (There must be a better way)
         if self.solver == "unsatFoam":
             pass
         elif self.solver == "unsatNutrientCycle":
-            export_fieds += "XAR XN XDN DOC O2 NH4 NO3 BAP EPS POCr XARp XNp XDNp"
+            fields += ["XAR", "XN", "XDN", "EPS", "XI"]  # Immobile
+            fields += ["DOC", "O2", "NH4", "NO3", "tracer"]  # Dissolved
+            fields += ["POCr", "BAP", "XARp", "XNp", "XDNp"]  # Particulates
 
-        export_fieds = f"({export_fieds})"
+        fields = f"({' '.join(fields)})"
 
-        subprocess.run(
+        process = subprocess.run(
             [
                 "foamToVTK",
                 "-fields",
-                export_fieds,
+                fields,
                 "-noZero",
             ],
             cwd=self.path_case,
             stdout=subprocess.DEVNULL,
         )
 
+        if process.returncode > 0:
+            raise ValueError("foamToVTK returned with error")
+
     def boundaryProbes_to_txt(self):
         """
         Run pointFiles.sh on the case to parse the probe data into single files
 
-        pointFiles.sh is located in the ~/bin folder (so make sure to bring this to the repo at some point)
+        A symlink to pointFiles.sh is located in the ~/bin folder.
 
         Parameters
         ----------
@@ -733,14 +546,14 @@ class OpenFOAM:
     def plot_xarray(self):
         for bp in self.boundaryProbes:
             for k, v in bp.array_data.items():
-                fig, ax = plt.subplots(figsize=[6,5])
+                fig, ax = plt.subplots(figsize=[6, 5])
                 v.plot.line(x="time", ax=ax, lw=1)
 
                 plt.savefig(
                     self.path_case
                     / "organizedData/heatmaps"
                     / f"{self.path_case.name}_xarray_{k}.png",
-                    dpi=300
+                    dpi=300,
                 )
 
     def read_field_all_times(self, field: str):
@@ -826,16 +639,170 @@ class OpenFOAM:
             self.path_case
             / "organizedData/heatmaps"
             / f"{self.path_case.name}_{field}.png",
-            dpi=300
+            dpi=300,
         )
-    
-    def logger(self, *msgs:str):
-        
+
+    def logger(self, *msgs: str):
         for msg in msgs:
             self._log_buffer.write(msg)
 
-        with open(self.path_case/f"{self.path_case.name}.log", "a") as f:
+        with open(self.path_case / f"{self.path_case.name}.log", "a") as f:
             f.write(self._log_buffer.getvalue())
             f.write("\n")
-        
+
         self._log_buffer = StringIO()
+
+
+class ScheduledOpenFOAM(OpenFOAM):
+    def __init__(self, path_case, path_template, schedule):
+        if isinstance(schedule, OperationSchedule):
+            self.schedule = schedule
+        else:
+            raise TypeError("schedule must be an OperationSchedule object")
+
+        super().__init__(path_case, path_template)
+
+    def check_schedule_and_runner(self):
+        schedule_current_time_min = self.schedule.current_time
+        schedule_current_time_sec = schedule_current_time_min * 60
+
+        schedule_next_time_min = self.schedule.next_time_minutes
+        schedule_next_time_sec = schedule_next_time_min * 60
+
+        case_latest_time_sec = self.latest_time
+        case_latest_time_min = round(float(case_latest_time_sec) / 60, 3)
+
+        self.schedule.in_sync = isclose(
+            schedule_current_time_min, case_latest_time_min, abs_tol=0.5
+        )
+        in_sync = "✔️" if self.schedule.in_sync else "🚫"
+
+        self.logger(
+            "📅 Schedule:".ljust(20),
+            f"{schedule_current_time_min} min".rjust(15),
+            f"[{schedule_current_time_sec} s]".rjust(15),
+        )
+
+        self.logger(
+            "💧 OpenFOAM case:".ljust(20),
+            f"{case_latest_time_min} min".rjust(15),
+            f"[{case_latest_time_sec} s]".rjust(15),
+            in_sync,
+        )
+
+        self.logger(
+            "🕓 Run until:".ljust(20),
+            f"{schedule_next_time_min} min".rjust(15),
+            f"[{schedule_next_time_sec} s]".rjust(15),
+        )
+
+    def run_case_by_schedule(self, verbose=True):
+        """
+        Executes the solver following the schedule instructions of dry
+        and flooding periods
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        None
+        """
+
+        write_time_minutes = 144
+
+        self.logger("\n SIMULATION RUNS")
+
+        while self.schedule:
+            ## Flood
+            self.schedule.next_time_minutes += self.schedule.flood_minutes
+
+            if verbose:
+                self.logger("\n🌊 ====== Flood period ======")
+                self.check_schedule_and_runner()
+
+            if not self.schedule.in_sync:
+                break
+
+            self.set_boundary_fixedValue()  ##Flood
+            self.set_endtime(self.schedule.next_time_minutes)
+            self.set_convergeThreshold(0.05)
+            self.set_writeInterval(write_time_minutes)
+            self.cleanup_last_timestep()
+            return_code = self.run_solver()
+
+            if return_code > 0:
+                ## Should raise an error or just print warning and end?
+                self.logger(
+                    f"☠️ {self.solver} ended with error {return_code}.".rjust(80)
+                )
+                break
+
+            self.schedule.current_time = self.schedule.next_time_minutes
+
+            if verbose:
+                self.logger("~ Flood period ended ~")
+
+            if not self.schedule:
+                break
+
+            ## Warm
+            self.schedule.next_time_minutes += 10
+
+            if verbose:
+                self.logger("\n🍜 ======= Warm period ======")
+                self.check_schedule_and_runner()
+
+            if not self.schedule.in_sync:
+                break
+
+            self.set_boundary_fixedGradient()  ## Dry
+            self.set_endtime(self.schedule.next_time_minutes)
+            self.set_convergeThreshold(0.10)
+            self.set_writeInterval(2)
+            self.cleanup_last_timestep()
+            return_code = self.run_solver()
+
+            if return_code > 0:
+                ## Should raise an error or just print warning and end?
+                self.logger(
+                    f"☠️ {self.solver} ended with error {return_code}.".rjust(80)
+                )
+                break
+
+            self.schedule.current_time = self.schedule.next_time_minutes
+
+            if verbose:
+                self.logger("~ Warm period ended ~")
+
+            if not self.schedule:
+                break
+
+            ## Dry
+            self.schedule.next_time_minutes += self.schedule.dry_minutes
+
+            if verbose:
+                self.logger("\n🔥 ======= Dry period ======")
+                self.check_schedule_and_runner()
+
+            if not self.schedule.in_sync:
+                break
+
+            self.set_endtime(self.schedule.next_time_minutes)
+            self.set_convergeThreshold(0.10)
+            self.set_writeInterval(write_time_minutes)
+            self.cleanup_last_timestep()
+            return_code = self.run_solver()
+
+            if return_code > 0:
+                ## Should raise an error or just print warning and end?
+                self.logger(
+                    f"☠️ {self.solver} ended with error {return_code}.".rjust(80)
+                )
+                break
+
+            self.schedule.current_time = self.schedule.next_time_minutes
+
+            if verbose:
+                self.logger("~ Dry period ended ~")

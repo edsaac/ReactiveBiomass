@@ -17,7 +17,7 @@ FoamFile
 
 ddtSchemes
 {
-    default         Euler;
+    default    CrankNicolson 0.85;
 }
 
 gradSchemes
@@ -28,7 +28,8 @@ gradSchemes
 
 divSchemes
 {
-    default         Gauss Minmod;
+    // default         Gauss Minmod;
+    default        Gauss limitedLinear 1.0;
 }
 
 laplacianSchemes

@@ -17,8 +17,8 @@ FoamFile
 
 ddtSchemes
 {
+    ddt(h_after)         CrankNicolson 0.85;
     default              Euler;
-    dtt(h_after)         CrankNicolson 0.85;
 }
 
 gradSchemes

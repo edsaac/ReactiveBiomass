@@ -20,7 +20,7 @@ attachmentModel constantRate;
 
 constantRateCoeffs
 {
-    value   10e-6;
+    value   6e-6;
 }
 
 // attachmentModel rittmannShearPower;
