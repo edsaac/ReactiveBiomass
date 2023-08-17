@@ -441,7 +441,7 @@ int main(int argc, char *argv[])
             (
                 fvm::ddt(porosity, Sw, O2)
                 + fvm::div(phi, O2)
-                // - fvm::laplacian(porosity * Sw*(mag(U)*DispTensor + molDiff), O2)
+                - fvm::laplacian(porosity * Sw*(mag(U)*DispTensor + molDiff), O2)
                 ==
                 - alpha_1 * rH * (XAR + (porosity * Sw * XARp))   //Metabolism XAR
                 - alpha_N * rN * (XN + (porosity * Sw * XNp))     //Metabolism XN
@@ -469,12 +469,12 @@ int main(int argc, char *argv[])
             // OxygenGasTransport.solve();
             // fvOptions.correct(O2gas);
 
-            if (Foam::max(O2) > O2_saturation)
-            {
-                Foam::SeriousError<< "Oxygen in the aqueous phase is getting over saturated" << endl;
-                Info << "Exiting with code 103..." << endl;
-                exit(103);
-            }
+            // if (Foam::max(O2) > O2_saturation)
+            // {
+            //     Foam::SeriousError<< "Oxygen in the aqueous phase is getting over saturated" << endl;
+            //     Info << "Exiting with code 103..." << endl;
+            //     exit(103);
+            // }
 
             // Info << "\nNH4-N transport" << endl;
             fvScalarMatrix AmmoniumTransport

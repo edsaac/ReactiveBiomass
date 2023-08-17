@@ -1,6 +1,7 @@
 import subprocess
 from pathlib import Path
 import shutil
+import os
 
 from myusefultools.parser import getVTKList
 import pyvista as pv
@@ -506,6 +507,17 @@ class OpenFOAM:
 
         if process.returncode > 0:
             raise ValueError("foamToVTK returned with error")
+        
+        # Initialize organizedData folder for plots and stuff
+        organizedData_path = Path(self.path_case / "organizedData")
+        if not organizedData_path.exists():
+            os.makedirs(organizedData_path)
+            self.logger("organizedData folder created")
+        
+        heatmaps_path = organizedData_path / "heatmaps"
+        if not heatmaps_path.exists():
+            os.makedirs(heatmaps_path)
+
 
     def boundaryProbes_to_txt(self):
         """
