@@ -7,7 +7,6 @@ from myusefultools.parser import getVTKList
 import pyvista as pv
 import numpy as np
 import xarray as xr
-import matplotlib.pyplot as plt
 from dataclasses import dataclass
 from fractions import Fraction
 from math import isclose
@@ -15,6 +14,10 @@ from math import isclose
 from io import StringIO
 from datetime import datetime
 
+import matplotlib.pyplot as plt
+import matplotlib.colors as colors
+from myusefultools.he_utilities import set_matplotlib_customization
+set_matplotlib_customization(plt)
 
 @dataclass(slots=True, frozen=True)
 class probePoint:
@@ -129,6 +132,7 @@ class OperationSchedule:
 class OpenFOAM:
     path_case: str | Path
     path_template: str | Path
+    write_to_log: bool = False
 
     def __post_init__(self) -> None:
         self.path_case = Path(self.path_case)
@@ -616,7 +620,7 @@ class OpenFOAM:
 
         return data
 
-    def plot_field_over_time(self, field: str, label: str, units: str):
+    def plot_field_over_time(self, field: str, pcolormesh_kwargs: dict):
         """
         Generates a Depth-time heatmap plot of the field
 
@@ -638,14 +642,23 @@ class OpenFOAM:
         fig, (cax, ax) = plt.subplots(
             2, 1, figsize=[5, 7], gridspec_kw={"height_ratios": [0.2, 5]}, sharex=False
         )
+
+        if pcolormesh_kwargs.get("LogNorm"):
+            pcolormesh_kwargs["norm"] = colors.LogNorm(
+                **pcolormesh_kwargs["LogNorm"]
+            )
+
+            del pcolormesh_kwargs["LogNorm"]
+
         img = ax.pcolormesh(
-            scalar.t[igt:] / 86400, scalar.z, scalar[:, igt:], cmap="copper"
+            scalar.t[igt:] / 86400, scalar.z, scalar[:, igt:], 
+            **pcolormesh_kwargs
         )
         ax.spines.right.set_visible(False)
         ax.set_xlabel("Time $t$ [d]")
         ax.set_ylabel("Depth $z$ [m]")
         plt.colorbar(img, cax=cax, orientation="horizontal")
-        cax.set_title(rf"{label} {units}")
+        cax.set_title(rf"{field} [units]")
         fig.tight_layout()
         plt.savefig(
             self.path_case
@@ -655,6 +668,10 @@ class OpenFOAM:
         )
 
     def logger(self, *msgs: str):
+        
+        if not self.write_to_log:
+            return None
+
         for msg in msgs:
             self._log_buffer.write(msg)
 
@@ -666,13 +683,13 @@ class OpenFOAM:
 
 
 class ScheduledOpenFOAM(OpenFOAM):
-    def __init__(self, path_case, path_template, schedule):
+    def __init__(self, path_case, path_template, write_to_log, schedule):
         if isinstance(schedule, OperationSchedule):
             self.schedule = schedule
         else:
             raise TypeError("schedule must be an OperationSchedule object")
 
-        super().__init__(path_case, path_template)
+        super().__init__(path_case, path_template, write_to_log)
 
     def check_schedule_and_runner(self):
         schedule_current_time_min = self.schedule.current_time
@@ -722,7 +739,7 @@ class ScheduledOpenFOAM(OpenFOAM):
         None
         """
 
-        write_time_minutes = 144
+        write_time_minutes = 120
 
         self.logger("\n SIMULATION RUNS")
 
@@ -737,9 +754,9 @@ class ScheduledOpenFOAM(OpenFOAM):
             if not self.schedule.in_sync:
                 break
 
-            self.set_boundary_fixedValue()  ##Flood
+            self.set_boundary_fixedValue(value=-0.432)  ##Flood  but low flux
             self.set_endtime(self.schedule.next_time_minutes)
-            self.set_convergeThreshold(0.05)
+            self.set_convergeThreshold(0.005)
             self.set_writeInterval(write_time_minutes)
             self.cleanup_last_timestep()
             return_code = self.run_solver()
@@ -759,37 +776,37 @@ class ScheduledOpenFOAM(OpenFOAM):
             if not self.schedule:
                 break
 
-            ## Warm
-            self.schedule.next_time_minutes += 10
+            # ## Warm
+            # self.schedule.next_time_minutes += 10
 
-            if verbose:
-                self.logger("\n🍜 ======= Warm period ======")
-                self.check_schedule_and_runner()
+            # if verbose:
+            #     self.logger("\n🍜 ======= Warm period ======")
+            #     self.check_schedule_and_runner()
 
-            if not self.schedule.in_sync:
-                break
+            # if not self.schedule.in_sync:
+            #     break
 
-            self.set_boundary_fixedGradient()  ## Dry
-            self.set_endtime(self.schedule.next_time_minutes)
-            self.set_convergeThreshold(0.10)
-            self.set_writeInterval(2)
-            self.cleanup_last_timestep()
-            return_code = self.run_solver()
+            # self.set_boundary_fixedGradient()  ## Dry
+            # self.set_endtime(self.schedule.next_time_minutes)
+            # self.set_convergeThreshold(0.10)
+            # self.set_writeInterval(2)
+            # self.cleanup_last_timestep()
+            # return_code = self.run_solver()
 
-            if return_code > 0:
-                ## Should raise an error or just print warning and end?
-                self.logger(
-                    f"☠️ {self.solver} ended with error {return_code}.".rjust(80)
-                )
-                break
+            # if return_code > 0:
+            #     ## Should raise an error or just print warning and end?
+            #     self.logger(
+            #         f"☠️ {self.solver} ended with error {return_code}.".rjust(80)
+            #     )
+            #     break
 
-            self.schedule.current_time = self.schedule.next_time_minutes
+            # self.schedule.current_time = self.schedule.next_time_minutes
 
-            if verbose:
-                self.logger("~ Warm period ended ~")
+            # if verbose:
+            #     self.logger("~ Warm period ended ~")
 
-            if not self.schedule:
-                break
+            # if not self.schedule:
+            #     break
 
             ## Dry
             self.schedule.next_time_minutes += self.schedule.dry_minutes
@@ -801,8 +818,9 @@ class ScheduledOpenFOAM(OpenFOAM):
             if not self.schedule.in_sync:
                 break
 
+            self.set_boundary_fixedGradient()
             self.set_endtime(self.schedule.next_time_minutes)
-            self.set_convergeThreshold(0.10)
+            self.set_convergeThreshold(0.05)
             self.set_writeInterval(write_time_minutes)
             self.cleanup_last_timestep()
             return_code = self.run_solver()

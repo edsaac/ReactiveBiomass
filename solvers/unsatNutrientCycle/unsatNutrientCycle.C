@@ -116,6 +116,7 @@ int main(int argc, char *argv[])
 
     double convergeFlow = 1.0;
     int nCycles = 0;
+    bool lastIteration = false;
 
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -139,10 +140,14 @@ int main(int argc, char *argv[])
 
     Foam::Info << "\nCalculating...\n" << endl;
 
-    while (simple.loop(runTime))
-    {
-        Foam::Info<< "Time = " << runTime.timeName() << nl << endl;
+    while (runTime.run()){
 
+    // }
+    // while (simple.loop(runTime))
+    // {
+        runTime++;
+        
+        Foam::Info<< "Time = " << runTime.timeName() << nl << endl;
         
         /*
         - Calculate the total immobile biomass, the growth rate limiting function
@@ -185,9 +190,7 @@ int main(int argc, char *argv[])
         h_before = h;
         h_after = h;
 
-        while(true)
-        {
-
+        while(true){
             //- Calculate grad(K(h)) and extract z-component
             debug("Calculate perm_satu");
             soil.waterSaturationCalculator(h_before); // <- Updates Sw(h)
@@ -414,6 +417,45 @@ int main(int argc, char *argv[])
             fvOptions.constrain(InertGeneration);
             InertGeneration.solve();
             fvOptions.correct(XI);
+            
+            //Info << "\nDissolved oxygen (O2)" << endl;
+            fvScalarMatrix OxygenTransport
+            (
+                fvm::ddt(porosity, Sw, O2)
+                + fvm::div(phi, O2)
+                - fvm::laplacian(porosity * Sw*(mag(U)*DispTensor + molDiff), O2)
+                ==
+                - alpha_1 * rH * (XAR + (porosity * Sw * XARp))   //Metabolism XAR
+                - alpha_N * rN * (XN + (porosity * Sw * XNp))     //Metabolism XN
+                // - oxygen_mass_transfer * porosity * ((Sw * O2) - (Sa * Hacc * O2gas)) //Replenish to saturation if Sa?
+                // - oxygen_mass_transfer * porosity * ((Sw * O2) - (Sa * O2_saturation)) //Replenish to saturation if Sa?
+                - oxygen_mass_transfer * porosity * (Sw * O2)
+                + oxygen_mass_transfer * porosity * (Sa * O2_saturation) * pow(1.0 - O2/O2_saturation, 2) //Replenish to saturation if Sa?
+            );
+            OxygenTransport.relax();
+            fvOptions.constrain(OxygenTransport);
+            OxygenTransport.solve();
+            fvOptions.correct(O2);
+
+            // Info << "Gaseous oxygen (O2gas)" << endl;
+            // fvScalarMatrix OxygenGasTransport
+            // (
+            //     fvm::ddt(porosity, Sa, O2gas)
+            //     - fvm::laplacian(porosity * Sa * molDiff_air, O2gas)
+            //     ==
+            //     oxygen_mass_transfer * porosity * ((Sw * O2) - (Sa * Hacc * O2gas)) 
+            // );
+            // OxygenGasTransport.relax();
+            // fvOptions.constrain(OxygenGasTransport);
+            // OxygenGasTransport.solve();
+            // fvOptions.correct(O2gas);
+
+            // if (Foam::max(O2) > O2_saturation)
+            // {
+            //     Foam::SeriousError<< "Oxygen in the aqueous phase is getting over saturated" << endl;
+            //     Info << "Exiting with code 103..." << endl;
+            //     exit(103);
+            // }
 
             //Info << "\nDissolved Organic Carbon DOC transport" << endl;
             fvScalarMatrix DissolvedCarbonTransport
@@ -436,46 +478,6 @@ int main(int argc, char *argv[])
             DissolvedCarbonTransport.solve();
             fvOptions.correct(DOC);
             
-            //Info << "\nDissolved oxygen (O2)" << endl;
-            fvScalarMatrix OxygenTransport
-            (
-                fvm::ddt(porosity, Sw, O2)
-                + fvm::div(phi, O2)
-                - fvm::laplacian(porosity * Sw*(mag(U)*DispTensor + molDiff), O2)
-                ==
-                - alpha_1 * rH * (XAR + (porosity * Sw * XARp))   //Metabolism XAR
-                - alpha_N * rN * (XN + (porosity * Sw * XNp))     //Metabolism XN
-                // - oxygen_mass_transfer * porosity * ((Sw * O2) - (Sa * Hacc * O2gas)) //Replenish to saturation if Sa?
-                // + oxygen_mass_transfer * porosity * (Sa * Hacc * O2gas) //Replenish to saturation if Sa?
-
-            );
-            OxygenTransport.relax();
-            fvOptions.constrain(OxygenTransport);
-            OxygenTransport.solve();
-            fvOptions.correct(O2);
-
-            //Info << "\Gaseous oxygen (O2gas)" << endl;
-            // fvScalarMatrix OxygenGasTransport
-            // (
-            //     porosity * Sa * fvm::ddt(O2gas)
-            //     + O2gas * fvc::ddt(Sa, porosity)                   // Oxygen in the gaseous phase
-            //     - fvm::laplacian(porosity * Sa * molDiff_air, O2gas)
-            //     ==
-            //     // oxygen_mass_transfer * porosity * ((Sw * O2) - (Sa * Hacc * O2gas)) 
-            //     // - oxygen_mass_transfer * porosity * (Sa * Hacc * O2gas)
-            // );
-            // OxygenGasTransport.relax();
-            // fvOptions.constrain(OxygenGasTransport);
-            // OxygenGasTransport.solve();
-            // fvOptions.correct(O2gas);
-
-            // if (Foam::max(O2) > O2_saturation)
-            // {
-            //     Foam::SeriousError<< "Oxygen in the aqueous phase is getting over saturated" << endl;
-            //     Info << "Exiting with code 103..." << endl;
-            //     exit(103);
-            // }
-
             // Info << "\nNH4-N transport" << endl;
             fvScalarMatrix AmmoniumTransport
             (
@@ -583,7 +585,7 @@ int main(int argc, char *argv[])
                 << nl << endl;
     }
 
-    runTime.writeNow();
+    // runTime.writeNow();
 
     Foam::Info<< "End\n" << endl;
 

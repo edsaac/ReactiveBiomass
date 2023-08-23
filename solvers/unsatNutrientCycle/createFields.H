@@ -76,6 +76,35 @@ volScalarField m_vangenucthen
     1.0 - 1.0/n_vangenucthen
 );
 
+Foam::Info << "Creating field: relative permeability by clogging \n" << endl;
+volScalarField perm_clog
+(
+    IOobject
+    (
+        "perm_clog",
+        runTime.timeName(),
+        mesh,
+        IOobject::NO_READ,
+        IOobject::AUTO_WRITE
+    ),
+    mesh,
+    dimensionedScalar("perm_clog", dimless, 1.0)
+);
+
+Foam::Info << "Creating field: relative permeability by saturation \n" << endl;
+volScalarField perm_satu
+(
+    IOobject
+    (
+        "perm_satu",
+        runTime.timeName(),
+        mesh,
+        IOobject::NO_READ,
+        IOobject::AUTO_WRITE
+    ),
+    mesh,
+    dimensionedScalar("perm_satu", dimless, 1.0)
+);
 
 Foam::Info << "Reading field: Hydraulic head (h) \n" << endl;
 volScalarField h
@@ -133,36 +162,6 @@ volScalarField Sa
     ),
     mesh,
     dimensionedScalar("Sa", dimless, 0.0)
-);
-
-Foam::Info << "Creating field: relative permeability by clogging \n" << endl;
-volScalarField perm_clog
-(
-    IOobject
-    (
-        "perm_clog",
-        runTime.timeName(),
-        mesh,
-        IOobject::NO_READ,
-        IOobject::AUTO_WRITE
-    ),
-    mesh,
-    dimensionedScalar("perm_clog", dimless, 1.0)
-);
-
-Foam::Info << "Creating field: relative permeability by saturation \n" << endl;
-volScalarField perm_satu
-(
-    IOobject
-    (
-        "perm_satu",
-        runTime.timeName(),
-        mesh,
-        IOobject::NO_READ,
-        IOobject::AUTO_WRITE
-    ),
-    mesh,
-    dimensionedScalar("perm_satu", dimless, 1.0)
 );
 
 Foam::Info << "Creating field: hydraulic conductivity [m/s] \n" << endl;

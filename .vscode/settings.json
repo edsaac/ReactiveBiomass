@@ -1,11 +1,13 @@
 {
     "files.associations": {
+        "0.000/*": "OpenFOAM",
+        "constant/*": "OpenFOAM",
+        "system/*": "OpenFOAM",
         "*Dict": "OpenFOAM",
         "*Properties": "OpenFOAM",
         "fvSchemes": "OpenFOAM",
         "fvSolution": "OpenFOAM",
         "**/0/*": "OpenFOAM",
-        "0.000/*": "OpenFOAM",
         "**/constant/**": "OpenFOAM",
         "**/system/*": "OpenFOAM",
         "**/dynamicCode/*": "OpenFOAM",
@@ -28,9 +30,17 @@
         "type_traits": "cpp",
         "*.tpl": "cpp",
         "functional": "cpp",
-        "tuple": "cpp"
+        "tuple": "cpp",
+        "numeric": "cpp"
     },
 
+    "files.watcherExclude": {
+        "**/.git/objects/**": true,
+        "**/.git/subtree-cache/**": true,
+        "**/node_modules/*/**": true,
+        "**/.hg/store/**": true,
+        "**/CASES/**": true
+    },
     // Controls whether entries in .gitignore should be parsed and excluded from the explorer. Similar to `files.exclude`.
     "explorer.excludeGitIgnore": false,
     "editor.stickyScroll.enabled": true,

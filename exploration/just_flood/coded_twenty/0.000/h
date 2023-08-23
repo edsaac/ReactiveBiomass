@@ -1,0 +1,158 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  7
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version         2;
+    format          ascii;
+    class           volScalarField;
+    object          h;
+}
+
+dimensions      [ 0 1 0 0 0 0 0 ];
+
+internalField   uniform -0.5;
+
+boundaryField
+{
+    front
+    {
+        type            empty;
+    }
+    back
+    {
+        type            empty;
+    }
+    right
+    {
+        type            empty;
+    }
+    left
+    {
+        type            empty;
+    }
+    top
+    {   
+        type        unsatFlux;
+        value       $internalField;
+        targetFlow  3.32E-6;
+        
+        // type            fixedValue;
+        // value           uniform -0.432;
+        /*
+        Rosenzweig (2011) Thesis
+        ------------
+        Flow rate               Q   = 1 mL/min = 1.67E-8 m³/s
+        Hyd. conduct.           Ks  = 1.24 cm/min = 2.067E-4 m/s
+                                K(h =-0.30) = 9.83E-5 m/s
+        Diameter                D   = 8.0 cm = 0.08 m
+        Cross-area              A   = π*D²/4
+                                    = π*(0.08)²/4 = 5.026E-3 m²
+        Darcy vel.               q  = Q/A 
+                                    = 1.67E-8 m³/s / 5.026E-3 m² 
+                                    = 3.32E-6 m/s
+        
+        -------
+        Darcy Law               q = - K(h) • grad(h) 
+        Assume                  grad(h) = -1 
+        Then                    q = K(h)
+                                  = Ks * k(s) * k(n)
+        Solve for h             h = -0.432m if k(n) = 1
+        Expect                  h -> +inf as k(n) -> 1e-3
+        */
+
+        // - ♣ Targeted Darcy Flux
+        // type            codedFixedValue;
+        // value           $internalField;      // <- Do NOT set a uniform value!
+        // name            adjustableWetting;   // name of generated BC
+
+        // code
+        // #{
+        //     // Read the soil parameters
+        //     const volScalarField& Ks = this->db().objectRegistry::lookupObject<volScalarField>("K_0");
+        //     const volScalarField& alpha = this->db().objectRegistry::lookupObject<volScalarField>("alpha");
+        //     const volScalarField& n_vang = this->db().objectRegistry::lookupObject<volScalarField>("n_vangenucthen");
+        //     const volScalarField& Swr = this->db().objectRegistry::lookupObject<volScalarField>("Sw_r");
+        //     const volScalarField& Sws = this->db().objectRegistry::lookupObject<volScalarField>("Sw_s");
+
+        //     // Read current clogging state
+        //     const volScalarField& perm_clogging = this->db().objectRegistry::lookupObject<volScalarField>("perm_clog");
+  
+        //     // Call geometry
+        //     const fvPatch& boundaryPatch = patch(); 
+
+        //     // Initialize field
+        //     const vectorField& Cf = boundaryPatch.Sf(); 
+        //     scalarField& field = *this; 
+
+        //     // Call time
+        //     // scalar t = this->db().time().value();
+        //     const scalar qtarget = 3.36E-6;
+        //     scalar solution;
+
+        //     // Loop through all faces in the boundary
+        //     forAll(Cf, faceI)
+        //     {
+        //         // Build soil top
+        //         UnsaturatedSoilTop soiltop(
+        //             Sws[faceI],
+        //             Swr[faceI],
+        //             alpha[faceI],
+        //             n_vang[faceI],
+        //             Ks[faceI] * perm_clogging[faceI], // Ks but penalized by clogging
+        //             qtarget 
+        //         );
+
+        //         // Info << "Location: "<< nl << endl;
+        //         // x = Cf[faceI].x();
+                
+        //         Info << "Soil state:" << nl;
+        //         Info << "Ks [m/s]: " << soiltop.Ks << endl;
+        //         Info << "k(n): " << perm_clogging[faceI] << endl;
+                
+        //         solution = soiltop.bisection_h_from_target(-10.0, 0.0);
+        //         Info << "Bisection solution h: " << solution << " m" << endl;
+                
+        //         // Assign value to h
+        //         field[faceI] = solution;
+        //     }
+
+        //     this->operator==(solution);
+        //     writeEntry(os, "", "value");
+        //     // fixedValueFvPatchVectorField::updateCoeffs();
+
+        //         // this->operator==(this->patchInternalField());
+            
+        // #};
+
+        codeOptions
+        #{
+
+            -I$(LIB_SRC)/finiteVolume/lnInclude \
+            -I$(LIB_SRC)/meshTools/lnInclude
+
+        #};
+
+        codeInclude
+        #{
+            #include "fvCFD.H"
+            #include <iostream>
+            #include <math.h>
+            #include "unsaturatedCalculator.H"
+
+        #};
+
+    }
+    bottom
+    {
+        type            fixedGradient;
+        gradient        uniform 0;
+    }
+}
+
+
+// ************************************************************************* //

@@ -45,11 +45,12 @@ def main(args):
     ):
         schedule = OperationSchedule(
             # dry_minutes=dry, flood_minutes=flood, end_minutes=14_400
-            dry_minutes=dry, flood_minutes=flood, end_minutes=14_400
+            dry_minutes=dry, flood_minutes=flood, end_minutes=28_800
         )
         identifier = f"CASES/dry_{dry}__flood_{flood}"
         of = ScheduledOpenFOAM(
-            path_case=identifier, schedule=schedule, path_template=template_folder
+            path_case=identifier, write_to_log = True, path_template=template_folder,
+            schedule=schedule,
         )
         cases_objs[identifier] = of
 
@@ -74,10 +75,16 @@ def main(args):
     if RUN_OPTIONS["heatmap"]:
         field = RUN_OPTIONS["heatmap"]
 
+        with open("heatmaps_config.json") as f:
+            heatmaps_config = json.load(f)
+
+        default_pcolormesh_kwargs = dict(vmin=0, cmap="winter")
+        pcolormesh_kwargs = heatmaps_config.get(field) or default_pcolormesh_kwargs
+        
         with mp.Pool() as pool:
             pool.starmap(
                 ScheduledOpenFOAM.plot_field_over_time,
-                [(of, field, field, "[Units]") for of in cases_objs.values()],
+                [(of, field, pcolormesh_kwargs) for of in cases_objs.values()],
             )
 
     if RUN_OPTIONS["timeseries_probes"]:

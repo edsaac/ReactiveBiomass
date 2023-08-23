@@ -21,21 +21,21 @@ with st.sidebar:
 r"# Constitutive relations for unsaturated flow"
 
 ## Globals
-# α = 2.79 #1/m
-# θs = 0.385
-# θr = 0.012
-# n = 7.26
-# m = 1 - 1/n
-# Ks = 2.07E-4  #m/s
-# qtarget = 3.32E-6 #m/s
-
-α = 1.433 #1/m
-θs = 0.3308
-θr = 0.0
-n = 1.506
+α = 2.79 #1/m
+θs = 0.385
+θr = 0.012
+n = 7.26
 m = 1 - 1/n
-Ks = 6.944E-5  #m/s
+Ks = 2.07E-4  #m/s
 qtarget = 3.32E-6 #m/s
+
+# α = 1.433 #1/m
+# θs = 0.3308
+# θr = 0.0
+# n = 1.506
+# m = 1 - 1/n
+# Ks = 6.944E-5  #m/s
+# qtarget = 3.32E-6 #m/s
 
 with st.sidebar:
     with st.form("Parameters:"):

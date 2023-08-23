@@ -1,0 +1,6 @@
+/* dynamicCode:
+ * SHA1 = 275742c1b689f944bb554834bffc7e16d65ff3e8
+ */
+fixedValueFvPatchFieldTemplate.C
+
+LIB = $(PWD)/../platforms/$(WM_OPTIONS)/lib/libadjustableWetting_275742c1b689f944bb554834bffc7e16d65ff3e8

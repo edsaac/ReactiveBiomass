@@ -27,9 +27,13 @@ Description
 // \*---------------------------------------------------------------------------*/
 
 // Was the non-linerity solved?
+
+Info << nl << runTime.value() << endl;
+
 if (convergeFlow < timeControl.convergeThreshold)
 {
     h = h_after;
+ 
 
     // Can we increase the timestep?
     if (nCycles <= timeControl.UpDeltaT_nIters)
@@ -49,9 +53,33 @@ if (convergeFlow < timeControl.convergeThreshold)
         }
         else
         {
-            Info << nl << "deltaT is already at its max" << endl;
+            Info << nl << "deltaT is already at its max: " << runTime.deltaTValue() << endl;
         }
     }
+
+    // Make sure next deltaT does not exceed the last timestep
+
+    // Info << "runTime.value() = " << runTime.value() << nl 
+    //     << "runTime.deltaTValue()" << runTime.deltaTValue() << nl
+    //     << " runTime.endTime().value()" <<  runTime.endTime().value() << endl;
+
+    if (!lastIteration){
+        if(runTime.value() + runTime.deltaTValue() > runTime.endTime().value()){
+            runTime.setDeltaT
+            (
+                runTime.endTime().value() - runTime.value() + small
+            );
+
+            Foam::Info << nl << "deltaT adjusted to end at exact end time: "
+                << runTime.deltaTValue() << endl;
+
+            lastIteration = true;
+        }
+    }
+    else{
+        runTime.writeAndEnd();
+    }
+
     break;
 }
 
@@ -68,9 +96,7 @@ else
     {
         // End simulation if deltaT is too small 
         if (runTime.deltaTValue() < timeControl.minDeltaT)
-        {
-            RETURNCODE = 1;
-            
+        {            
             Foam::Info << "\n deltaT is lower than minDeltaT: "
                        << runTime.deltaTValue() << " < " << timeControl.minDeltaT << nl
                        << "\n Failed to converge :( " << nl << endl;
@@ -78,9 +104,6 @@ else
             Foam::Info << "\n Final time: " << runTime.timeName()<< endl;
             Info << "Exiting with code 101..." << endl;
             exit(101);
-
-            // runTime.writeAndEnd();
-            break;
         }
 
         runTime.setDeltaT
@@ -95,3 +118,4 @@ else
         nCycles = 0;
     }
 }
+

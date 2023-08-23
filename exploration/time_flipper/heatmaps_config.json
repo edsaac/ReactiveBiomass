@@ -1,0 +1,25 @@
+{
+    "XAR": {
+        "cmap": "afmhot_r",
+        "LogNorm": {
+            "vmin": 1e-5,
+            "vmax": 1e-1
+        }
+    },
+    "Sw": {
+        "cmap": "Blues"
+    },
+    "O2": {
+        "cmap": "Reds",
+        "vmin": 0,
+        "vmax": 0.009
+    },
+    "NH4": {
+        "cmap": "Greens",
+        "vmin": 0,
+        "vmax": 1e-2
+    },
+    "tracer":{
+        "cmap": "gnuplot"
+    }
+}
