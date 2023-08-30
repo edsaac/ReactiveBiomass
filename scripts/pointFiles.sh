@@ -39,7 +39,7 @@ sed -e "s/\s\s*/ /g" $RAND_FILE | cut -d " " -f 1,2,3 > $COORD_FILE
 
 ## Save the list of point_$FIELDS.xy
 FIELDS=$(ls -v $RAND_FOLDER)
-echo $FIELDS
+# echo $FIELDS
 
 # Read each time and generate a pressure array
 # with each timestep as rows and coords points as cols
@@ -59,6 +59,6 @@ for FIELD in $FIELDS
 
   sed -i "s/ $//g" $OUT_FIELD_FILE
   
-  echo "Processed $FIELD !"
+#   echo "Processed $FIELD !"
 
 done

@@ -11,12 +11,12 @@ Description
 
 \*---------------------------------------------------------------------------*/
 
-fields ("Sw" "h" "DOC" "U");
+fields ("Sw" "h" "U" "DOC");
 
 points
 (
 (0.1 0.1 0.0)
-(0.1 0.1 2.0)
+(0.1 0.1 0.6)
 );
 
 maxDistance 0.01;
@@ -33,7 +33,7 @@ patches     ("bottom" "top");
 
 executeControl  timeStep;
 writeControl	runTime;
-writeInterval	600;
+writeInterval	300;
 
 
 // ************************************************************************* //

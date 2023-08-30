@@ -77,6 +77,9 @@ class boundaryProbe:
 
     def get_probe_points(self):
         xyz = np.loadtxt(self.path_xyz)
+        if len(xyz.shape) == 1:
+            xyz = [xyz]
+
         self.probes_points = [probePoint(*coord) for coord in xyz]
 
     def get_times(self):
@@ -153,6 +156,14 @@ class OpenFOAM:
         else:
             self.logger("💇🏻‍♂️ Case exists! No need to clone template.")
 
+    def _repr_html_(self):
+        html = ""
+        html += (f"<h3>{self.__class__.__name__} object</h3>\n")
+        html += (f"<p><b>path_case:  </b>{str(self.path_case)}<br>")
+        html += (f"<b>path_template:  </b>{self.path_template}</p>\n")
+        return html
+
+
     def get_value_from_foamDictionary(self, location: str, entry: str):
         command = ["foamDictionary", location, "-entry", entry, "-value"]
 
@@ -216,9 +227,9 @@ class OpenFOAM:
                 self.path_template / "0.000",
                 self.path_template / "constant",
                 self.path_template / "system",
-                self.path_template / "VTK",
-                self.path_template / "VTK_soilProperties",
-                self.path_template / "organizedData",
+                # self.path_template / "VTK",
+                # self.path_template / "VTK_soilProperties",
+                # self.path_template / "organizedData",
                 self.path_case,
             ]
         )
@@ -445,7 +456,7 @@ class OpenFOAM:
         # for param in list_soilParameters:
         #     (path_soilParameters/param).unlink()
 
-        subprocess.run("rm -r VTK VTK_soilProperties".split(), cwd=self.path_case)
+        subprocess.run("rm -rf VTK VTK_soilProperties".split(), cwd=self.path_case)
         subprocess.run(
             [
                 "cp",
@@ -620,7 +631,7 @@ class OpenFOAM:
 
         return data
 
-    def plot_field_over_time(self, field: str, pcolormesh_kwargs: dict):
+    def plot_field_over_time(self, field: str, pcolormesh_kwargs: dict, save_png: bool = False):
         """
         Generates a Depth-time heatmap plot of the field
 
@@ -640,7 +651,7 @@ class OpenFOAM:
 
         igt = 0
         fig, (cax, ax) = plt.subplots(
-            2, 1, figsize=[5, 7], gridspec_kw={"height_ratios": [0.2, 5]}, sharex=False
+            2, 1, figsize=[5, 5], gridspec_kw={"height_ratios": [0.2, 5]}, sharex=False
         )
 
         if pcolormesh_kwargs.get("LogNorm"):
@@ -660,12 +671,17 @@ class OpenFOAM:
         plt.colorbar(img, cax=cax, orientation="horizontal")
         cax.set_title(rf"{field} [units]")
         fig.tight_layout()
-        plt.savefig(
-            self.path_case
-            / "organizedData/heatmaps"
-            / f"{self.path_case.name}_{field}.png",
-            dpi=300,
-        )
+
+        if save_png:
+            plt.savefig(
+                self.path_case
+                / "organizedData/heatmaps"
+                / f"{self.path_case.name}_{field}.png",
+                dpi=300,
+            )
+        
+        else:
+            return fig
 
     def logger(self, *msgs: str):
         

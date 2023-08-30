@@ -22,7 +22,8 @@ startTime       0;
 
 stopAt          endTime;
 
-endTime         3456000;
+endTime         1987200;
+//endTime         8640;
 
 writeControl    runTime;
 

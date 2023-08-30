@@ -38,9 +38,9 @@ st.session_state["axis_setup"] = dict(
     color="#bbb",
     showline=True)
 
-casesList = ["highFlowRate", "oxygenReplenish", "steadyInflow"]
+casesList = ["inoculated"]
 casename = st.radio("Select simulation:", casesList)
-st.session_state.casepath = Path(".", casename)
+st.session_state.casepath = Path("fit_ravid", casename)
 
 @dataclass
 class ModelResult:
@@ -134,3 +134,6 @@ def get_results_blob(group:str):
     return { k:ModelResult(k, **v) for k,v in details.items() }
 
 st.session_state.get_results_blob = get_results_blob
+
+if st.button("Clear All"):
+    st.cache_data.clear()

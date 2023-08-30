@@ -3,13 +3,15 @@
 class UnsaturatedSoilTop
 {
 public:
-    scalar Sw_s;
+    scalar Sw_s;  
     scalar Sw_r;
     scalar alpha;
     scalar n;
     scalar m;
     scalar Ks;
-    scalar qtarget;
+    scalar qtarget;  // target flow
+    scalar hcell;
+    scalar dist;
 
     // Constructors
     UnsaturatedSoilTop(
@@ -18,14 +20,18 @@ public:
         scalar alpha,
         scalar n,
         scalar Ks,
-        scalar qtarget)
+        scalar qtarget,
+        scalar hcell,
+        scalar dist)
         : Sw_s(Sw_s),
           Sw_r(Sw_r),
           alpha(alpha),
           n(n),
           m(1.0 - 1.0/n),
           Ks(Ks),
-          qtarget(qtarget)
+          qtarget(qtarget),
+          hcell(hcell),
+          dist(dist)
     {
     }
 
@@ -70,7 +76,7 @@ public:
 
     scalar target_flow(const scalar h)
     {
-        return qtarget - (Ks * mualemCalculator(h));
+        return qtarget - (Ks * mualemCalculator(h)); // * ((h - hcell)/dist - 1.0));
     }
     scalar bisection_h_from_target(scalar lower_end, scalar upper_end)
     {
@@ -79,8 +85,12 @@ public:
 
         /* Bisection method, adapted from: 
            https://pythonnumericalmethods.berkeley.edu/notebooks/chapter19.03-Bisection-Method.html
+
+           Replace recursion by a while loop.
         */
-        const scalar tol = 1e-20;
+        const scalar tol = 1e-18;
+        const unsigned int max_iters = 100;
+        unsigned int bisection_iter = 0;
         scalar midpoint = 0;
 
         // check if lower_end and upper_end bound lower_end root
@@ -88,28 +98,39 @@ public:
             return 0.0;
         }
         
-        midpoint = (lower_end + upper_end)/2;    // get midpoint
+        while (bisection_iter < max_iters)
+        {
+            midpoint = (lower_end + upper_end)/2;    // get midpoint
+            bisection_iter++;
+            
+            if ( Foam::mag(target_flow(midpoint)) < tol )
+            {
+                break;  // stopping condition, report m as root
+            } 
+            else if ( Foam::sign(target_flow(lower_end)) == Foam::sign(target_flow(midpoint)) ) 
+            {
+                // case where midpoint is an improvement on lower_end. 
+                // Make recursive call with lower_end = midpoint
+                // return bisection_h_from_target(midpoint, upper_end);
+                lower_end = midpoint;
+            } 
+            else if ( Foam::sign(target_flow(upper_end)) == Foam::sign(target_flow(midpoint)) )
+            {
+                // # case where midpoint is an improvement on upper_end. 
+                // # Make recursive call with upper_end = midpoint
+                // return bisection_h_from_target(lower_end, midpoint);
+                upper_end = midpoint;
+            }
 
+        }
         // Info << "  current midpoint: " << midpoint << endl;
         // Info << "target_flow(" << midpoint << "): " << target_flow(midpoint) << endl;
-    
-        if ( Foam::mag(target_flow(midpoint)) < tol )
-        {
-            return midpoint;  // stopping condition, report m as root
-        } 
-        else if ( Foam::sign(target_flow(lower_end)) == Foam::sign(target_flow(midpoint)) ) 
-        {
-            // case where midpoint is an improvement on lower_end. 
-            // Make recursive call with lower_end = midpoint
-            return bisection_h_from_target(midpoint, upper_end);
-        } 
-        else if ( Foam::sign(target_flow(upper_end)) == Foam::sign(target_flow(midpoint)) )
-        {
-            // # case where midpoint is an improvement on upper_end. 
-            // # Make recursive call with upper_end = midpoint
-            return bisection_h_from_target(lower_end, midpoint);
+        if (bisection_iter < max_iters){
+            Info << "Finished in " << bisection_iter << " bisections" << endl;
         }
-
-        return -1000;
+        else{
+            Info << "Too many bisections!" << endl;
+        }
+        return midpoint;
     }
 };

@@ -40,7 +40,7 @@ boundaryField
         type        unsatFlux;
         value       $internalField;
         targetFlow  3.32E-6;
-        
+
         // type            fixedValue;
         // value           uniform -0.432;
         /*

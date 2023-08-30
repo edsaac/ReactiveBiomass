@@ -60,14 +60,9 @@ Foam::unsatFluxFvPatchScalarField::unsatFluxFvPatchScalarField
     // NOTE: calls the = operator to assign the value to the faces held by this BC
     fvPatchScalarField::operator=(scalarField("value", dict, p.size()));
 
-    // NOTE: looks up the necessary paramters
-    // approximationType_ = dict.lookupOrDefault<word>("approximationType","exponential");
+    // NOTE: looks up the necessary parameters
     dict.lookup("targetFlow") >> targetFlow_;
-	// dict.lookup("deltaByR") >> deltaByR_;
-	// centrepoint_ = dict.lookupOrDefault<vector>("centrepoint",vector::zero);
-	// dict.lookup("R") >> R_;
-	// lambda_ = dict.lookupOrDefault<scalar>("lambda",0.);
-
+    
     // NOTE: calls the .updateCoeffs() method to calculate the inlet profile in
     // accordance with the controls which have just been read.
 	updateCoeffs();
@@ -86,12 +81,6 @@ Foam::unsatFluxFvPatchScalarField::unsatFluxFvPatchScalarField
     // instance being created from another one.
     fixedValueFvPatchScalarField(ptf, p, iF, mapper),
     targetFlow_(ptf.targetFlow_)
-    // approximationType_(ptf.approximationType_),
-    // flowSpeed_(ptf.flowSpeed_),
-	// deltaByR_(ptf.deltaByR_),
-	// centrepoint_(ptf.centrepoint_),
-	// R_(ptf.R_),
-	// lambda_(ptf.lambda_)
 {}
 
 Foam::unsatFluxFvPatchScalarField::unsatFluxFvPatchScalarField
@@ -102,12 +91,6 @@ Foam::unsatFluxFvPatchScalarField::unsatFluxFvPatchScalarField
 :
     fixedValueFvPatchScalarField(rifvpvf, iF),
     targetFlow_(rifvpvf.targetFlow_)
-    // approximationType_(rifvpvf.approximationType_),
-    // flowSpeed_(rifvpvf.flowSpeed_),
-    // deltaByR_(rifvpvf.deltaByR_),
-    // centrepoint_(rifvpvf.centrepoint_),
-    // R_(rifvpvf.R_),
-    // lambda_(rifvpvf.lambda_)
 {}
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
@@ -122,7 +105,7 @@ void Foam::unsatFluxFvPatchScalarField::updateCoeffs()
     }
     
     const fvMesh& mesh = patch().boundaryMesh().mesh();
-    label target_patch = mesh.boundaryMesh().findPatchID("top");
+    label target_patch = mesh.boundaryMesh().findPatchID(this->patch().name());
     
     // Get the other fields
     const volScalarField& Ks = this->db().objectRegistry::lookupObject<volScalarField>("K_0");    
@@ -130,7 +113,9 @@ void Foam::unsatFluxFvPatchScalarField::updateCoeffs()
     const volScalarField& n_vang = this->db().objectRegistry::lookupObject<volScalarField>("n_vangenucthen");
     const volScalarField& Swr = this->db().objectRegistry::lookupObject<volScalarField>("Sw_r");
     const volScalarField& Sws = this->db().objectRegistry::lookupObject<volScalarField>("Sw_s");
+    
     const volScalarField& perm_clogging = this->db().objectRegistry::lookupObject<volScalarField>("perm_clog");
+    const volScalarField& head = this->db().objectRegistry::lookupObject<volScalarField>("h");
 
     // Get their boundaries
     const fvPatchScalarField& Ks_bc = Ks.boundaryField()[target_patch];
@@ -140,11 +125,23 @@ void Foam::unsatFluxFvPatchScalarField::updateCoeffs()
     const fvPatchScalarField& Sws_bc = Sws.boundaryField()[target_patch];
     const fvPatchScalarField& perm_clogging_bc = perm_clogging.boundaryField()[target_patch];
 
+    scalar headCell = 0.0;
+    scalar distanceBoundaryCell = 1.0;
+    
+    // Initialize a field for the calculated h
 	scalarField h_solution(this->patch().size(), 1.0);
 
-    // go over each face and add the BL profile for faces close to the wall
+    // Go over each face and add the BL profile for faces close to the wall
 	forAll(h_solution, faceI)
 	{
+        // Head value in the cell next to the boundary
+        label cellI = patch().faceCells()[faceI];
+        Info << "head[cellI]: "<< head[cellI] << endl;
+        headCell = head[cellI];
+        
+        Info << "Distance: " << 1.0/(mesh.deltaCoeffs().boundaryField()[target_patch][faceI]) << endl;
+        distanceBoundaryCell = 1.0/(2 * mesh.deltaCoeffs().boundaryField()[target_patch][faceI]);
+
         // Build soil top
         UnsaturatedSoilTop soiltop(
             Sws_bc[faceI],
@@ -152,16 +149,17 @@ void Foam::unsatFluxFvPatchScalarField::updateCoeffs()
             alpha_bc[faceI],
             n_vang_bc[faceI],
             Ks_bc[faceI] * perm_clogging_bc[faceI], // Ks but penalized by clogging
-            targetFlow_ 
+            targetFlow_,
+            headCell,
+            distanceBoundaryCell
         );
         
         Info << "Soil state:" << nl;
         Info << "Ks [m/s]: " << soiltop.Ks << endl;
         Info << "k(n): " << perm_clogging_bc[faceI] << endl;
         
-        h_solution[faceI] = soiltop.bisection_h_from_target(-10.0, 0.0);
+        h_solution[faceI] = soiltop.bisection_h_from_target(-20.0, 5.0);
         Info << "Bisection solution h: " << h_solution[faceI] << " m" << endl;
-        // h_solution = Ks_bc[faceI];
 	}
 
 	// set the value_ of this patch to the newly computed flow speed

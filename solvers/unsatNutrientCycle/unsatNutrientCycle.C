@@ -77,6 +77,8 @@ Description
     rBDN = qBAP*M(B)*M(NO3)*I(O2)
 
     Y' = Y*(1 - k1 - kE)  ## Code assumes Y is Y'
+
+   Add unsatFlux boundary condition
 ENDIGNORE
 \*---------------------------------------------------------------------------*/
 
