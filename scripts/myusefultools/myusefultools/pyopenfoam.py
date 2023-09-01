@@ -329,11 +329,11 @@ class OpenFOAM:
         dict_loc = f"{t}/{field}"
         boundary = f"boundaryField.{patch}"
 
-        self.set_value_in_foamDictionary(dict_loc, f"{boundary}.type", "fixedValue")
-        self.set_value_in_foamDictionary(
-            dict_loc, f"{boundary}.value", f"uniform {value:.4E}"
-        )
-        self.remove_entry_in_foamDictionary(dict_loc, f"{boundary}.gradient")
+        self.set_value_in_foamDictionary(dict_loc, boundary, f"{{type  fixedValue; value  uniform {value:.4E}; }}")
+        # self.set_value_in_foamDictionary(
+        #     dict_loc, f"{boundary}.value", f"uniform {value:.4E}"
+        # )
+        # self.remove_entry_in_foamDictionary(dict_loc, f"{boundary}.gradient")
 
     def set_boundary_fixedGradient(
         self, value: float = -1.0, patch: str = "top", field: str = "h"
@@ -373,11 +373,13 @@ class OpenFOAM:
         dict_loc = f"{t}/{field}"
         boundary = f"boundaryField.{patch}"
 
-        self.set_value_in_foamDictionary(dict_loc, f"{boundary}.type", "fixedGradient")
-        self.set_value_in_foamDictionary(
-            dict_loc, f"{boundary}.gradient", f"uniform {value}"
-        )
-        self.remove_entry_in_foamDictionary(dict_loc, f"{boundary}.value")
+        self.set_value_in_foamDictionary(dict_loc, boundary, f"{{type  fixedGradient; gradient uniform {value}; }}")
+
+        # self.set_value_in_foamDictionary(dict_loc, f"{boundary}.type", "fixedGradient")
+        # self.set_value_in_foamDictionary(
+        #     dict_loc, f"{boundary}.gradient", f"uniform {value}"
+        # )
+        # self.remove_entry_in_foamDictionary(dict_loc, f"{boundary}.value")
 
     def cleanup_last_timestep(self):
         """

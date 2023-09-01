@@ -1,0 +1,90 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  7
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volScalarField;
+    location    "0.000";
+    object      alpha;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+/*
+    See Supplemental Material of Ben Moshe et al. (2020)
+    DOI: 10.1002/vzj2.20095
+
+    Table S2 - Soil hydraulic parameters for the six layers
+    |Layer|$\theta_s$|$\theta_r$|$\alpha$ [1/m]|$n$|$K_s$ [m/min]|
+    |:---:|:---:|:-----:|:-----:|:----:|:-------:|
+    |Thin | 0.45| 0.070 | 10.4  | 1.08 | 8E-7    |
+    | 1 | 0.31 | 0.010 | 0.912 | 2.3  | 1.7E-3  | <---
+    | 2 | 0.27 | 0.045 | 3.28  | 2.25 | 3.8E-3  |
+    | 3 | 0.22 | 0.043 | 3.28  | 2.7  | 2.37E-3 |
+    | 4 | 0.28 | 0.045 | 3.28  | 5.2  | 3.8E-3  |
+    | 5 | 0.28 | 0.045 | 3.28  | 3.9  | 2.8E-3  |
+    | 6 | 0.29 | 0.043 | 4.88  | 2.0  | 2.25E-3 |
+
+    Porosity values found on Ben Moshe et al. (2020)
+    DOI: 10.5194/hess-24-417-2020
+
+    |Layer|Porosity|Gravel (%)|Sand (&)|Silt (%)|Clay (%)|TOC (%)|
+    |:---:|:------:|:----:|:-----:|:----:|:----:|:-----:|
+    |   1 |  0.48  | 0.7 | 93.9 | 2.4 | 3.0 | 0.25 |
+    |   2 |  0.48  | 0.6 | 94.4 | 2.1 | 2.9 | 0.10 |
+    |   3 |  0.47  | 0.0 | 99.2 | 0.1 | 0.7 | 0.01 |
+    |   4 |  0.42  | 0.0 | 97.4 | 0.6 | 2.0 | 0.02 |
+    |   5 |     -  |   - |    - |   - |   - |    - |
+    |   6 |  0.42  | 0.4 | 86.4 | 5.4 | 7.6 | 0.05 |
+
+
+    · n = 0.48 (Porosity)
+    · n_vanGen = 2.3
+    · Ks = 1.7E-3 m/min = 2.83E-5 m/s
+    · α  = 0.912 1/m
+    · θs = 0.31
+    · Sw_s = θs/n = 0.646
+    · θr = 0.01
+    · Sw_r = θr/n = 0.021
+
+*/
+
+dimensions      [0 -1 0 0 0 0 0];
+
+internalField   uniform 0.912;
+
+boundaryField
+{
+    top
+    {
+        type            zeroGradient;
+    }
+    left
+    {
+        type            empty;
+    }
+    right
+    {
+        type            empty;
+    }
+    front
+    {
+        type            empty;
+    }
+    back
+    {
+        type            empty;
+    }
+    bottom
+    {
+        type            zeroGradient;
+    }
+}
+
+
+// ************************************************************************* //

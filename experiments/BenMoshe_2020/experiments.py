@@ -75,9 +75,17 @@ r"""
 ## Collected data
 
 """
+## Fig2.xlsx -> Data for Fig 1
+## Book1.xlsx -> Data for Fig S1
 
-book1 = read_excel("./experimental-data/.hiddendata/redatarequestfrom10_5194hess244172020/Book1.xlsx")
+def bgcolorer(value):
+    bgcolor = "yellow" if value <= 1.0 else "aquamarine"
+    return f"background-color: {bgcolor};"
+
+book1 = read_excel("./experimental-data/.hiddendata/redatarequestfrom10_5194hess244172020/Fig2.xlsx")
 book1
+
+st.dataframe(book1.style.applymap(bgcolorer, subset=['SH']))
 
 ## Time
 time = book1.index.to_numpy()
@@ -89,9 +97,15 @@ sensor_depths_centers = [-25, -75, -175, -275]
 sensor_depths_edges = [0, -50, -125, -225, -325]
 
 ## Parameters
-water_content = book1[["WC25", "WC75", "WC175", "WC275"]].to_numpy().T
+# water_content = book1[["WC25", "WC75", "WC175", "WC275"]].to_numpy().T ## If Book1.xlsx
+water_content = book1[["WC 25", "WC 75", "WC 175", "WC 275"]].to_numpy().T ## If Fig2.xlsx
+
 surface_head = np.where(book1["SH"].to_numpy() > 0.5, book1["SH"].to_numpy(), 0.5)
-dissolved_oxygen = book1[["DO25", "DO75", "DO175", "DO275"]].to_numpy().T
+
+
+
+#  dissolved_oxygen = book1[["DO25", "DO75", "DO175", "DO275"]].to_numpy().T  ## If Book1.xlsx
+dissolved_oxygen = book1[["OXY 25", "OXY 75", "OXY 175", "OXY 275"]].to_numpy().T ## If Fig2.xlsx
 
 
 fig, axs = plt.subplots(

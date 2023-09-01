@@ -1,0 +1,41 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  7
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "constant";
+    object      transportProperties;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// [kg m s K mol * *]
+
+// Clogging parameters
+clog?     true;
+
+nMin      nMin       [0 0 0 0 0 0 0]    0.10;     // Minimum porosity
+permMin   permMin   [0 0 0 0 0 0 0]    1.0E-3;   // Minimum relative permeability
+
+nRef      nRef       [0 0 0 0 0 0 0]    0.358;     // Reference porosity
+permRef   permRef    [0 0 0 0 0 0 0]    1.0;       // Reference permeability
+
+cloggingModel powerLaw;
+
+powerLawCoeffs
+{
+    nExponent dimless 3.0;
+}
+
+// kozenyCarmanCoeffs
+// {
+//     nExponent dimless 3.0;
+//     mExponent dimless 2.0;
+// }
+
+// ************************************************************************* //

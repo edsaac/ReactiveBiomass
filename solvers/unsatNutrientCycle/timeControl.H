@@ -28,7 +28,7 @@ Description
 
 // Was the non-linerity solved?
 
-Info << nl << runTime.value() << endl;
+// Info << nl << runTime.value() << endl;
 
 if (convergeFlow < timeControl.convergeThreshold)
 {

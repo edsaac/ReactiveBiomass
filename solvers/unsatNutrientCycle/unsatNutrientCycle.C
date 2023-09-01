@@ -31,8 +31,8 @@ Description
     Generation and consumption of EPS and BAP are included.
     Only advection of dissolved and particulate species is considered
 
-    Clogging is introduced by some porosity-permeability relationship
-    
+    Clogging is introduced by some porosity-permeability relationshi
+
     k(n)/k0 = f(n/n0)
 
     Solves eight species:
@@ -81,7 +81,7 @@ Description
    Add unsatFlux boundary condition
 ENDIGNORE
 \*---------------------------------------------------------------------------*/
-
+/////
 #define DEBUG false
 
 #define updateHydCond hydraulicCond = K_0 * perm_clog * perm_satu
