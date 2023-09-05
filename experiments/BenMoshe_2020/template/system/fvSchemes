@@ -24,7 +24,7 @@ ddtSchemes
 gradSchemes
 {
     default 	    leastSquares;
-    grad(h)         leastSquares cellMDLimited;
+    grad(h)         leastSquares;
 }
 
 divSchemes

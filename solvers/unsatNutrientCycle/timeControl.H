@@ -32,9 +32,8 @@ Description
 
 if (convergeFlow < timeControl.convergeThreshold)
 {
-    h = h_after;
+    // h = h_after;
  
-
     // Can we increase the timestep?
     if (nCycles <= timeControl.UpDeltaT_nIters)
     {
@@ -86,7 +85,7 @@ if (convergeFlow < timeControl.convergeThreshold)
 // The non-linerity was not solved, iterate over h.
 else 
 {
-    h_before = (timeControl.hguess_coeff * h_after) + ((1.0 - timeControl.hguess_coeff) * h_before);
+    h_before = (timeControl.hguess_coeff * h) + ((1.0 - timeControl.hguess_coeff) * h_before);
     // h_after = h;
     nCycles++;
 
@@ -114,7 +113,7 @@ else
         Foam::Info << nl << "deltaT going DOWN ↓↓↓: "
                    << runTime.deltaTValue() << endl;
 
-        h_after = h;
+        // h_after = h;
         nCycles = 0;
     }
 }

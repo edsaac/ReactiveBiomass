@@ -181,20 +181,35 @@ volScalarField hydraulicCond
 
 //  For Picard loops
 volScalarField h_before
-(
-    IOobject
-    (
-        "h_before",
-        runTime.timeName(),
-        mesh,
-        IOobject::NO_READ,
-        IOobject::NO_WRITE
-    ),
-    mesh,
-    dimensionedScalar("h_before", dimLength, scalar(0.0))
+(   
+    h
+    // IOobject
+    // (
+    //     "h_before",
+    //     runTime.timeName(),
+    //     mesh,
+    //     IOobject::NO_READ,
+    //     IOobject::AUTO_WRITE
+    // ),
+    // mesh,
+    // dimensionedScalar("h_before_", dimLength, scalar(0.0))
 );
 
-volScalarField h_after = h;
+// volScalarField h_after = h;
+// volScalarField h_after
+// (
+//     IOobject
+//     (
+//         "h_after",
+//         runTime.timeName(),
+//         mesh,
+//         IOobject::NO_READ,
+//         IOobject::AUTO_WRITE
+//     ),
+//     mesh,
+//     dimensionedScalar("h_after", dimLength, scalar(0.0))
+// );
+
 
 volScalarField err
 (
@@ -248,8 +263,8 @@ volVectorField U
         IOobject::NO_READ,
         IOobject::AUTO_WRITE
     ),
-    mesh,
-    dimensionedVector("U", dimensionSet(0,1,-1,0,0,0,0) , vector(0.0, 0.0, 0.0))
+    - hydraulicCond * (fvc::grad(h) + fvc::grad(z))
+    // dimensionedVector("U", dimensionSet(0,1,-1,0,0,0,0) , vector(0.0, 0.0, 0.0))
 );
 
 //- Face fluxes [m³/s]

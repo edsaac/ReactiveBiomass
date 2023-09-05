@@ -22,7 +22,7 @@ startTime       0;
 
 stopAt          endTime;
 
-endTime         20320;
+endTime         300;
 
 writeControl    runTime;
 

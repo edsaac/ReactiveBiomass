@@ -31,7 +31,15 @@
         "*.tpl": "cpp",
         "functional": "cpp",
         "tuple": "cpp",
-        "numeric": "cpp"
+        "numeric": "cpp",
+        "istream": "cpp",
+        "ratio": "cpp",
+        "array": "cpp",
+        "utility": "cpp",
+        "variant": "cpp",
+        "bitset": "cpp",
+        "string_view": "cpp",
+        "initializer_list": "cpp"
     },
 
     "files.watcherExclude": {

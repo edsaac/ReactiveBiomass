@@ -15,7 +15,7 @@ FoamFile
 
 dimensions      [ 0 1 0 0 0 0 0 ];
 
-internalField   uniform -1e-6;
+internalField   uniform  0;
 
 boundaryField
 {
@@ -40,23 +40,13 @@ boundaryField
         // type        fixedValue;
         // value       uniform -1;
         // phi             phi;
-        
+
         type            unsatTime;
-        value           $internalField;
-        uniformValue	table
-        (
-            (0 0)
-            (10000 1)
-        );
-        // {
-        //     type                ;
-        //     nHeaderLine      1;              // number of header lines
-        //     refColumn        0;              // time column index
-        //     componentColumns (1);            // data column index
-        //     separator        ",";            // optional (defaults to ",")
-        //     mergeSeparators  no;             // merge multiple separators
-        //     file             "../experimental-data/headFixed_SW150/headFixed_1.csv";
-        // } 
+        //value           $internalField;
+        initialTime     0;
+        finalTime       300;
+        initialHead     -0.69;
+        finalHead       0.69;
     }
     bottom
     {

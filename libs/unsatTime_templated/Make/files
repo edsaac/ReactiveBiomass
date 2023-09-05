@@ -1,3 +1,3 @@
-unsatTimeFvPatchScalarField.C
+unsatTimeFvPatchFields.C
 
 LIB = $(FOAM_USER_LIBBIN)/libunsatTime

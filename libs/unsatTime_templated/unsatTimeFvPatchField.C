@@ -123,16 +123,27 @@ Foam::unsatTimeFvPatchField<Type>::unsatTimeFvPatchField
 template<class Type>
 void Foam::unsatTimeFvPatchField<Type>::updateCoeffs()
 {
-    // if (this->updated())
-    // {
-    //     return;
-    // }
+    if (this->updated())
+    {
+        return;
+    }
 
     const scalar t = this->db().time().timeOutputValue();
-    fvPatchField<Type>::operator==(uniformValue_->value(t));
-    fixedValueFvPatchField<Type>::operator==(uniformValue_->value(t));   
-    
+    Type value = uniformValue_->value(t);
+
+    // fvPatchField<Type>::operator==(uniformValue_->value(t));
+    // fixedValueFvPatchField<Type>::operator==(uniformValue_->value(t));   
+    // fixedValueFvPatchField<Type>::updateCoeffs();
+
+    // set the value_ of this patch to the newly computed flow speed
+    this->operator==(value);
+
+    Foam::Info << "updateCoeffs: Is this always zero?: " << t << endl;
+    Foam::Info << "updateCoeffs: what does this evaluate?: " << value << endl;
+    // call the base class method to make sure all the other bits and pieces get updated
+    // fixedValueFvPatchScalarField::updateCoeffs();
     fixedValueFvPatchField<Type>::updateCoeffs();
+
 }
 
 
@@ -140,11 +151,13 @@ template<class Type>
 void Foam::unsatTimeFvPatchField<Type>::write(Ostream& os) const
 {
     const scalar t = this->db().time().timeOutputValue();
+    Foam::Info << "Is this always zero?: " << t << endl;
+    Foam::Info << "what does this evaluate?: " << uniformValue_->value(t) << endl;
 
     fvPatchField<Type>::write(os);
-    os.writeKeyword("value") << "uniform " << uniformValue_->value(t) << token::END_STATEMENT << nl;
+    // os.writeKeyword("value") << "uniform " << uniformValue_->value(t) << token::END_STATEMENT << nl;
     writeEntry(os, uniformValue_());
-    // writeEntry(os, "value", *this);
+    writeEntry(os, "value", *this);
     // writeEntry(os, "value", value_text << uniformValue_->value(t));
 }
 

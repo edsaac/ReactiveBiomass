@@ -81,7 +81,7 @@ Description
    Add unsatFlux boundary condition
 ENDIGNORE
 \*---------------------------------------------------------------------------*/
-/////
+/////1223445
 #define DEBUG false
 
 #define updateHydCond hydraulicCond = K_0 * perm_clog * perm_satu
@@ -190,7 +190,7 @@ int main(int argc, char *argv[])
         //- Start Richards' solver block
         nCycles = 0;
         h_before = h;
-        h_after = h;
+        // h_after = h;
 
         while(true){
             //- Calculate grad(K(h)) and extract z-component
@@ -209,21 +209,21 @@ int main(int argc, char *argv[])
             //--  To do: Add ddt(porosity) term for deformable media (done)
             fvScalarMatrix richardsEquation
             (
-                porosity * soil.capillary(h_before) * fvm::ddt(h_after)
+                porosity * soil.capillary(h_before) * fvm::ddt(h)
                 // fvm::ddt(soil.capillary(h_before), h_after)
                 + Sw * fvc::ddt(porosity)
                 ==
-                fvm::laplacian(hydraulicCond, h_after)
+                fvm::laplacian(hydraulicCond, h)
                 + grad_kz
             );
             debug("Solve Richards");
             fvOptions.constrain(richardsEquation);
             richardsEquation.solve();
-            fvOptions.correct(h_after);
+            fvOptions.correct(h);
 
             //- Check if solution converged
             debug("Check convergence");
-            err = Foam::mag(h_after - h_before);
+            err = Foam::mag(h - h_before);
             convergeFlow = Foam::gSumMag(err)/nbMesh;
             Foam::Info << "nCycles: "    << nCycles      << "\t"
                        << "Converger: " << convergeFlow << endl;

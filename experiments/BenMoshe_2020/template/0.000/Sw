@@ -24,7 +24,7 @@ boundaryField
     top
     {
         type            calculated;
-        value           uniform 0.646;
+        value           uniform 0.54968;
     }
     left
     {

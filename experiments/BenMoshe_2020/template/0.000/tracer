@@ -45,6 +45,12 @@ boundaryField
         type               uniformInletOutlet;
         uniformInletValue  constant 1.0E-3;
         phi                phi;
+
+//	type	unsatTime;
+//	initialTime	0;
+//	finalTime	300;
+//	initialHead	1;
+//	finalHead	2;
     }
 
     bottom

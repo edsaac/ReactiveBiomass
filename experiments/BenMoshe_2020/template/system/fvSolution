@@ -61,7 +61,7 @@ SIMPLE
 
 timeStepping
 {
-    convergeThreshold   0.005; // 
+    convergeThreshold   0.001; // 
     maxItersToConverge  30;  // Triggers dT down
 
     UpDeltaT_nIters     3;   // Triggers dT up
