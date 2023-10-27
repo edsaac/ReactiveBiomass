@@ -159,3 +159,6 @@ dmypy.json
 # Experimental data
 .hiddendata/
 .archive/
+
+# Plots
+*.pdf
