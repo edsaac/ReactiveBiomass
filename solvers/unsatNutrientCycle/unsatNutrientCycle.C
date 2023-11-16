@@ -93,7 +93,7 @@ ENDIGNORE
 
 #include "timeStepper.H"
 #include "declareClasses.H"
-#include "cloggingModel.H"
+// #include "cloggingModel.H"
 #include "attachmentModel.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -129,7 +129,9 @@ int main(int argc, char *argv[])
     Sw.write();
     
     debug("Clogging & porosity...");
-    if (cloggingSwitch) { clogging->calcPerm();}
+    if (cloggingSwitch) {
+        perm_clog = ((permRef - permMin) * Foam::pow((porosity - nMin)/(nRef - nMin), powerExponent) * pos(porosity - nMin)) + permMin;
+    }
     soil.mualemCalculator(h);
     
     // debug("Hydraulic conductivity...");
@@ -180,11 +182,13 @@ int main(int argc, char *argv[])
         - Update the porosity field based on the void space filled with biomass
           and update the permeability perm_clog multiplier
         */
-        porosity  = clogging->nRef() - totalBiomass/rho_X;
-        
+        // porosity  = clogging->nRef() - totalBiomass/rho_X;
+        porosity = nRef - totalBiomass/rho_X;
+
         if (cloggingSwitch) 
         { 
-            clogging->calcPerm();
+            // clogging->calcPerm();
+            perm_clog = ((permRef - permMin) * Foam::pow((porosity - nMin)/(nRef - nMin), powerExponent) * pos(porosity - nMin)) + permMin;
         }
         
         //- Start Richards' solver block
@@ -431,8 +435,8 @@ int main(int argc, char *argv[])
                 - alpha_N * rN * (XN + (porosity * Sw * XNp))     //Metabolism XN
                 // - oxygen_mass_transfer * porosity * ((Sw * O2) - (Sa * Hacc * O2gas)) //Replenish to saturation if Sa?
                 // - oxygen_mass_transfer * porosity * ((Sw * O2) - (Sa * O2_saturation)) //Replenish to saturation if Sa?
-                - oxygen_mass_transfer * porosity * (Sw * O2)
-                + oxygen_mass_transfer * porosity * (Sa * O2_saturation) * pow(1.0 - O2/O2_saturation, 2) //Replenish to saturation if Sa?
+                // - oxygen_mass_transfer * porosity * (Sw * O2)
+                + oxygen_mass_transfer * porosity * (Sa * O2_saturation) * pow(1.0 - O2/O2_saturation, 2) * neg(O2-O2_saturation) //Replenish to saturation if Sa?
             );
             OxygenTransport.relax();
             fvOptions.constrain(OxygenTransport);

@@ -22,7 +22,7 @@ startTime       0;
 
 stopAt          endTime;
 
-endTime         300;
+endTime         6000;
 
 writeControl    runTime;
 
@@ -54,6 +54,29 @@ functions
 {
 
   #includeFunc boundaryProbes
+  
+  probes
+  {
+      type            probes;
+      libs            ("libsampling.so");
+      writeControl	  runTime;
+      // writeControl    timeStep;
+      writeInterval   60;
+
+      fields
+      (
+          Sw
+      );
+
+      probeLocations
+      (
+          (0.1 0.1 5.75)
+          (0.1 0.1 5.25)
+          (0.1 0.1 4.25)
+          (0.1 0.1 3.25)
+      );
+
+  }
 
 };
 // ************************************************************************* //

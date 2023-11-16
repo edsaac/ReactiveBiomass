@@ -134,7 +134,7 @@ dmypy.json
 **/Make/linux*
 
 # Run cases
-**/CASES/
+**/CASES*/
 **/[1-9]*/
 **/dynamicCode/
 **/processor[0-9]*/

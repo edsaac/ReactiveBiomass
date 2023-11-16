@@ -6,6 +6,20 @@
             "vmax": 1e-1
         }
     },
+    "EPS": {
+        "cmap": "afmhot_r",
+        "LogNorm": {
+            "vmin": 1e-5,
+            "vmax": 1e-1
+            }
+    },
+    "XI": {
+        "cmap": "afmhot_r",
+        "LogNorm": {
+            "vmin": 1e-5,
+            "vmax": 1e-1
+            }
+    },
     "Sw": {
         "cmap": "Blues"
     },

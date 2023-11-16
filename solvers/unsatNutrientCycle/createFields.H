@@ -521,30 +521,53 @@ UnsaturatedSoilParametersField soil
 Foam::Info << "Switch for clogging?? (cloggingSwitch)\n" << endl;
 Foam::Switch cloggingSwitch(cloggingProperties.lookup("clog?"));
 
-autoPtr<cloggingModel> clogging
+dimensionedScalar permMin
 (
-    cloggingModel::New(
-        "clog",
-        cloggingProperties,
-        porosity,
-        &perm_clog // <-- It will modify this field
-        )
+    cloggingProperties.lookup("permMin")
 );
 
-clogging->read(cloggingProperties);
+dimensionedScalar nMin
+(
+    cloggingProperties.lookup("nMin")
+);
+
+dimensionedScalar permRef
+(
+    cloggingProperties.lookup("permRef")
+);
+
+dimensionedScalar powerExponent
+(
+    cloggingProperties.lookup("powerExponent")
+);
+
+volScalarField nRef
+(
+    IOobject
+    (
+        "nRef",
+        runTime.constantPath()/"soilParameters",
+        mesh,
+        IOobject::MUST_READ,
+        IOobject::NO_WRITE
+    ),
+    mesh
+);
 
 soil.mualemCalculator(h); // This will modify perm_satu
-if (cloggingSwitch) { clogging->calcPerm();} // This will modify perm_clog
+
+if (cloggingSwitch) { 
+    perm_clog = ((nRef - permMin) * Foam::pow((porosity - nMin)/(nRef - nMin), powerExponent) * pos(porosity - nMin)) + nMin;
+} // This will modify perm_clog
 
 // updateHydCond;
 // U = - hydraulicCond * (fvc::grad(h) + fvc::grad(z));
 // phi = fvc::flux(U);
 
 // Calculate deposited mass and clogLimiter
-dimensionedScalar XMAX 
-(
-    (clogging->nRef() - clogging->nMin()) * rho_X
-);
+volScalarField XMAX ((nRef - nMin) * rho_X);
+// (clogging->nRef() - clogging->nMin()) * rho_X
+
 
 Foam::Info << "Calculate max possible deposited mass: " << XMAX << "\n";
 

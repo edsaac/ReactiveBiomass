@@ -9,18 +9,22 @@ FoamFile
 {
     version     2.0;
     format      ascii;
-    class       labelList;
-    note        "nPoints: 1204 nCells: 300 nFaces: 1501 nInternalFaces: 299";
+    class       regIOobject;
     location    "constant/polyMesh";
-    object      neighbour;
+    object      cellZones;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-
-299
+6
 (
+layer_1
+{
+    type cellZone;
+cellLabels      List<label> 
+77
+(
+0
 1
-128
 2
 3
 4
@@ -96,8 +100,18 @@ FoamFile
 74
 75
 76
+)
+;
+}
+
+layer_2
+{
+    type cellZone;
+cellLabels      List<label> 
+52
+(
+77
 78
-175
 79
 80
 81
@@ -148,8 +162,18 @@ FoamFile
 126
 127
 128
+)
+;
+}
+
+layer_3
+{
+    type cellZone;
+cellLabels      List<label> 
+47
+(
+129
 130
-230
 131
 132
 133
@@ -195,8 +219,18 @@ FoamFile
 173
 174
 175
+)
+;
+}
+
+layer_4
+{
+    type cellZone;
+cellLabels      List<label> 
+55
+(
+176
 177
-239
 178
 179
 180
@@ -250,15 +284,23 @@ FoamFile
 228
 229
 230
-232
-299
-233
-234
-235
-236
-237
-238
-239
+)
+;
+}
+
+layer_5
+{
+    type cellZone;
+cellLabels      List<label> 9(231 232 233 234 235 236 237 238 239);
+}
+
+layer_6
+{
+    type cellZone;
+cellLabels      List<label> 
+60
+(
+240
 241
 242
 243
@@ -319,6 +361,8 @@ FoamFile
 298
 299
 )
-
+;
+}
+)
 
 // ************************************************************************* //

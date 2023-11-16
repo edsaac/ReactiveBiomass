@@ -22,8 +22,10 @@ clog?     true;
 nMin      nMin       [0 0 0 0 0 0 0]    0.10;     // Minimum porosity
 permMin   permMin   [0 0 0 0 0 0 0]    1.0E-3;   // Minimum relative permeability
 
-nRef      nRef       [0 0 0 0 0 0 0]    0.358;     // Reference porosity
+// nRef      nRef       [0 0 0 0 0 0 0]    0.48;     // Reference porosity
 permRef   permRef    [0 0 0 0 0 0 0]    1.0;       // Reference permeability
+
+powerExponent powerExponent [0 0 0 0 0 0 0] 3;
 
 cloggingModel powerLaw;
 

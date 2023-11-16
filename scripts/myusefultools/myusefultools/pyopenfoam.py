@@ -154,7 +154,7 @@ class OpenFOAM:
             else:
                 raise ValueError("`path_template` not a directory.")
         else:
-            self.logger("💇🏻‍♂️ Case exists! No need to clone template.")
+            self.logger("<'.'> Case exists! No need to clone template.")
 
     def _repr_html_(self):
         html = ""
@@ -584,6 +584,55 @@ class OpenFOAM:
                     / f"{self.path_case.name}_xarray_{k}.png",
                     dpi=300,
                 )
+
+    def read_as_xarray_dataset(self, fields:list[str]):
+        """
+        Export all VTK timesteps and fields to an xarray Dataset
+
+        Returns
+        -------
+        xr.Dataset
+            With depth and time as the dimensions and each parameter
+        """
+        
+        ## Extract VTK result (this should be done with a probe but meh)
+        all_vtk_paths = [self.path_vtk / f for f in getVTKList(self.path_vtk)]
+        nTimes = len(all_vtk_paths)
+        times = [
+            float(t)
+            for t in subprocess.check_output(
+                "foamListTimes", cwd=self.path_case, text=True, encoding="utf-8"
+            ).splitlines()
+            if t[0:2].isnumeric()
+        ]
+
+        ## Use dimensions from the first VTK
+        mesh = pv.read(all_vtk_paths[0])
+        _ = pv.Line(a := [0, 0, mesh.bounds[5]], b := [0, 0, mesh.bounds[2]])
+
+        sample = mesh.sample_over_line(a, b)
+        nPoints = len(sample[fields[0]]) #<- One of the fields
+
+        ## Initialize array to store data
+        mapping = dict()
+
+        for field in fields:
+            
+            ## A temp array
+            results = np.zeros([nPoints, nTimes])
+
+            ## Extract field for each vtk field
+            for t, vtk in enumerate(all_vtk_paths):
+                mesh = pv.read(vtk)
+                sample = mesh.sample_over_line(a, b)
+                results[:, t] = sample[field]
+
+            mapping[field] = xr.DataArray(
+                results, dims=("z", "t"), coords={"z": sample.points[:, 2], "t": times}
+            )
+
+        return xr.Dataset(mapping)
+
 
     def read_field_all_times(self, field: str):
         """
