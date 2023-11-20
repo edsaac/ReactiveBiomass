@@ -5,6 +5,9 @@ from pathlib import Path
 from typing import Literal
 from myusefultools.pyopenfoam import OpenFOAM
 import multiprocessing as mp
+import colorcet as cc
+
+st.set_page_config(page_title=None, page_icon=None, layout="wide", initial_sidebar_state="auto", menu_items=None)
 
 cmaps = st.session_state.cmaps
 
@@ -28,7 +31,7 @@ def draw_heatmaps(data):
             img.set_norm(colors.LogNorm(5e-5, 1e-0))
             img.set_cmap(cmap)
         else:
-            img.set_cmap("magma_r")
+            img.set_cmap("cet_gray_r")
         
         if is_dissolved:
             img.set_clim(vmin=0)

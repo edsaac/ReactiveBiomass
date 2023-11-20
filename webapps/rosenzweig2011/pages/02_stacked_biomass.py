@@ -12,6 +12,23 @@ linecolors = st.session_state.linecolors
 def show_nice_option(i):
     return [r"ρ_X", "[DOC]", r"κ"][i]
 
+def plot_stacked(k, data):
+    fig, ax = plt.subplots()
+
+    totalxar = data.XAR.sum(dim="z")
+    totaleps = data.EPS.sum(dim="z")
+    totalxi = data.XI.sum(dim="z")
+
+    ax.stackplot(data.XAR.t/86400, totalxar, totaleps, totalxi, colors=linecolors)
+    ax.ticklabel_format(useMathText=True)
+    ax.spines.right.set_visible(False)
+    ax.set_xlabel("Time $t$ [d]")
+    ax.set_ylabel("Total biomass\n" + "$\int{X_j}dV$")
+
+    ax.set_title(k)
+    ax.set_ylim(0, max([float(s.max()) for s in totalsum]))
+
+    return fig
 
 def main():
     RHO_X_LIST = st.session_state.rho_x_list
@@ -65,30 +82,18 @@ def main():
         totalsxar = [data.XAR.sum(dim="z") for data in data_list]
         totalseps = [data.EPS.sum(dim="z") for data in data_list]
         totalsxi = [data.XI.sum(dim="z") for data in data_list]
-
+        global totalsum 
         totalsum = [xar+eps+xi for xar,eps,xi in zip(totalsxar, totalseps, totalsxi)]
 
-        tabs = st.tabs([str(i) for i in looped_list])
 
-        for k,tab,data in zip(looped_list, tabs, data_list):
-        
-            fig, ax = plt.subplots()
+        with mp.Pool() as pool:
+            figs = pool.starmap(plot_stacked, list(zip(looped_list, data_list)))
 
-            totalxar = data.XAR.sum(dim="z")
-            totaleps = data.EPS.sum(dim="z")
-            totalxi = data.XI.sum(dim="z")
-
-            ax.stackplot(data.XAR.t/3600, totalxar, totaleps, totalxi, colors=linecolors)
-            ax.ticklabel_format(useMathText=True)
-            ax.spines.right.set_visible(False)
-            ax.set_xlabel("Time $t$ [d]")
-            ax.set_ylabel("Total biomass $\int{X}dV$ [g/L * V]")
-
-            ax.set_title(k)
-            ax.set_ylim(0, max([float(s.max()) for s in totalsum]))
-
+        tabs = st.tabs([f"{show_nice_option(dynamic_var)} = {i}" for i in looped_list])
+        for tab, fig in zip(tabs, figs):
             with tab:
-                st.pyplot(fig)
+                cols = st.columns([1,4,1])
+                cols[1].pyplot(fig)
 
 if __name__ == "__main__":
     main()

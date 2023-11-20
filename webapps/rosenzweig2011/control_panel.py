@@ -1,16 +1,17 @@
 import streamlit as st
+# import colorcet as cc
+# import matplotlib.pyplot as plt
+# import matplotlib.colors as colors
+# import matplotlib as mpl
 
-import matplotlib.pyplot as plt
-import matplotlib.colors as colors
-from pathlib import Path
-from typing import Literal
-
-from myusefultools.pyopenfoam import OpenFOAM
+# from pathlib import Path
+# from typing import Literal
+# from myusefultools.pyopenfoam import OpenFOAM
 
 st.session_state.cmaps = ["Greens", "Purples", "Greys", "Oranges"]
 st.session_state.linecolors = ["forestgreen", "purple", "grey", "darkorange"]
 
-st.session_state.doc_list = [1, 2, 5, 10, 20, "XX"]
+st.session_state.doc_list = [1, 2, 5, 10, 20]
 st.session_state.rho_x_list = [1, 3, 10, 31, 100, 316, 1000]  #<- Values chosen so they are nice powers of 10
 st.session_state.d_growth_list = [0, 1e-11, 1e-10, 1e-9, 1e-8]
 
