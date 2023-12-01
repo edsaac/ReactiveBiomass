@@ -10,42 +10,31 @@ FoamFile
     version     2.0;
     format      ascii;
     class       volScalarField;
-    location    "0";
-    object      porosity;
+    object      O2gas;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dimensions      [0 0 0 0 0 0 0];
+dimensions      [1 -3 0 0 0 0 0];
 
-internalField   uniform 0.385;
+internalField   uniform 243.84E-3; 
 
 boundaryField
 {
-    front
+    "(front|back|right|left)"
     {
-        type            empty;
+        type    empty;
     }
-    back
-    {
-        type            empty;
-    }
-    left
-    {
-        type            empty;
-    }
-    right
-    {
-        type            empty;
-    }
-    bottom
-    {
-        type            zeroGradient;
-    }
+
     top
     {
-        type            zeroGradient;
+        type	fixedValue;
+        value	uniform 243.84E-3; //243.84 mg/L [Berlin 2014]
+    }
+
+    bottom
+    {
+        type    zeroGradient;
     }
 }
-
 
 // ************************************************************************* //

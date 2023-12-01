@@ -7,17 +7,15 @@
 \*---------------------------------------------------------------------------*/
 FoamFile
 {
-    version     2.0;
-    format      ascii;
-    class       volScalarField;
-    location    "0";
-    object      porosity;
+    version         2;
+    format          ascii;
+    class           volScalarField;
+    object          h;
 }
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dimensions      [0 0 0 0 0 0 0];
+dimensions      [ 0 1 0 0 0 0 0 ];
 
-internalField   uniform 0.385;
+internalField   uniform -0.432;
 
 boundaryField
 {
@@ -29,21 +27,23 @@ boundaryField
     {
         type            empty;
     }
-    left
-    {
-        type            empty;
-    }
     right
     {
         type            empty;
     }
-    bottom
+    left
     {
-        type            zeroGradient;
+        type            empty;
     }
     top
     {
-        type            zeroGradient;
+        type            fixedValue;
+        value           uniform -0.432;
+    }
+    bottom
+    {
+        type            fixedGradient;
+        gradient        uniform 0;
     }
 }
 

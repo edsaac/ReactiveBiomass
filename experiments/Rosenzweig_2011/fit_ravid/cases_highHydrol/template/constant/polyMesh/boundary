@@ -9,43 +9,54 @@ FoamFile
 {
     version     2.0;
     format      ascii;
-    class       volScalarField;
-    location    "0";
-    object      porosity;
+    class       polyBoundaryMesh;
+    location    "constant/polyMesh";
+    object      boundary;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dimensions      [0 0 0 0 0 0 0];
-
-internalField   uniform 0.385;
-
-boundaryField
-{
-    front
+6
+(
+    top
     {
-        type            empty;
-    }
-    back
-    {
-        type            empty;
+        type            patch;
+        nFaces          1;
+        startFace       59;
     }
     left
     {
         type            empty;
+        inGroups        List<word> 1(empty);
+        nFaces          60;
+        startFace       60;
     }
     right
     {
         type            empty;
+        inGroups        List<word> 1(empty);
+        nFaces          60;
+        startFace       120;
+    }
+    front
+    {
+        type            empty;
+        inGroups        List<word> 1(empty);
+        nFaces          60;
+        startFace       180;
+    }
+    back
+    {
+        type            empty;
+        inGroups        List<word> 1(empty);
+        nFaces          60;
+        startFace       240;
     }
     bottom
     {
-        type            zeroGradient;
+        type            patch;
+        nFaces          1;
+        startFace       300;
     }
-    top
-    {
-        type            zeroGradient;
-    }
-}
-
+)
 
 // ************************************************************************* //

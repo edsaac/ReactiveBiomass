@@ -10,42 +10,47 @@ FoamFile
     version     2.0;
     format      ascii;
     class       volScalarField;
-    location    "0";
-    object      porosity;
+    object      DOC;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dimensions      [0 0 0 0 0 0 0];
+dimensions      [1 -3 0 0 0 0 0];
 
-internalField   uniform 0.385;
+internalField   uniform 10.0E-3;
 
 boundaryField
 {
     front
     {
-        type            empty;
+        type    empty;
     }
+
     back
     {
-        type            empty;
+        type    empty;
     }
-    left
-    {
-        type            empty;
-    }
+
     right
     {
-        type            empty;
+        type    empty;
     }
+
+    left
+    {
+        type    empty;
+    }
+
+    top
+    {
+        type               uniformInletOutlet;
+        uniformInletValue  constant 10.0E-3;
+        phi                phi;
+    }
+
     bottom
     {
         type            zeroGradient;
     }
-    top
-    {
-        type            zeroGradient;
-    }
 }
-
 
 // ************************************************************************* //

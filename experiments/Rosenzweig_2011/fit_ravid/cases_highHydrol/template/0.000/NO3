@@ -10,42 +10,46 @@ FoamFile
     version     2.0;
     format      ascii;
     class       volScalarField;
-    location    "0.000";
-    object      hydraulicCond;
+    object      NO3;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dimensions      [0 1 -1 0 0 0 0];
+dimensions      [1 -3 0 0 0 0 0];
 
-internalField   uniform 5.82788e-06;
+internalField   uniform 2.0E-3;
 
 boundaryField
 {
-    top
-    {
-        type            calculated;
-        value           uniform 5.82788e-06;
-    }
-    left
-    {
-        type            empty;
-    }
-    right
-    {
-        type            empty;
-    }
     front
     {
-        type            empty;
+        type    empty;
     }
+
     back
     {
-        type            empty;
+        type    empty;
     }
+
+    right
+    {
+        type    empty;
+    }
+
+    left
+    {
+        type    empty;
+    }
+
+    top
+    {
+        type               uniformInletOutlet;
+        uniformInletValue  constant 2.0E-3;
+        phi                phi;
+    }
+    
     bottom
     {
-        type            calculated;
-        value           uniform 5.82788e-06;
+        type            zeroGradient;
     }
 }
 

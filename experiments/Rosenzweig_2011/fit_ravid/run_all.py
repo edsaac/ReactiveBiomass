@@ -4,8 +4,8 @@ import multiprocessing as mp
 import os
 import itertools
 
-DOC_CONCENTRATION = 10  #mg/L
-CASES_FOLDER = f"CASES_{DOC_CONCENTRATION}mgDOC_noKNH4"
+DOC_CONCENTRATION = 2  #mg/L
+CASES_FOLDER = f"CASES_{DOC_CONCENTRATION}mgDOC"
 
 ## Check CASES folder exists
 cases_folder = Path(CASES_FOLDER)

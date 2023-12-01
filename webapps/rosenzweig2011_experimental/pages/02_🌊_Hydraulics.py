@@ -14,17 +14,17 @@ ModelResult = st.session_state.ModelResult
 get_results_blob = st.session_state.get_results_blob
 
 ####### Simulation data #########################
-"## **💻 Numerical simulation**"
-hydraulics = get_results_blob("hydraulics")
+# "## **💻 Numerical simulation**"
+# hydraulics = get_results_blob("hydraulics")
 
-selection = st.selectbox(
-    "Select variable:", 
-    hydraulics.keys(), 
-    format_func=lambda x:hydraulics[x].long_name
-    )
+# selection = st.selectbox(
+#     "Select variable:", 
+#     hydraulics.keys(), 
+#     format_func=lambda x:hydraulics[x].long_name
+#     )
 
-hydraulics[selection].plot_heatmap()
-st.plotly_chart(hydraulics[selection].figure, use_container_width=True)
+# hydraulics[selection].plot_heatmap()
+# st.plotly_chart(hydraulics[selection].figure, use_container_width=True)
 
 ####### Experimental data #######################
 "## **🧪 Experimental data**"
@@ -37,7 +37,7 @@ z = np.array([0.57, 0.52, 0.47, 0.42, 0.37, 0.32])
 with tabs[0]:
     ### Format experimental head data as a ModelResult object
     θ = pd.read_excel(
-        "./experimentalData/.hiddendata/TDR-theta.xlsx", 
+        "../../experiments/Rosenzweig_2011/experimentalData/.hiddendata/TDR-theta.xlsx", 
         sheet_name=sheet_name)
 
     t = θ["Time (hr)"].to_numpy()*(60*60)  # convert to seconds
@@ -63,7 +63,7 @@ with tabs[0]:
 with tabs[1]:
     ### Format experimental head data as a ModelResult object
     head = pd.read_excel(
-        "./experimentalData/.hiddendata/matricHead.xlsx", 
+        "../../experiments/Rosenzweig_2011/experimentalData/.hiddendata/matricHead.xlsx", 
         sheet_name=sheet_name)
 
     t = head["Time (min)"].to_numpy()*60 # convert to seconds
@@ -88,7 +88,7 @@ with tabs[1]:
 
 "## 💻 Post-processing"
 
-r"""
+R"""
 For the simulation, the water saturation is calculated as
 
 $$
@@ -114,16 +114,16 @@ $$
 """
 
 
-post_hydr = get_results_blob("postprocessed_hydraulics")
-biomass = get_results_blob("biomass")
-post_biom = get_results_blob("postprocessed_biomass")
+# post_hydr = get_results_blob("postprocessed_hydraulics")
+# biomass = get_results_blob("biomass")
+# post_biom = get_results_blob("postprocessed_biomass")
 
-post_biom["Xactive"].data = biomass["XAR"].data + biomass["XN"].data + biomass["XDN"].data
-post_biom["Xinactive"].data = biomass["XI"].data + biomass["EPS"].data
-post_biom["Xtotal"].data = post_biom["Xactive"].data + post_biom["Xinactive"].data
+# post_biom["Xactive"].data = biomass["XAR"].data + biomass["XN"].data + biomass["XDN"].data
+# post_biom["Xinactive"].data = biomass["XI"].data + biomass["EPS"].data
+# post_biom["Xtotal"].data = post_biom["Xactive"].data + post_biom["Xinactive"].data
 
-RHOX = 0.5
-post_hydr["Swb"].data = ( (hydraulics["porosity"].data * hydraulics["Sw"].data) + (post_biom["Xtotal"].data / RHOX) ) / ( hydraulics["porosity"].data + (post_biom["Xtotal"].data / RHOX) )
+# RHOX = 0.5
+# post_hydr["Swb"].data = ( (hydraulics["porosity"].data * hydraulics["Sw"].data) + (post_biom["Xtotal"].data / RHOX) ) / ( hydraulics["porosity"].data + (post_biom["Xtotal"].data / RHOX) )
 
-post_hydr["Swb"].plot_heatmap()
-st.plotly_chart(post_hydr["Swb"].figure, use_container_width=True)
+# post_hydr["Swb"].plot_heatmap()
+# st.plotly_chart(post_hydr["Swb"].figure, use_container_width=True)

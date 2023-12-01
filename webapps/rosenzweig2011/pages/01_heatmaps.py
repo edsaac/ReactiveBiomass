@@ -50,6 +50,7 @@ def main():
     RHO_X_LIST = st.session_state.rho_x_list
     DOC_LIST = st.session_state.doc_list
     KAPPA_LIST = st.session_state.d_growth_list
+    HYDROLYSIS_DICT = st.session_state.hydrolysis_dict
 
     with st.sidebar.form("Select case:"):
         doc_val = st.selectbox(r"$[DOC]$", DOC_LIST, index=2)
@@ -60,45 +61,49 @@ def main():
     
     if submit_btn:
         
-        ## Check CASES folder exists
-        cases_folder = Path(f"../../experiments/Rosenzweig_2011/fit_ravid/CASES_{doc_val}mgDOC")
-        template_folder = Path("template")
-        
-        if not cases_folder.exists():
-            st.toast("Path does not exist!")
-        
-        else:
-            identifier = cases_folder / f"rhox_{rho_x}__dgrowth_{d_growth}"
+        for hydrolysis, folder_path in HYDROLYSIS_DICT.items():
+            
+            st.title(f"Hydrolysis Rate `{hydrolysis}`")
+            
+            ## Check CASES folder exists
+            cases_folder = Path(f"{folder_path}/CASES_{doc_val}mgDOC")
+            template_folder = Path(f"{folder_path}/template")
+            
+            if not cases_folder.exists():
+                st.toast("Path does not exist!")
+            
+            else:
+                identifier = cases_folder / f"rhox_{rho_x}__dgrowth_{d_growth}"
 
-            of = OpenFOAM(
-                    path_case=identifier, 
-                    write_to_log = False, 
-                    path_template=template_folder
+                of = OpenFOAM(
+                        path_case=identifier, 
+                        write_to_log = False, 
+                        path_template=template_folder
+                    )
+
+                groups = dict(
+                    biomass = ["XAR", "EPS", "XI"],
+                    dissolved = ["DOC", "O2", "NH4"],
+                    tracers = ["NO3", "tracer"],
+                    hydraulics = ["h", "Sw", "porosity"]
                 )
 
-            groups = dict(
-                biomass = ["XAR", "EPS", "XI"],
-                dissolved = ["DOC", "O2", "NH4"],
-                tracers = ["NO3", "tracer"],
-                hydraulics = ["h", "Sw", "porosity"]
-            )
+                with mp.Pool() as pool:
+                    data = pool.starmap(
+                        OpenFOAM.read_as_xarray_dataset,
+                        [(of, group) for group in groups.values()],
+                    )
 
-            with mp.Pool() as pool:
-                data = pool.starmap(
-                    OpenFOAM.read_as_xarray_dataset,
-                    [(of, group) for group in groups.values()],
-                )
-
-            with st.expander("Raw data as an `xarray`"):
-                for i,v in enumerate(data):
-                    f"### {i}"
-                    st.components.v1.html(v._repr_html_(), height=250, scrolling=True)
-            
-            with mp.Pool() as pool:
-                figures = pool.map(draw_heatmaps, data)
-            
-            for fig in figures:
-                st.pyplot(fig)
+                with st.expander("Raw data as an `xarray`"):
+                    for i,v in enumerate(data):
+                        f"### {i}"
+                        st.components.v1.html(v._repr_html_(), height=250, scrolling=True)
+                
+                with mp.Pool() as pool:
+                    figures = pool.map(draw_heatmaps, data)
+                
+                for fig in figures:
+                    st.pyplot(fig)
             
 if __name__ == "__main__":
     main()
