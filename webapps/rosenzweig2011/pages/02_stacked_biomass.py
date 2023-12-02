@@ -41,21 +41,21 @@ def plot_stacked(k, data):
         totaleps,
         totalxi,
         colors=linecolors,
-        labels=[R"$X_{\mathsf{aerobic resp.}}$", R"$X_{\mathsf{labile}}$", R"$X_{\mathsf{recalcitrant}}$"],
+        labels=[R"$X_{\mathsf{aerobic\;resp.}}$", R"$X_{\mathsf{labile}}$", R"$X_{\mathsf{recalcitrant}}$"],
     )
 
     ax.ticklabel_format(useMathText=True)
     ax.spines.right.set_visible(False)
     ax.set_xlabel("Time $t$ [d]")
     ax.set_ylabel("Total biomass\n" + "$\int{X_j}dV$")
-    ax.set_title(f"With ${show_nice_option(dynamic_var)}$ = {k}")
+    # ax.set_title(f"With ${show_nice_option(dynamic_var)}$ = {k}")
     # ax.set_ylim(0, max([float(s.max()) for s in totalsum]))
-    ax.set_ylim(0, 5)
+    ax.set_ylim(0, 3.5)
     ax.legend(loc="upper left")
 
     ##############################
 
-    fig_profiles, axs = plt.subplots(1,2, figsize=[12,5])
+    fig_profiles, axs = plt.subplots(1,2, figsize=[12,5], sharey=True, gridspec_kw=dict(wspace=0.1))
 
     ## Final active biomass over depth
     ax = axs[0]
@@ -66,7 +66,7 @@ def plot_stacked(k, data):
     ax.set_xlim(2e-6, 9e-1)
     ax.set_ylim(bottom=0)
     ax.set_ylabel("Depth [m]")
-    ax.set_xlabel(R"Active biomass $X_{\mathsf{aerobic\;resp.}}$ [g/L]")
+    ax.set_xlabel(R"Active biomass [g/L]")
     ax.xaxis.set_major_locator(LogLocator())
     ax.xaxis.set_minor_locator(LogLocator(subs="auto"))
 
@@ -86,7 +86,8 @@ def plot_stacked(k, data):
     ax2.legend(
         [l, l2],
         [l.get_label(), l2.get_label()],
-        title="$X_{\mathsf{ar}}$",
+        title=R"$X_{\mathsf{aerobic\;resp.}}$",
+        title_fontproperties=dict(size=10, weight=100),
         loc="lower right",
     )
     
@@ -106,7 +107,7 @@ def plot_stacked(k, data):
     ax.set_xscale("log")
     ax.set_xlim(2e-6, 9e-1)
     ax.set_ylim(bottom=0)
-    ax.set_ylabel("Depth [m]")
+    # ax.set_ylabel("Depth [m]")
     ax.set_xlabel(R"Inactive biomass  [g/L]")
     ax.xaxis.set_major_locator(LogLocator())
     ax.xaxis.set_minor_locator(LogLocator(subs="all"))
@@ -127,13 +128,14 @@ def plot_stacked(k, data):
     ax2.set_xscale("log")
     ax2.set_ylim(ax.get_ylim())
     ax2.spines.top.set_visible(True)
-    ax2.set_xlim(1e-4, 1e0)
+    ax2.set_xlim(2e-6, 9e-1) #(1e-4, 1e0)
     ax2.set_xlabel(r"Protein content [mg protein/g dry sand]")
     ax2.legend(
         [l, l2],
         [l.get_label(), l2.get_label()],
         title=R"$X_{\mathsf{labile}} + X_{\mathsf{recalcitrant}}$",
-        loc="lower right",
+        title_fontproperties=dict(size=10, weight=100),
+        loc="lower left",
     )
 
     return (fig_stacked, fig_profiles)

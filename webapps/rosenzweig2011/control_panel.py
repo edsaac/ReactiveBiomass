@@ -24,8 +24,8 @@ st.session_state.rho_x_list = [
 ]  # <- Values chosen so they are nice powers of 10
 st.session_state.d_growth_list = [0, 1e-11, 1e-10, 1e-9, 1e-8]
 st.session_state.hydrolysis_dict = dict(
-    Low="../../experiments/Rosenzweig_2011/fit_ravid",
-    High="../../experiments/Rosenzweig_2011/fit_ravid/cases_highHydrol",
+    Low="../../experiments/Rosenzweig_2011/fit_ravid/cases_lowHydrol",
+    High="../../experiments/Rosenzweig_2011/fit_ravid/cases_lowPowerLaw",
 )
 
 st.session_state.experiments_path = Path(
