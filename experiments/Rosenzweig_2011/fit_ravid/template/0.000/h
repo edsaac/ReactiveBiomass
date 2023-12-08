@@ -15,7 +15,7 @@ FoamFile
 
 dimensions      [ 0 1 0 0 0 0 0 ];
 
-internalField   uniform -0.432;
+internalField   uniform -0.432;//-0.432;
 
 boundaryField
 {
@@ -35,11 +35,88 @@ boundaryField
     {
         type            empty;
     }
+
     top
     {
-        type            fixedValue;
-        value           uniform -0.432;
+        /*
+        Rosenzweig (2011) Thesis
+        ------------
+        Flow rate               Q   = 1 mL/min = 1.67E-8 m³/s
+        Hyd. conduct.           Ks  = 1.24 cm/min = 2.067E-4 m/s
+                                K(h =-0.30) = 9.83E-5 m/s
+        Diameter                D   = 8.0 cm = 0.08 m
+        Cross-area              A   = π*D²/4
+                                    = π*(0.08)²/4 = 5.026E-3 m²
+        Darcy vel.               q  = Q/A
+                                    = 1.67E-8 m³/s / 5.026E-3 m² = 3.32E-6 m/s
+
+        -------
+        Darcy Law - if no clogging and saturated
+            q = - Ks • grad(h + z)
+            3.32E-6 m/s = 2.067E-4 m/s • (grad(h) + 1);
+            grad(h) = -0.016 [Check if this value was calculated by the code below!]
+
+        */
+
+        //- ♣ Fixed Darcy Flux
+
+        type            codedMixed;
+        refValue        uniform 0;
+        refGradient     uniform 0;
+        valueFraction   uniform 0;          // If 0: fixedGradient, if 1: fixedValue
+        name            DarcyInflux;        // name of generated BC
+
+        code
+        #{ 
+            // Read the hydraulic conductivity field
+            const fvMesh& mesh = patch().boundaryMesh().mesh();
+            label myinlet = mesh.boundaryMesh().findPatchID("top");
+
+            const volScalarField& myK = this->db().objectRegistry::lookupObject<volScalarField>("hydraulicCond");
+            auto k_boundary = myK.boundaryField()[myinlet];
+            scalar h_value;
+
+            // Info << "k_boundary" << k_boundary ;
+
+            // Specify the target Darcy flow velocity
+            dimensionedScalar targetDarcyFlow 
+            (
+                "targetDarcyFlow",
+                dimensionSet(0,1,-1,0,0,0,0),
+                scalar(3.32E-6)
+            );
+
+            scalar maximum_ponding = 0.10; 
+
+            // int my_i = 0;
+            // Assign the corresponding gradient to each boundary face
+            forAll(patch(), faceI)
+            { 
+                this->valueFraction() = 0; //<- fixedGradient
+                Info << "Hydraulic conductivity at the patch is " << myK[faceI] << endl;
+                Info << "Hydraulic conductivity at the boundary is " << k_boundary[faceI] << endl;
+                h_value = this->db().objectRegistry::lookupObject<volScalarField>("h").boundaryField()[myinlet][faceI];
+                
+                if(h_value < maximum_ponding){
+                    Info << "Target Darcy flow is " << targetDarcyFlow.value() << endl;
+                    // Info << my_i <<endl;
+                    // my_i++;
+                    // this->refGrad()[faceI] = (targetDarcyFlow.value() - myK[faceI]) / myK[faceI];
+                    this->refGrad()[faceI] = (targetDarcyFlow.value() - k_boundary[faceI]) / k_boundary[faceI];
+
+                    Info << "grad(h) " << this->refGrad()[faceI] << endl;
+                    Info << "Flux is " << k_boundary[faceI] * (this->refGrad()[faceI] + 1) << endl;
+                    Info << "Head value is " << h_value << endl;
+                }
+                else{
+                    this->valueFraction() = 1; //<- fixedValue
+                    this->refValue() = maximum_ponding;
+                }
+            }
+
+        #};
     }
+    
     bottom
     {
         type            fixedGradient;
@@ -49,3 +126,39 @@ boundaryField
 
 
 // ************************************************************************* //
+
+// // Read the hydraulic conductivity field
+            // const fvMesh& mesh = patch().boundaryMesh().mesh();
+            // label myinlet = mesh.boundaryMesh().findPatchID("top");
+
+            // const volScalarField& myK = this->db().objectRegistry::lookupObject<volScalarField>("hydraulicCond");
+            // auto k_boundary = myK.boundaryField()[myinlet];
+            // // Info << "k_boundary" << k_boundary ;
+
+            // // Specify the target Darcy flow velocity
+            // dimensionedScalar targetDarcyFlow 
+            // (
+            //     "targetDarcyFlow",
+            //     dimensionSet(0,1,-1,0,0,0,0),
+            //     scalar(3.32E-6)
+            // );
+
+            // // int my_i = 0;
+            // // Assign the corresponding gradient to each boundary face
+            // forAll(patch(), faceI)
+            // { 
+            //     Info << "Hydraulic conductivity at the patch is " << myK[faceI] << endl;
+            //     Info << "Hydraulic conductivity at the boundary is " << k_boundary[faceI] << endl;
+
+            //     Info << "Target Darcy flow is " << targetDarcyFlow.value() << endl;
+            //     // Info << my_i <<endl;
+            //     // my_i++;
+            //     // this->refGrad()[faceI] = (targetDarcyFlow.value() - myK[faceI]) / myK[faceI];
+            //     this->refGrad()[faceI] = (targetDarcyFlow.value() - k_boundary[faceI]) / k_boundary[faceI];
+
+            //     Info << "grad(h) " << this->refGrad()[faceI] << endl;
+            //     Info << "Flux is " << k_boundary[faceI] * (this->refGrad()[faceI] + 1) << endl;
+            // }
+
+            // //this->refGrad() = Zero;
+            // this->valueFraction() = 0;

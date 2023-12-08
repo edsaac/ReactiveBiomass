@@ -45,7 +45,7 @@ def main(args):
     ):
         schedule = OperationSchedule(
             # dry_minutes=dry, flood_minutes=flood, end_minutes=14_400
-            dry_minutes=dry, flood_minutes=flood, end_minutes=28_800
+            dry_minutes=dry, flood_minutes=flood, end_minutes=33_120 #28_800
         )
         identifier = f"CASES/dry_{dry}__flood_{flood}"
         of = ScheduledOpenFOAM(

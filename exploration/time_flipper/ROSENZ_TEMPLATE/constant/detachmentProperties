@@ -9,48 +9,29 @@ FoamFile
 {
     version     2.0;
     format      ascii;
-    class       volScalarField;
-    object      DOC;
+    class       dictionary;
+    location    "constant";
+    object      detachmentProperties;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// [kg m s K mol * *]
 
-dimensions      [1 -3 0 0 0 0 0];
+attachmentModel constantRate;
 
-internalField   uniform 100.0E-3;
-
-boundaryField
+constantRateCoeffs
 {
-    front
-    {
-        type    empty;
-    }
-
-    back
-    {
-        type    empty;
-    }
-
-    right
-    {
-        type    empty;
-    }
-
-    left
-    {
-        type    empty;
-    }
-
-    top
-    {
-        type               uniformInletOutlet;
-        uniformInletValue  constant 100.0E-3;
-        phi                phi;
-    }
-
-    bottom
-    {
-        type            zeroGradient;
-    }
+    // value   6e-6;
+    value       0;
 }
+
+// attachmentModel rittmannShearPower;
+
+// rittmannShearPowerCoeffs
+// {
+//     collectorSize   2.0E-3;
+//     fluidViscosity  0.0008891;
+//     rittmannCoeff   1E-4;
+//     rittmannExpon   0.52;
+// }
 
 // ************************************************************************* //

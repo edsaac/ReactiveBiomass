@@ -164,7 +164,7 @@ class OpenFOAM:
         return html
 
 
-    def get_value_from_foamDictionary(self, location: str, entry: str):
+    def get_value_from_foamDictionary(self, location: str, entry: str, is_vector: bool = False):
         command = ["foamDictionary", location, "-entry", entry, "-value"]
 
         value = subprocess.run(
@@ -176,7 +176,11 @@ class OpenFOAM:
         )
 
         if value.returncode == 0:
-            return value.stdout.split()[-1].replace(";", "")
+
+            if is_vector:
+                return value.stdout.split("(")[-1].replace(")", "").strip().split()
+            else:
+                return value.stdout.split()[-1].replace(";", "")
 
         else:
             raise ValueError(" ".join(command) + " get returned with error")
@@ -264,6 +268,37 @@ class OpenFOAM:
 
         else:
             self.logger(" ".join(command) + " returned with error")
+
+    @property
+    def list_times(self):
+        """ 
+        Run `foamListTimes` to get the latest time in the simulation.
+
+        Returns
+        -------
+        str
+            Folder name with the latest time
+        """
+
+        command = ["foamListTimes"]
+
+        foamListTimes = subprocess.run(
+            command,
+            cwd=self.path_case,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+        )
+
+        if foamListTimes.returncode == 0:
+            if not foamListTimes.stdout:
+                return "0.000"
+            else:
+                return foamListTimes.stdout.splitlines()
+
+        else:
+            self.logger(" ".join(command) + " returned with error")
+
 
     def set_endtime(self, time_minutes: int) -> None:
         time_sec = str(int(time_minutes * 60))  # OpenFOAM expects seconds

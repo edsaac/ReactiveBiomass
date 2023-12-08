@@ -10,47 +10,44 @@ FoamFile
     version     2.0;
     format      ascii;
     class       volScalarField;
-    object      DOC;
+    location    "0.000";
+    object      Sw;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dimensions      [1 -3 0 0 0 0 0];
+dimensions      [0 0 0 0 0 0 0];
 
-internalField   uniform 100.0E-3;
+internalField   uniform 0.278218;
 
 boundaryField
 {
-    front
-    {
-        type    empty;
-    }
-
-    back
-    {
-        type    empty;
-    }
-
-    right
-    {
-        type    empty;
-    }
-
-    left
-    {
-        type    empty;
-    }
-
     top
     {
-        type               uniformInletOutlet;
-        uniformInletValue  constant 100.0E-3;
-        phi                phi;
+        type            calculated;
+        value           uniform 0.278218;
     }
-
+    left
+    {
+        type            empty;
+    }
+    right
+    {
+        type            empty;
+    }
+    front
+    {
+        type            empty;
+    }
+    back
+    {
+        type            empty;
+    }
     bottom
     {
-        type            zeroGradient;
+        type            calculated;
+        value           uniform 0.278218;
     }
 }
+
 
 // ************************************************************************* //

@@ -76,6 +76,12 @@ def main():
                 numeric = data[1].sel(z=z_probe, method="nearest")
                 sw = numeric["Sw"]
                 n = numeric["porosity"]
+                
+                numeric = data[0].sel(z=z_probe, method="nearest")
+                xi = numeric["XI"]
+                xar = numeric["XAR"]
+                xeps = numeric["EPS"]
+
                 time = numeric.t/86_400
 
                 # tabs = st.tabs([f"θ{i}" for i in range(1,7)])
@@ -104,20 +110,22 @@ def main():
                 # with tab:
                 cols[1].pyplot(fig)
 
-                eff_sw = ((sw*n) + 0.99 * (POROSITY_0 - n))/POROSITY_0
+                # eff_sw = ((sw*n) + 0.99 * (POROSITY_0 - n))/POROSITY_0
+                theta_wb = (sw*n) + 0.99 * (xar+xeps+xi)/rho_x
 
                 fig, ax = plt.subplots()
-                ax.plot(time, eff_sw, label="Numerical")
+                ax.plot(time, theta_wb, label="Numerical")
                 
                 try: 
                     i = z_list.index(z_probe) + 1
-                    ax.plot(t/86_400, θ[f"θ{i}"]/POROSITY_0, label="Lab")
+                    ax.plot(t/86_400, θ[f"θ{i}"], label="Lab")
                 except ValueError:
                     ...
                 ax.set_xlabel("Time [d]")
-                ax.set_ylabel("Water saturation with biomass $S'w$ [(Vw + Vb)/Vv]")
+                ax.set_ylabel("Water content with biomass" + R"$\theta'_{w,b}$ [(Vw + Vb)/Vv]")
                 ax.set_ylim(0,1)
                 ax.set_title(z_probe)
+                ax.legend()
                 # with tab:
                 cols[2].pyplot(fig)
 

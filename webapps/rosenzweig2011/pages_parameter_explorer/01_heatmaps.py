@@ -63,7 +63,7 @@ def main():
         
         for hydrolysis, folder_path in HYDROLYSIS_DICT.items():
             
-            st.title(f"Hydrolysis Rate `{hydrolysis}`")
+            f"### Hydrolysis Rate `{hydrolysis}`"
             
             ## Check CASES folder exists
             cases_folder = Path(f"{folder_path}/CASES_{doc_val}mgDOC")

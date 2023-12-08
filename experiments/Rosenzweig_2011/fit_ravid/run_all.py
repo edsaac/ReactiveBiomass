@@ -4,7 +4,7 @@ import multiprocessing as mp
 import os
 import itertools
 
-all_concentrations = [2, 5, 10, 20, 50]
+all_concentrations = [2, 5, 10, 20, 50, 100, 1000]
 # DOC_CONCENTRATION = 2  #mg/L
 
 for DOC_CONCENTRATION in all_concentrations:

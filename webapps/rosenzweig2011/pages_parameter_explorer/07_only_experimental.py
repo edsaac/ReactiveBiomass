@@ -40,7 +40,7 @@ def main():
 
     ## End of experiment
     with tabs[0]:
-        fig,axs = plt.subplots(1,3, figsize=[10,5], sharey=True, gridspec_kw=dict(wspace=0.1))
+        fig,axs = plt.subplots(1,3, figsize=[10,4], sharey=True, gridspec_kw=dict(wspace=0.1))
         
         ## CFU
         ax=axs[0]
@@ -48,13 +48,13 @@ def main():
             fmt="none",ecolor=linecolors[0], capsize=2)
         ax.plot(cfu["CFU/mL"], cfu["z (m)"],
             marker="o",markersize=5, c=linecolors[0], lw=1, ls="dashed",)
-        ax.set_xscale("log")
-        ax.set_ylim(bottom=0.2)
-        ax.set_xlim(1e7, 1e10)
         ax.set_xlabel("Microbial counts\n[CFU/mL]")    
-        ax.set_ylabel("Depth [m]", fontsize=12)
+        ax.set_ylabel("Elev. $z$ [m]", fontsize=14)
+        ax.set_xlim(5e6, 2e10)
+        ax.set_ylim(bottom=0.2)
+        ax.set_xscale("log")
         ax.xaxis.set_major_locator(LogLocator())
-        ax.xaxis.set_minor_locator(LogLocator(subs="all"))
+        # ax.xaxis.set_minor_locator(LogLocator(subs="all"))
         ax.yaxis.set_major_locator(MaxNLocator(5))
         ax.yaxis.set_minor_locator(MaxNLocator(17))
 
@@ -64,16 +64,16 @@ def main():
             marker="o", markersize=5, c=linecolors[1], lw=1, ls="dashed",)
         ax.set_xscale("log")
         ax.set_xlim(2e-4, 9e-1)
-        ax.set_xlabel("Protein content\n[mg protein/g dry sand]")
+        ax.set_xlabel("Protein content\n[mg/g dry sand]")
     
         ## Water content at the end
         ax=axs[2]
-        ax.plot(theta["θ"]/POROSITY_0, theta["z (m)"], 
+        ax.plot(theta["θ"], theta["z (m)"], 
             marker="o", markersize=5, c=linecolors[2], lw=2, ls="dashed",)
-        ax.set_xlabel("Water saturation\n$S_w$ [Vw/Vv]",)
-        ax.set_xlim(0.1, 1.0)
-        ax.xaxis.set_major_locator(MaxNLocator(5))
-        ax.xaxis.set_minor_locator(MaxNLocator(10))
+        ax.set_xlabel("Water content\n" + R"$\theta_{w,b}$ [Vw+Vwb/Vv]",)
+        ax.set_xlim(0.0, 0.6)
+        ax.xaxis.set_major_locator(MaxNLocator(6))
+        ax.xaxis.set_minor_locator(MaxNLocator(13))
 
         st.pyplot(fig)
     
@@ -87,26 +87,25 @@ def main():
         for i, label in enumerate(labels, start=1):
             ax.plot(
                 tdr["Time (hr)"], 
-                tdr[f"θ{i}"]/POROSITY_0,
+                tdr[f"θ{i}"],
                 marker=".", mec=linecolors[i], ms=3, mfc=linecolors[i], 
                 lw=0.5, ls=":",
             )
             ax.plot(
                 tdr["Time (hr)"], 
-                tdr[f"θ{i}"].rolling(6).mean()/POROSITY_0, 
+                tdr[f"θ{i}"].rolling(6).mean(), 
                 label=f"{label} cm", 
-                c=linecolors[i], lw=3
+                c=linecolors[i], lw=2
             )
         
-        
-        
-        ax.set_ylim(0.2, 0.6)
+        ax.set_ylim(0.0, 0.25)
         ax.set_xlim(left=0)
         ax.set_xlabel("Time [hr]",)
-        ax.set_ylabel("Water saturation\n$S_w$" + R"[$\mathrm{V_w}$/$\mathrm{V_{v0}}$]",)
+        ax.set_ylabel("Water content" + R"  $\theta_{\mathsf{w,b}}$" + "\n[Vw+Vwb/Vv]",)
+        # ax.set_ylabel("Water saturation\n$S_w$" + R"[$\mathrm{V_w}$/$\mathrm{V_{v0}}$]",)
 
-        ax.yaxis.set_major_locator(MaxNLocator(4))
-        ax.yaxis.set_minor_locator(MaxNLocator(17))
+        ax.yaxis.set_major_locator(MaxNLocator(3))
+        ax.yaxis.set_minor_locator(MaxNLocator(6))
         ax.legend(
             title=R"$z$",
             title_fontproperties=dict(size=10, weight=100),

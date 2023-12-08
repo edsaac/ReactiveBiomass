@@ -12,7 +12,7 @@ from pathlib import Path
 st.session_state.cmaps = ["Greens", "Purples", "Greys", "Oranges"]
 st.session_state.linecolors = ["forestgreen", "purple", "grey", "darkorange"]
 
-st.session_state.doc_list = [2, 5, 10, 20, 50]
+st.session_state.doc_list = [2, 5, 10, 20, 50, 100, 1000]
 st.session_state.rho_x_list = [
     1,
     3,
@@ -23,9 +23,14 @@ st.session_state.rho_x_list = [
     1000,
 ]  # <- Values chosen so they are nice powers of 10
 st.session_state.d_growth_list = [0, 1e-11, 1e-10, 1e-9, 1e-8]
+# st.session_state.hydrolysis_dict = dict(
+#     Low="../../experiments/Rosenzweig_2011/fit_ravid/cases_lowHydrol",
+#     High="../../experiments/Rosenzweig_2011/fit_ravid/cases_highHydrol",
+# )
+
 st.session_state.hydrolysis_dict = dict(
-    Low="../../experiments/Rosenzweig_2011/fit_ravid/cases_lowHydrol",
-    High="../../experiments/Rosenzweig_2011/fit_ravid/cases_lowPowerLaw",
+    High = "../../exploration/time_flipper/CASES",
+    Low = "../../experiments/Rosenzweig_2011/fit_ravid/cases_lowHydrol",
 )
 
 st.session_state.experiments_path = Path(
@@ -82,6 +87,9 @@ Unsaturated parameters extracted from Table 4.1. Hydraulic conductivity from Cha
 
 To achieve a flow rate of 1mL/min, $h = -0.432 m$ given free drainage (grad(h) = 0, so grad(h+z) = 1).
 
+#### Carbon removal
+> TOC analyses of the feeding solution and the effluent conducted at the end of the experiment showed 89% and
+> 63% removal of the substrate in the low and high flow rate experiments, respectively.
 """
 
 # if "submitted" not in st.session_state:
